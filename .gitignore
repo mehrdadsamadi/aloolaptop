@@ -1,0 +1,62 @@
+# ======================
+# Node Modules
+# ======================
+node_modules/
+frontend/node_modules/
+backend/node_modules/
+
+# ======================
+# Build / Dist / Output
+# ======================
+dist/
+build/
+frontend/.next/
+frontend/out/
+frontend/.next/cache/
+frontend/.next/standalone/
+frontend/.next/static/
+backend/dist/
+
+# ======================
+# Environment Files
+# ======================
+.env
+.env.*.local
+frontend/.env*
+backend/.env*
+*.local
+
+# ======================
+# Logs
+# ======================
+logs/
+*.log
+*.log.*
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# ======================
+# Temporary / Cache
+# ======================
+tmp/
+temp/
+.cache/
+out/
+
+# ======================
+# OS / Editor
+# ======================
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# ======================
+# Misc
+# ======================
+coverage/
+*.tsbuildinfo
