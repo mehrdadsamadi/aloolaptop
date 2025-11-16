@@ -12,6 +12,7 @@ import { JwtService } from '@nestjs/jwt';
 import { randomInt } from 'crypto';
 import { ConfigService } from '@nestjs/config';
 import { AuthMessage } from '../../common/enums/message.enum';
+import axios from 'axios';
 
 interface TokensPayload {
   userId: string;
@@ -38,11 +39,47 @@ export class AuthService {
       });
     }
 
-    await this.createOtp(user);
+    const otp = await this.createOtp(user);
 
-    return {
-      message: AuthMessage.SendOtp(mobile),
-    };
+    const url = 'https://api.sms.ir/v1/send/verify';
+    const apiKey = this.configService.get<string>('SMS_API_KEY'); // API key را در env قرار بده
+    const templateId = this.configService.get<string>('SMS_TEMPLATE_ID'); // Template ID از env
+
+    try {
+      const response = await axios.post(
+        url,
+        {
+          mobile,
+          templateId,
+          parameters: [
+            {
+              name: 'CODE',
+              value: otp.code,
+            },
+          ],
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'text/plain',
+            'x-api-key': apiKey,
+          },
+        },
+      );
+
+      // بررسی پاسخ
+      const data = response.data as { status: number };
+      if (data.status !== 1) {
+        throw new BadRequestException(AuthMessage.SendSmsFailed);
+      }
+
+      return {
+        message: AuthMessage.SendOtp(mobile),
+      };
+    } catch (error) {
+      console.error('SMS send error:', error);
+      throw new BadRequestException(AuthMessage.SendSmsFailed);
+    }
   }
 
   async checkOtp(otpDto: CheckOtpDto) {
