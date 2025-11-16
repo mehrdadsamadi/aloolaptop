@@ -1,7 +1,6 @@
 import {
   CanActivate,
   ExecutionContext,
-  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -11,7 +10,7 @@ import { isJWT } from 'class-validator';
 import { AuthService } from '../auth.service';
 import { Reflector } from '@nestjs/core';
 import { SKIP_AUTH } from '../../../common/decorators/skip-auth.decorator';
-import { UserStatus } from '../../user/enum/status.enum';
+import { IUserRequestType } from '../../user/types/request.type';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -32,17 +31,21 @@ export class AuthGuard implements CanActivate {
 
     const token = this.extractToken(request);
 
-    request.user = await this.authService.validateAccessToken(token);
+    const user = await this.authService.validateAccessToken(token);
 
-    if (request?.user?.status === UserStatus.BLOCK) {
-      throw new ForbiddenException(AuthMessage.Blocked);
-    }
+    request.user = {
+      _id: user._id,
+      role: user.role,
+      mobile: user.mobile,
+      mobileVerified: user.mobileVerified,
+    } as IUserRequestType;
 
     return true;
   }
 
   protected extractToken(request: Request) {
     const { authorization } = request.headers;
+
     if (!authorization || authorization.trim() === '') {
       throw new UnauthorizedException(AuthMessage.RequiredLogin);
     }
