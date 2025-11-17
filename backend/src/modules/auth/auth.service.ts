@@ -149,7 +149,7 @@ export class AuthService {
       // از دیتابیس کاربر را بگیر (در صورت نیاز می‌تونی چک‌های اضافی مثل blocked/disabled بذاری)
       const user = await this.userModel.findById(payload.userId);
       if (!user) {
-        throw new UnauthorizedException(UserMessage.NotfoundUser);
+        throw new UnauthorizedException(UserMessage.Notfound);
       }
 
       // (اختیاری) اگر می‌خوای مطمئن بشی موبایل واریفاید شده:
@@ -210,7 +210,7 @@ export class AuthService {
       }
 
       const user = await this.userModel.findById(payload.userId);
-      if (!user) throw new UnauthorizedException(UserMessage.NotfoundUser);
+      if (!user) throw new UnauthorizedException(UserMessage.Notfound);
 
       return user;
     } catch {

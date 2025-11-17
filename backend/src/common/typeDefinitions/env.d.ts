@@ -12,5 +12,10 @@ declare namespace NodeJS {
 
     SMS_API_KEY: string;
     SMS_TEMPLATE_ID: string;
+
+    S3_ACCESS_KEY: string;
+    S3_SECRET_KEY: string;
+    S3_BUCKET_NAME: string;
+    S3_ENDPOINT: string;
   }
 }

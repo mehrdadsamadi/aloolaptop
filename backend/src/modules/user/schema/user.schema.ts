@@ -3,7 +3,7 @@ import { HydratedDocument, Types } from 'mongoose';
 import { OtpDocument } from './otp.schema';
 import { Roles } from '../../../common/enums/role.enum';
 
-@Schema({ versionKey: false })
+@Schema({ versionKey: false, timestamps: true })
 export class User {
   @Prop({})
   firstName?: string;
@@ -30,6 +30,10 @@ export type UserDocument = HydratedDocument<User> & {
 };
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.index({ mobile: 1 }, { unique: true });
+UserSchema.index({ role: 1 });
+UserSchema.index({ mobileVerified: 1 });
 
 /**
  * --- تنظیم virtual populate ---

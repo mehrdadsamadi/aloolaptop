@@ -8,6 +8,7 @@ import { Reflector } from '@nestjs/core';
 import { Roles } from '../../../common/enums/role.enum';
 import { Request } from 'express';
 import { ROLES_KEY } from '../../../common/decorators/role.decorator';
+import { ExceptionMessage } from '../../../common/enums/message.enum';
 
 @Injectable()
 export class RoleGuard implements CanActivate {
@@ -28,6 +29,6 @@ export class RoleGuard implements CanActivate {
     if (userRole === Roles.ADMIN) return true;
     if (requiredRoles.includes(userRole)) return true;
 
-    throw new ForbiddenException();
+    throw new ForbiddenException(ExceptionMessage.Forbidden);
   }
 }

@@ -4,9 +4,10 @@ import { APP_GUARD } from '@nestjs/core';
 import { ConfigsModule } from '../configs/configs.module';
 import { AuthModule } from '../auth/auth.module';
 import { UserModule } from '../user/user.module';
+import { CategoryModule } from '../category/category.module';
 
 @Module({
-  imports: [ConfigsModule, AuthModule, UserModule],
+  imports: [ConfigsModule, AuthModule, UserModule, CategoryModule],
   controllers: [],
   providers: [
     {

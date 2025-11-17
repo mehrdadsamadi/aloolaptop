@@ -2,13 +2,13 @@ export const AuthMessage = {
   // =========================
   // Login / Authentication
   // =========================
-  RequiredLogin: 'وارد حساب کاربری خود شوید.',
+  RequiredLogin: 'وارد حساب کاربری خود شوید',
 
   // =========================
   // Mobile / User
   // =========================
   InvalidMobile: 'شماره موبایل معتبر نمیباشد',
-  NotfoundMobile: 'کاربری با این شماره موبایل یافت نشد.',
+  NotfoundMobile: 'کاربری با این شماره موبایل یافت نشد',
 
   // =========================
   // Token / Auth
@@ -18,18 +18,28 @@ export const AuthMessage = {
   // =========================
   // OTP
   // =========================
-  SendSmsFailed: 'ارسال پیامک با خطا مواجه شد.',
+  SendSmsFailed: 'ارسال پیامک با خطا مواجه شد',
   InvalidOtpCode: 'کد وارد شده باید ۵ عدد باشد',
-  ExpireOtpCode: 'کد منقضی شده است.',
-  NotExpireOtpCode: 'کد قبلی هنوز منقضی نشده است.',
-  NotEqualOtpCode: 'کد معتبر نمیباشد.',
+  ExpireOtpCode: 'کد منقضی شده است',
+  NotExpireOtpCode: 'کد قبلی هنوز منقضی نشده است',
+  NotEqualOtpCode: 'کد معتبر نمیباشد',
 
   // =========================
   // Dynamic Messages
   // =========================
-  SendOtp: (mobile: string) => `کد برای شماره موبایل ${mobile} ارسال شد.`,
+  SendOtp: (mobile: string) => `کد برای شماره موبایل ${mobile} ارسال شد`,
 } as const;
 
 export const UserMessage = {
-  NotfoundUser: 'کاربری یافت نشد.',
+  Notfound: 'کاربری یافت نشد',
+} as const;
+
+export const ExceptionMessage = {
+  Forbidden: 'دسترسی ممنوع',
+  InvalidId: 'آیدی معتبر نمیباشد',
+} as const;
+
+export const CategoryMessage = {
+  Created: 'دسته بندی با موفقیت ایجاد شد',
+  Notfound: 'دسته بندی یافت نشد',
 } as const;
