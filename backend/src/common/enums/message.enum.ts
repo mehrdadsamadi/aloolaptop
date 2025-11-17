@@ -11,6 +11,11 @@ export const AuthMessage = {
   NotfoundMobile: 'کاربری با این شماره موبایل یافت نشد.',
 
   // =========================
+  // Token / Auth
+  // =========================
+  InvalidRefreshToken: 'توکن معتبر نمیباشد',
+
+  // =========================
   // OTP
   // =========================
   SendSmsFailed: 'ارسال پیامک با خطا مواجه شد.',
@@ -23,4 +28,8 @@ export const AuthMessage = {
   // Dynamic Messages
   // =========================
   SendOtp: (mobile: string) => `کد برای شماره موبایل ${mobile} ارسال شد.`,
+} as const;
+
+export const UserMessage = {
+  NotfoundUser: 'کاربری یافت نشد.',
 } as const;

@@ -11,7 +11,7 @@ import { CheckOtpDto, SendOtpDto } from './dto/otp.dto';
 import { JwtService } from '@nestjs/jwt';
 import { randomInt } from 'crypto';
 import { ConfigService } from '@nestjs/config';
-import { AuthMessage } from '../../common/enums/message.enum';
+import { AuthMessage, UserMessage } from '../../common/enums/message.enum';
 import axios from 'axios';
 
 interface TokensPayload {
@@ -41,11 +41,19 @@ export class AuthService {
 
     const otp = await this.createOtp(user);
 
-    const url = 'https://api.sms.ir/v1/send/verify';
-    const apiKey = this.configService.get<string>('SMS_API_KEY'); // API key را در env قرار بده
-    const templateId = this.configService.get<string>('SMS_TEMPLATE_ID'); // Template ID از env
+    await this.sendSms(mobile, otp.code);
 
+    return {
+      message: AuthMessage.SendOtp(mobile),
+    };
+  }
+
+  async sendSms(mobile: string, code: string) {
     try {
+      const url = 'https://api.sms.ir/v1/send/verify';
+      const apiKey = this.configService.get<string>('SMS_API_KEY'); // API key را در env قرار بده
+      const templateId = this.configService.get<string>('SMS_TEMPLATE_ID'); // Template ID از env
+
       const response = await axios.post(
         url,
         {
@@ -54,7 +62,7 @@ export class AuthService {
           parameters: [
             {
               name: 'CODE',
-              value: otp.code,
+              value: code,
             },
           ],
         },
@@ -72,10 +80,6 @@ export class AuthService {
       if (data.status !== 1) {
         throw new BadRequestException(AuthMessage.SendSmsFailed);
       }
-
-      return {
-        message: AuthMessage.SendOtp(mobile),
-      };
     } catch (error) {
       console.error('SMS send error:', error);
       throw new BadRequestException(AuthMessage.SendSmsFailed);
@@ -130,6 +134,37 @@ export class AuthService {
     };
   }
 
+  async refreshTokens(refreshToken: string) {
+    try {
+      // ابتدا token را با SECRET مخصوص refresh اعتبارسنجی کن
+      const payload = this.jwtService.verify<TokensPayload>(refreshToken, {
+        secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
+      });
+
+      // چک کن payload درست و شامل userId باشه
+      if (!payload || typeof payload !== 'object' || !payload.userId) {
+        throw new UnauthorizedException(AuthMessage.InvalidRefreshToken);
+      }
+
+      // از دیتابیس کاربر را بگیر (در صورت نیاز می‌تونی چک‌های اضافی مثل blocked/disabled بذاری)
+      const user = await this.userModel.findById(payload.userId);
+      if (!user) {
+        throw new UnauthorizedException(UserMessage.NotfoundUser);
+      }
+
+      // (اختیاری) اگر می‌خوای مطمئن بشی موبایل واریفاید شده:
+      // if (!user.mobileVerified) throw new UnauthorizedException(AuthMessage.RequiredLogin);
+
+      // تولید توکن‌های جدید
+      return this.generateJwtTokens({
+        userId: String(user._id),
+        mobile: user.mobile,
+      });
+    } catch (error) {
+      throw new UnauthorizedException(AuthMessage.InvalidRefreshToken);
+    }
+  }
+
   async createOtp(user: UserDocument) {
     const expiresIn = new Date(new Date().getTime() + 1000 * 60 * 2); // 2 دقیقه
     const code = randomInt(10000, 100000).toString(); // عدد 5 رقمی
@@ -175,7 +210,7 @@ export class AuthService {
       }
 
       const user = await this.userModel.findById(payload.userId);
-      if (!user) throw new UnauthorizedException(AuthMessage.RequiredLogin);
+      if (!user) throw new UnauthorizedException(UserMessage.NotfoundUser);
 
       return user;
     } catch {
@@ -186,12 +221,12 @@ export class AuthService {
   generateJwtTokens(payload: TokensPayload) {
     const accessToken = this.jwtService.sign(payload, {
       secret: this.configService.get<string>('ACCESS_TOKEN_SECRET'),
-      expiresIn: '30d',
+      expiresIn: '1h',
     });
 
     const refreshToken = this.jwtService.sign(payload, {
       secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
-      expiresIn: '1y',
+      expiresIn: '1w',
     });
 
     return { accessToken, refreshToken };
