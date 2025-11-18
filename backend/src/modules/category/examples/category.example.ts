@@ -16,9 +16,10 @@ export const EXAMPLE_CATEGORY = {
   ],
   isActive: true,
   order: 1,
-  image:
-    'https://storage.c2.liara.space/aloolaptop/category%2F1763379020568.jpg',
-  imageKey: 'category/1763379020568.jpg',
+  image: {
+    url: 'https://storage.c2.liara.space/aloolaptop/category%2F1763379020568.jpg',
+    ket: 'category/1763379020568.jpg',
+  },
   meta: {
     title: 'لپتاپ',
     description: 'خرید لپتاپ',

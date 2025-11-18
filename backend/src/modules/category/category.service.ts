@@ -70,8 +70,7 @@ export class CategoryService {
       isActive,
       order,
       description,
-      image: url,
-      imageKey: key,
+      image: { url, key },
       attributes,
     });
 
@@ -155,11 +154,12 @@ export class CategoryService {
       const { url, key } = await this.s3Service.uploadFile(image, 'category');
 
       if (url) {
-        if (category?.imageKey)
-          await this.s3Service.deleteFile(category?.imageKey);
+        if (category?.image) {
+          await this.s3Service.deleteFile(category?.image?.key);
 
-        category.image = url;
-        category.imageKey = key;
+          category.image.url = url;
+          category.image.key = key;
+        }
       }
     }
 
@@ -172,8 +172,10 @@ export class CategoryService {
           slug,
           attributes,
           description,
-          image: category?.image,
-          imageKey: category?.imageKey,
+          image: {
+            url: category?.image?.url,
+            key: category?.image?.key,
+          },
           order,
           parentId,
           isActive,
@@ -217,7 +219,7 @@ export class CategoryService {
       .lean();
 
     const map = new Map<string, any>();
-    const roots: any[] = [];
+    const roots: CategoryDocument[] = [];
 
     for (const c of cats) {
       map.set(String(c._id), { ...c, children: [] });

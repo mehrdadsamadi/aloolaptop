@@ -1,6 +1,7 @@
 import { HydratedDocument, Types } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { AttributeType } from '../enum/attribute-type.enum';
+import { AttributeType } from '../enums/attribute-type.enum';
+import { ImageDto } from '../../../common/dtos/image.dto';
 
 export class CategoryAttribute {
   @Prop({ required: true }) key: string;
@@ -34,11 +35,14 @@ export class Category {
   @Prop({ default: 0 })
   order: number;
 
-  @Prop()
-  image?: string;
-
-  @Prop()
-  imageKey?: string;
+  @Prop({
+    type: {
+      url: String,
+      key: String,
+    },
+    default: null,
+  })
+  image?: ImageDto;
 
   @Prop({ type: Object, default: {} })
   meta?: { title?: string; description?: string; keywords?: string[] };

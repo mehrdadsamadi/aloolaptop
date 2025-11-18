@@ -1,6 +1,7 @@
 import {
   IsArray,
   IsBoolean,
+  IsEnum,
   IsMongoId,
   IsNumber,
   IsOptional,
@@ -8,7 +9,7 @@ import {
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { AttributeType } from '../enum/attribute-type.enum';
+import { AttributeType } from '../enums/attribute-type.enum';
 
 class AttributeDto {
   @ApiProperty({ example: 'ram' }) @IsString() key: string;
@@ -21,11 +22,11 @@ class AttributeDto {
   @ApiPropertyOptional({
     enum: AttributeType,
     default: AttributeType.SELECT,
-    example: 'select',
+    example: AttributeType.SELECT,
     description: 'string | number | select | boolean | range',
   })
   @IsOptional()
-  @IsString()
+  @IsEnum(AttributeType)
   type?: AttributeType;
 
   @ApiPropertyOptional({ example: ['4GB', '8GB', '16GB'] })
@@ -97,7 +98,6 @@ export class CreateCategoryDto {
 
   @ApiPropertyOptional({
     format: 'binary',
-    example: '/uploads/category/laptop.png',
   })
   @IsOptional()
   @IsString()
