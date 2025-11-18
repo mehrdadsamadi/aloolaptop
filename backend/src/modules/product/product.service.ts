@@ -118,7 +118,6 @@ export class ProductService {
     filter?: FilterProductDto;
     paginationDto: PaginationDto;
   }) {
-    // paginationSolver should return { page, limit, skip }
     const { page, limit, skip } = paginationSolver(paginationDto);
 
     const finalFilter = { ...filter };
@@ -152,7 +151,7 @@ export class ProductService {
     updateDto: UpdateProductDto,
     imageFiles?: Express.Multer.File[],
   ) {
-    const product = await this.findById(id);
+    await this.findById(id);
 
     let {
       slug,

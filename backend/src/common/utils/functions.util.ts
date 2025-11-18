@@ -11,7 +11,18 @@ export const makeSlug = (name: string, provided?: string) => {
 export const parseAttributes = (maybe: any) => {
   if (!maybe) return [];
 
-  if (Array.isArray(maybe)) return maybe;
+  if (Array.isArray(maybe)) {
+    return maybe.map((item) => {
+      if (typeof item === 'string') {
+        try {
+          return JSON.parse(item);
+        } catch {
+          return item;
+        }
+      }
+      return item;
+    });
+  }
 
   if (typeof maybe === 'string') {
     try {

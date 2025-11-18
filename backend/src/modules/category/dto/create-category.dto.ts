@@ -10,6 +10,7 @@ import {
 import { Transform, Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { AttributeType } from '../enums/attribute-type.enum';
+import { parseAttributes } from '../../../common/utils/functions.util';
 
 class AttributeDto {
   @ApiProperty({ example: 'ram' }) @IsString() key: string;
@@ -80,7 +81,7 @@ export class CreateCategoryDto {
   @IsArray()
   @Type(() => AttributeDto)
   @Transform(({ value }) =>
-    typeof value === 'string' ? JSON.parse(value) : value,
+    typeof value === 'string' ? parseAttributes(value) : value,
   )
   attributes?: AttributeDto[];
 
@@ -96,9 +97,8 @@ export class CreateCategoryDto {
   @Type(() => Number)
   order?: number;
 
-  @ApiProperty({
-    format: 'binary',
-  })
+  @ApiPropertyOptional({ format: 'binary' })
+  @IsOptional()
   @IsString()
-  image: string;
+  image?: string;
 }
