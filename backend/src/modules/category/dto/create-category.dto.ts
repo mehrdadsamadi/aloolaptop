@@ -8,6 +8,7 @@ import {
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { AttributeType } from '../enum/attribute-type.enum';
 
 class AttributeDto {
   @ApiProperty({ example: 'ram' }) @IsString() key: string;
@@ -18,12 +19,14 @@ class AttributeDto {
   label?: string;
 
   @ApiPropertyOptional({
+    enum: AttributeType,
+    default: AttributeType.SELECT,
     example: 'select',
     description: 'string | number | select | boolean | range',
   })
   @IsOptional()
   @IsString()
-  type?: 'string' | 'number' | 'select' | 'boolean' | 'range';
+  type?: AttributeType;
 
   @ApiPropertyOptional({ example: ['4GB', '8GB', '16GB'] })
   @IsOptional()

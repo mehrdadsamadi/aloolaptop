@@ -9,6 +9,7 @@ import {
   ParseFilePipe,
   Patch,
   Post,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -23,6 +24,8 @@ import { Roles } from '../../common/enums/role.enum';
 import { SwaggerConsumes } from '../../common/enums/swagger-consumes.enum';
 import { EXAMPLE_CATEGORY } from './examples/category.example';
 import { UploadFileS3 } from '../../common/interceptors/upload-file.interceptor';
+import { Pagination } from '../../common/decorators/pagination.decorator';
+import { PaginationDto } from '../../common/dtos/pagination.dto';
 
 @Controller('categories')
 @ApiTags('Categories')
@@ -36,24 +39,26 @@ export class CategoryController {
   @ApiConsumes(SwaggerConsumes.Multipart)
   @UseInterceptors(UploadFileS3('image'))
   create(
+    @Body() createCategoryDto: CreateCategoryDto,
     @UploadedFile(
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 10 }),
           new FileTypeValidator({ fileType: 'image/(png|jpeg|jpg|webp)' }),
         ],
+        fileIsRequired: false,
       }),
     )
     image: Express.Multer.File,
-    @Body() createCategoryDto: CreateCategoryDto,
   ) {
     return this.categoryService.create(createCategoryDto, image);
   }
 
   @Get()
   @CanAccess(Roles.ADMIN)
-  findAll() {
-    return this.categoryService.findAll();
+  @Pagination()
+  findAll(@Query() paginationDto: PaginationDto) {
+    return this.categoryService.findAll({ paginationDto });
   }
 
   @Get('tree')
@@ -63,9 +68,15 @@ export class CategoryController {
   }
 
   @Get(':id')
-  @SkipAuth()
+  @CanAccess(Roles.ADMIN)
   findOne(@Param('id') id: string) {
     return this.categoryService.findById(id);
+  }
+
+  @Get(':id/visitor')
+  @SkipAuth()
+  findOneVisitor(@Param('id') id: string) {
+    return this.categoryService.findByIdVisitor(id);
   }
 
   @Patch(':id')
@@ -75,16 +86,17 @@ export class CategoryController {
   @UseInterceptors(UploadFileS3('image'))
   update(
     @Param('id') id: string,
+    @Body() updateCategoryDto: UpdateCategoryDto,
     @UploadedFile(
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 10 }),
           new FileTypeValidator({ fileType: 'image/(png|jpeg|jpg|webp)' }),
         ],
+        fileIsRequired: false,
       }),
     )
     image: Express.Multer.File,
-    @Body() updateCategoryDto: UpdateCategoryDto,
   ) {
     return this.categoryService.update(id, updateCategoryDto, image);
   }

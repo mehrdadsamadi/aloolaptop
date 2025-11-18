@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import slugify from 'slugify';
 import { Category, CategoryDocument } from './schema/category.schema';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -15,6 +15,12 @@ import {
   ExceptionMessage,
 } from '../../common/enums/message.enum';
 import { S3Service } from '../common/s3/s3.service';
+import { PaginationDto } from '../../common/dtos/pagination.dto';
+import {
+  paginationGenerator,
+  paginationSolver,
+} from '../../common/utils/pagination.util';
+import { isValidObjectId } from '../../common/utils/functions.util';
 
 @Injectable()
 export class CategoryService {
@@ -38,6 +44,14 @@ export class CategoryService {
       description,
       attributes,
     } = createCategoryDto;
+
+    if (parentId) {
+      if (!isValidObjectId(parentId))
+        throw new BadRequestException(CategoryMessage.InvalidParentId);
+
+      const parent = await this.categoryModel.findById(parentId);
+      if (!parent) throw new NotFoundException(CategoryMessage.NotfoundParent);
+    }
 
     const { url, key } = await this.s3Service.uploadFile(image, 'category');
 
@@ -67,18 +81,51 @@ export class CategoryService {
     };
   }
 
-  async findAll({ activeOnly = true } = {}) {
-    const filter: any = {};
+  async findAll({
+    activeOnly = true,
+    paginationDto,
+  }: {
+    activeOnly?: boolean;
+    paginationDto: PaginationDto;
+  }) {
+    const { page, limit, skip } = paginationSolver(paginationDto);
+
+    const filter: CategoryDocument | { isActive?: boolean } = {};
     if (activeOnly) filter.isActive = true;
 
-    return this.categoryModel.find(filter).sort({ order: 1, name: 1 }).lean();
+    // 1) تعداد کلی مطابق فیلتر
+    const count = await this.categoryModel.countDocuments(filter);
+
+    // 2) گرفتن صفحه مورد نظر با skip/limit و مرتب‌سازی
+    const categories = await this.categoryModel
+      .find(filter)
+      .sort({ order: 1, name: 1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    // 3) برگردوندن لیست و اطلاعات pagination
+    return {
+      categories,
+      pagination: paginationGenerator(count, page, limit),
+    };
   }
 
   async findById(id: string) {
-    if (!Types.ObjectId.isValid(id))
+    if (!isValidObjectId(id))
       throw new BadRequestException(ExceptionMessage.InvalidId);
 
     const c = await this.categoryModel.findById(id);
+    if (!c) throw new NotFoundException(CategoryMessage.Notfound);
+
+    return c;
+  }
+
+  async findByIdVisitor(id: string) {
+    if (!isValidObjectId(id))
+      throw new BadRequestException(ExceptionMessage.InvalidId);
+
+    const c = await this.categoryModel.findOne({ _id: id, isActive: true });
     if (!c) throw new NotFoundException(CategoryMessage.Notfound);
 
     return c;
@@ -92,7 +139,17 @@ export class CategoryService {
     let { name, slug, attributes, description, order, parentId, isActive } =
       updateCategoryDto;
 
+    if (!isValidObjectId(id))
+      throw new BadRequestException(ExceptionMessage.InvalidId);
     const category = await this.findById(id);
+
+    if (parentId) {
+      if (!isValidObjectId(parentId))
+        throw new BadRequestException(CategoryMessage.InvalidParentId);
+
+      const parent = await this.categoryModel.findById(parentId);
+      if (!parent) throw new NotFoundException(CategoryMessage.NotfoundParent);
+    }
 
     if (image) {
       const { url, key } = await this.s3Service.uploadFile(image, 'category');
@@ -128,11 +185,17 @@ export class CategoryService {
     );
     if (!updated) throw new NotFoundException(CategoryMessage.Notfound);
 
-    return updated;
+    return {
+      message: CategoryMessage.Updated,
+      category: updated,
+    };
   }
 
   async remove(id: string) {
     // soft delete preferred: set isActive=false
+    if (!isValidObjectId(id))
+      throw new BadRequestException(ExceptionMessage.InvalidId);
+
     const deleted = await this.categoryModel.findByIdAndUpdate(
       id,
       { isActive: false },
@@ -140,13 +203,16 @@ export class CategoryService {
     );
     if (!deleted) throw new NotFoundException(CategoryMessage.Notfound);
 
-    return deleted;
+    return {
+      message: CategoryMessage.Deleted,
+      category: deleted,
+    };
   }
 
   // Return categories as a tree array
   async getTree() {
     const cats = await this.categoryModel
-      .find({})
+      .find({ isActive: true })
       .sort({ order: 1, name: 1 })
       .lean();
 

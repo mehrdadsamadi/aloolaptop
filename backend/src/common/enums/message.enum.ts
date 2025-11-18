@@ -41,5 +41,9 @@ export const ExceptionMessage = {
 
 export const CategoryMessage = {
   Created: 'دسته بندی با موفقیت ایجاد شد',
+  Updated: 'دسته بندی با موفقیت ویرایش شد',
+  Deleted: 'دسته بندی با موفقیت غیر فعال شد',
   Notfound: 'دسته بندی یافت نشد',
+  NotfoundParent: 'دسته بندی والد یافت نشد',
+  InvalidParentId: 'ایدی دسته بندی والد معتبر نمیباشد',
 } as const;

@@ -1,7 +1,7 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiQuery } from '@nestjs/swagger';
 
-export function Pagination(page: number = 1, limit: number = 10) {
+export function Pagination(page: number = 1, limit: number = 20) {
   return applyDecorators(
     ApiQuery({ name: 'page', example: page, required: false, type: 'integer' }),
     ApiQuery({
