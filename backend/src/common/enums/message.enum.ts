@@ -36,7 +36,9 @@ export const UserMessage = {
 
 export const ExceptionMessage = {
   Forbidden: 'دسترسی ممنوع',
+  Server: 'خطایی رخ داده است، باردیگر تلاش کنید',
   InvalidId: 'آیدی معتبر نمیباشد',
+  UnUniqueSlug: 'این اسلاگ قبلا ثبت شده است',
 } as const;
 
 export const CategoryMessage = {
@@ -45,5 +47,15 @@ export const CategoryMessage = {
   Deleted: 'دسته بندی با موفقیت غیر فعال شد',
   Notfound: 'دسته بندی یافت نشد',
   NotfoundParent: 'دسته بندی والد یافت نشد',
+  InvalidId: 'ایدی دسته بندی معتبر نمیباشد',
   InvalidParentId: 'ایدی دسته بندی والد معتبر نمیباشد',
+} as const;
+
+export const ProductMessage = {
+  Created: 'محصول با موفقیت ایجاد شد',
+  Updated: 'محصول با موفقیت ویرایش شد',
+  Deleted: 'محصول با موفقیت حذف شد',
+  Notfound: 'محصول یافت نشد',
+  ImageNotfound: 'تصویر محصول یافت نشد',
+  DeleteImage: 'تصویر محصول با موفقیت حذف شد',
 } as const;

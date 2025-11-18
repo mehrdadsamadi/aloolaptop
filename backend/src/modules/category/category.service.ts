@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import slugify from 'slugify';
 import { Category, CategoryDocument } from './schema/category.schema';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -20,7 +19,11 @@ import {
   paginationGenerator,
   paginationSolver,
 } from '../../common/utils/pagination.util';
-import { isValidObjectId } from '../../common/utils/functions.util';
+import {
+  isValidObjectId,
+  makeSlug,
+  parseAttributes,
+} from '../../common/utils/functions.util';
 
 @Injectable()
 export class CategoryService {
@@ -42,26 +45,29 @@ export class CategoryService {
       isActive,
       order,
       description,
-      attributes,
+      attributes: CAttributes,
     } = createCategoryDto;
 
     if (parentId) {
       if (!isValidObjectId(parentId))
         throw new BadRequestException(CategoryMessage.InvalidParentId);
 
-      const parent = await this.categoryModel.findById(parentId);
+      const parent = await this.findByIdVisitor(parentId);
       if (!parent) throw new NotFoundException(CategoryMessage.NotfoundParent);
     }
 
     const { url, key } = await this.s3Service.uploadFile(image, 'category');
 
-    const slug = this.makeSlug(name, CSlug);
+    const slug = makeSlug(name, CSlug);
     // ensure unique slug (append number if needed)
     let uniqueSlug = slug;
     let i = 1;
     while (await this.categoryModel.findOne({ slug: uniqueSlug })) {
       uniqueSlug = `${slug}-${i++}`;
     }
+
+    // parse attributes if sent as string
+    const attributes = parseAttributes(CAttributes);
 
     const category = await this.categoryModel.create({
       name,
@@ -146,7 +152,7 @@ export class CategoryService {
       if (!isValidObjectId(parentId))
         throw new BadRequestException(CategoryMessage.InvalidParentId);
 
-      const parent = await this.categoryModel.findById(parentId);
+      const parent = await this.findByIdVisitor(parentId);
       if (!parent) throw new NotFoundException(CategoryMessage.NotfoundParent);
     }
 
@@ -163,7 +169,7 @@ export class CategoryService {
       }
     }
 
-    if (slug) slug = this.makeSlug(slug);
+    if (slug) slug = makeSlug(slug);
     const updated = await this.categoryModel.findByIdAndUpdate(
       id,
       {
@@ -234,10 +240,5 @@ export class CategoryService {
     }
 
     return roots;
-  }
-
-  private makeSlug(name: string, provided?: string) {
-    const base = provided?.trim() || name;
-    return slugify(base, { lower: true, strict: true });
   }
 }

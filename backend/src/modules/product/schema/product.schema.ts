@@ -2,6 +2,10 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { ProductCondition } from '../enums/product-condition.enum';
 import { ProductGrade } from '../enums/product-grade.enum';
+import {
+  ImageSchema,
+  ImageSubSchema,
+} from '../../../common/schemas/image.schema';
 
 @Schema({ timestamps: true, versionKey: false })
 export class Product {
@@ -41,15 +45,10 @@ export class Product {
   attributes: { key: string; value: string; label?: string }[];
 
   @Prop({
-    type: [
-      {
-        url: String,
-        key: String,
-      },
-    ],
+    type: [ImageSubSchema],
     default: [],
   })
-  images: { url: string; key: string }[];
+  images: ImageSchema[];
 
   @Prop({ default: true })
   isActive: boolean;

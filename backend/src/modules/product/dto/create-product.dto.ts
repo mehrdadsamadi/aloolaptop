@@ -13,7 +13,6 @@ import { Transform, Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ProductCondition } from '../enums/product-condition.enum';
 import { ProductGrade } from '../enums/product-grade.enum';
-import { ImageDto } from '../../../common/dtos/image.dto';
 
 class AttributeDto {
   @ApiProperty({ example: 'ram' }) @IsString() key: string;
@@ -75,10 +74,9 @@ export class CreateProductDto {
   )
   attributes?: AttributeDto[];
 
-  @ApiPropertyOptional({ format: 'binary' })
-  @IsOptional()
+  @ApiProperty({ format: 'binary' })
   @IsArray()
-  images?: ImageDto[];
+  images: string[];
 
   @ApiPropertyOptional({ example: true })
   @IsOptional()

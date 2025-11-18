@@ -5,9 +5,16 @@ import { ConfigsModule } from '../configs/configs.module';
 import { AuthModule } from '../auth/auth.module';
 import { UserModule } from '../user/user.module';
 import { CategoryModule } from '../category/category.module';
+import { ProductModule } from '../product/product.module';
 
 @Module({
-  imports: [ConfigsModule, AuthModule, UserModule, CategoryModule],
+  imports: [
+    ConfigsModule,
+    AuthModule,
+    UserModule,
+    CategoryModule,
+    ProductModule,
+  ],
   controllers: [],
   providers: [
     {

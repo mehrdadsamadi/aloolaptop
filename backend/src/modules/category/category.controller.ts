@@ -46,7 +46,6 @@ export class CategoryController {
           new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 10 }),
           new FileTypeValidator({ fileType: 'image/(png|jpeg|jpg|webp)' }),
         ],
-        fileIsRequired: false,
       }),
     )
     image: Express.Multer.File,

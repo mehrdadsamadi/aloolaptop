@@ -96,10 +96,9 @@ export class CreateCategoryDto {
   @Type(() => Number)
   order?: number;
 
-  @ApiPropertyOptional({
+  @ApiProperty({
     format: 'binary',
   })
-  @IsOptional()
   @IsString()
-  image?: string;
+  image: string;
 }

@@ -15,5 +15,6 @@ import { S3Service } from '../common/s3/s3.service';
   ],
   controllers: [CategoryController],
   providers: [CategoryService, S3Service],
+  exports: [CategoryService, S3Service, AuthModule, MongooseModule],
 })
 export class CategoryModule {}
