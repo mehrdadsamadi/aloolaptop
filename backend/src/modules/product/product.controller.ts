@@ -20,11 +20,11 @@ import { EXAMPLE_PRODUCT } from './examples/product.example';
 import { CreateProductDto } from './dto/create-product.dto';
 import { AuthDecorator } from '../../common/decorators/auth.decorator';
 import { Pagination } from '../../common/decorators/pagination.decorator';
-import { PaginationDto } from '../../common/dtos/pagination.dto';
 import { FilterProduct } from '../../common/decorators/filter.decorator';
 import { FilterProductDto } from '../../common/dtos/filter.dto';
 import { SkipAuth } from '../../common/decorators/skip-auth.decorator';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { extractFilters } from '../../common/utils/functions.util';
 
 @Controller('products')
 @ApiTags('Products')
@@ -48,11 +48,10 @@ export class ProductController {
   @SkipAuth()
   @Pagination()
   @FilterProduct()
-  findAll(
-    @Query() paginationDto: PaginationDto,
-    @Query() filterDto: FilterProductDto,
-  ) {
-    return this.productService.findAll({ paginationDto, filter: filterDto });
+  findAll(@Query() filterDto: FilterProductDto) {
+    const { paginationDto, filter } = extractFilters(filterDto);
+
+    return this.productService.findAll({ paginationDto, filter });
   }
 
   @Get(':id')

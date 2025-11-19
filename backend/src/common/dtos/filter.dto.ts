@@ -3,8 +3,9 @@ import { ProductGrade } from '../../modules/product/enums/product-grade.enum';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsBoolean, IsEnum, IsMongoId, IsOptional } from 'class-validator';
 import { Transform } from 'class-transformer';
+import { PaginationDto } from './pagination.dto';
 
-export class FilterProductDto {
+export class FilterProductDto extends PaginationDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsMongoId()

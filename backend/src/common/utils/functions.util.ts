@@ -34,3 +34,24 @@ export const parseAttributes = (maybe: any) => {
 
   return [];
 };
+
+export function extractFilters<T extends Record<string, any>>(filterDto: T) {
+  // page & limit را جدا می‌کنیم
+  const { page, limit, ...rest } = filterDto;
+
+  // حذف فیلدهای غیرمعتبر
+  const filter: Record<string, any> = {};
+  Object.entries(rest).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      filter[key] = value;
+    }
+  });
+
+  return {
+    paginationDto: {
+      page: Number(page) || 1,
+      limit: Number(limit) || 20,
+    },
+    filter,
+  };
+}

@@ -120,14 +120,13 @@ export class ProductService {
   }) {
     const { page, limit, skip } = paginationSolver(paginationDto);
 
-    const finalFilter = { ...filter };
-
-    const count = await this.productModel.countDocuments(finalFilter);
+    const count = await this.productModel.countDocuments(filter);
     const products = await this.productModel
-      .find(finalFilter)
+      .find(filter)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
+      .populate('categoryId')
       .lean();
 
     return {
@@ -140,7 +139,7 @@ export class ProductService {
     if (!isValidObjectId(id))
       throw new NotFoundException(ExceptionMessage.InvalidId);
 
-    const product = await this.productModel.findById(id);
+    const product = await this.productModel.findById(id).populate('categoryId');
     if (!product) throw new NotFoundException(ProductMessage.Notfound);
 
     return product;
