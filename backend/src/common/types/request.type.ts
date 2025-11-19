@@ -1,4 +1,4 @@
-import { Roles } from '../../../common/enums/role.enum';
+import { Roles } from '../enums/role.enum';
 import { Types } from 'mongoose';
 
 export interface IUserRequestType {

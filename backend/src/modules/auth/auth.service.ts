@@ -4,9 +4,9 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from '../user/schema/user.schema';
+import { User, UserDocument } from '../user/schemas/user.schema';
 import { Model } from 'mongoose';
-import { Otp, OtpDocument } from '../user/schema/otp.schema';
+import { Otp, OtpDocument } from '../user/schemas/otp.schema';
 import { CheckOtpDto, SendOtpDto } from './dto/otp.dto';
 import { JwtService } from '@nestjs/jwt';
 import { randomInt } from 'crypto';

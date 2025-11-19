@@ -3,6 +3,7 @@ import { HydratedDocument, Types } from 'mongoose';
 import { ProductCondition } from '../enums/product-condition.enum';
 import { ProductGrade } from '../enums/product-grade.enum';
 import { ImageSchema, ImageSubSchema } from '../../common/schemas/image.schema';
+import { ReviewDocument } from '../../user/schemas/review.schema';
 
 @Schema({ timestamps: true, versionKey: false })
 export class Product {
@@ -57,7 +58,11 @@ export class Product {
   discountExpiresAt?: Date;
 }
 
-export type ProductDocument = HydratedDocument<Product>;
+export type ProductDocument = HydratedDocument<Product> & {
+  // virtual populate
+  finalPrice?: number;
+  reviews?: ReviewDocument[] | null;
+};
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
 
@@ -76,3 +81,12 @@ ProductSchema.virtual('finalPrice').get(function () {
   }
   return this.price;
 });
+
+ProductSchema.virtual('reviews', {
+  ref: 'Review',
+  localField: '_id',
+  foreignField: 'productId',
+});
+
+ProductSchema.set('toObject', { virtuals: true });
+ProductSchema.set('toJSON', { virtuals: true });

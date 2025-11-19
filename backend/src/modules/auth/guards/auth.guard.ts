@@ -10,7 +10,7 @@ import { isJWT } from 'class-validator';
 import { AuthService } from '../auth.service';
 import { Reflector } from '@nestjs/core';
 import { SKIP_AUTH } from '../../../common/decorators/skip-auth.decorator';
-import { IUserRequestType } from '../../user/types/request.type';
+import { IUserRequestType } from '../../../common/types/request.type';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
