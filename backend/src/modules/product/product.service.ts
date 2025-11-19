@@ -9,7 +9,7 @@ import { Model } from 'mongoose';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product, ProductDocument } from './schema/product.schema';
-import { S3Service } from '../common/s3/s3.service';
+import { S3Service } from '../common/services/s3/s3.service';
 import {
   isValidObjectId,
   makeSlug,

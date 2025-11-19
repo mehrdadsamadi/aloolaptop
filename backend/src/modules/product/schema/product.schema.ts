@@ -2,10 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { ProductCondition } from '../enums/product-condition.enum';
 import { ProductGrade } from '../enums/product-grade.enum';
-import {
-  ImageSchema,
-  ImageSubSchema,
-} from '../../../common/schemas/image.schema';
+import { ImageSchema, ImageSubSchema } from '../../common/schemas/image.schema';
 
 @Schema({ timestamps: true, versionKey: false })
 export class Product {

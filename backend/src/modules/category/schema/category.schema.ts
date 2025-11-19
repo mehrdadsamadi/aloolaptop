@@ -1,10 +1,7 @@
 import { HydratedDocument, Types } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { AttributeType } from '../enums/attribute-type.enum';
-import {
-  ImageSchema,
-  ImageSubSchema,
-} from '../../../common/schemas/image.schema';
+import { ImageSchema, ImageSubSchema } from '../../common/schemas/image.schema';
 
 export class CategoryAttribute {
   @Prop({ required: true }) key: string;

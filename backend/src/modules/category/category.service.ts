@@ -13,7 +13,7 @@ import {
   CategoryMessage,
   ExceptionMessage,
 } from '../../common/enums/message.enum';
-import { S3Service } from '../common/s3/s3.service';
+import { S3Service } from '../common/services/s3/s3.service';
 import { PaginationDto } from '../../common/dtos/pagination.dto';
 import {
   paginationGenerator,

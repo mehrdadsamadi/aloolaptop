@@ -4,7 +4,7 @@ import { Category, CategorySchema } from './schema/category.schema';
 import { CategoryController } from './category.controller';
 import { CategoryService } from './category.service';
 import { AuthModule } from '../auth/auth.module';
-import { S3Service } from '../common/s3/s3.service';
+import { S3Service } from '../common/services/s3/s3.service';
 
 @Module({
   imports: [
