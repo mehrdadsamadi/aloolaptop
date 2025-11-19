@@ -9,11 +9,15 @@ import { AddressController } from './controllers/address.controller';
 import { ReviewController } from './controllers/review.controller';
 import { AddressService } from './services/address.service';
 import { ReviewService } from './services/review.service';
+import { Otp, OtpSchema } from './schemas/otp.schema';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
+    AuthModule,
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
+      { name: Otp.name, schema: OtpSchema },
       { name: Address.name, schema: AddressSchema },
       { name: Review.name, schema: ReviewSchema },
     ]),

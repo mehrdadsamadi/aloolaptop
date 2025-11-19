@@ -9,6 +9,7 @@ export const AuthMessage = {
   // =========================
   InvalidMobile: 'شماره موبایل معتبر نمیباشد',
   NotfoundMobile: 'کاربری با این شماره موبایل یافت نشد',
+  DuplicateMobile: 'این شماره قبلاً ثبت شده است',
 
   // =========================
   // Token / Auth
@@ -32,6 +33,7 @@ export const AuthMessage = {
 
 export const UserMessage = {
   Notfound: 'کاربری یافت نشد',
+  ProfileUpdated: 'پروفایل شما با موفقیت ویرایش شد',
 } as const;
 
 export const ExceptionMessage = {
