@@ -56,7 +56,7 @@ export class CategoryService {
       if (!parent) throw new NotFoundException(CategoryMessage.NotfoundParent);
     }
 
-    const { url, key } = await this.s3Service.uploadFile(image, 'category');
+    const { url, key } = await this.s3Service.uploadFile(image, 'categories');
 
     const slug = makeSlug(name, CSlug);
     // ensure unique slug (append number if needed)

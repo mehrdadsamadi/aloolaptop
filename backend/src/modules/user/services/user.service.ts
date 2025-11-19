@@ -11,6 +11,7 @@ import { AuthMessage, UserMessage } from '../../../common/enums/message.enum';
 import { UpdateProfileDto } from '../dto/user-profile.dto';
 import { SendOtpDto } from '../../auth/dto/otp.dto';
 import { AuthService } from '../../auth/auth.service';
+import { S3Service } from '../../common/services/s3/s3.service';
 
 @Injectable()
 export class UserService {
@@ -19,6 +20,7 @@ export class UserService {
     @InjectModel(Otp.name) private otpModel: Model<OtpDocument>,
 
     private readonly authService: AuthService,
+    private readonly s3Service: S3Service,
   ) {}
 
   async getMe(userId: string) {
@@ -32,13 +34,33 @@ export class UserService {
     return user;
   }
 
-  async updateProfile(userId: string, updateProfileDto: UpdateProfileDto) {
-    // TODO: fix upload avatar
-    const { firstName, lastName, avatar } = updateProfileDto;
+  async updateProfile(
+    userId: string,
+    updateProfileDto: UpdateProfileDto,
+    avatar: Express.Multer.File,
+  ) {
+    const { firstName, lastName } = updateProfileDto;
+
+    let url: string | undefined = undefined;
+    let key: string | undefined = undefined;
+
+    if (avatar) {
+      const uploaded = await this.s3Service.uploadFile(avatar, 'avatars');
+      url = uploaded.url;
+      key = uploaded.key;
+    }
 
     const user = await this.userModel.findByIdAndUpdate(
       userId,
-      { profile: { firstName, lastName, avatar } },
+      {
+        $set: {
+          'profile.firstName': firstName,
+          'profile.lastName': lastName,
+          ...(avatar && {
+            'profile.avatar': { url, key },
+          }),
+        },
+      },
       { new: true },
     );
 

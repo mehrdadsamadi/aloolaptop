@@ -1,9 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { ImageSchema, ImageSubSchema } from '../../common/schemas/image.schema';
 
 @Schema({ _id: false, versionKey: false })
 export class Profile {
-  @Prop()
-  avatar?: string; // URL عکس
+  @Prop({
+    type: ImageSubSchema,
+    default: null,
+  })
+  avatar?: ImageSchema;
 
   @Prop({})
   firstName?: string;

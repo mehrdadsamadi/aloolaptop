@@ -11,6 +11,7 @@ import { AddressService } from './services/address.service';
 import { ReviewService } from './services/review.service';
 import { Otp, OtpSchema } from './schemas/otp.schema';
 import { AuthModule } from '../auth/auth.module';
+import { S3Service } from '../common/services/s3/s3.service';
 
 @Module({
   imports: [
@@ -23,6 +24,6 @@ import { AuthModule } from '../auth/auth.module';
     ]),
   ],
   controllers: [UserController, AddressController, ReviewController],
-  providers: [UserService, AddressService, ReviewService],
+  providers: [UserService, AddressService, ReviewService, S3Service],
 })
 export class UserModule {}
