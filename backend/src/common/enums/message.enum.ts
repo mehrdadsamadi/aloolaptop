@@ -36,6 +36,14 @@ export const UserMessage = {
   ProfileUpdated: 'پروفایل شما با موفقیت ویرایش شد',
 } as const;
 
+export const UserAddressMessage = {
+  Created: 'آدرس با موفقیت اضافه شد',
+  Updated: 'آدرس با موفقیت ویرایش شد',
+  Deleted: 'آدرس با موفقیت حذف شد',
+  Notfound: 'آدرس یافت نشد',
+  Location: 'طول و عرض جغرافیایی برای ویرایش کردن آدرس لازم است',
+} as const;
+
 export const ExceptionMessage = {
   Forbidden: 'دسترسی ممنوع',
   Server: 'خطایی رخ داده است، باردیگر تلاش کنید',
