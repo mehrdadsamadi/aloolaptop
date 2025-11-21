@@ -12,8 +12,6 @@ import {
 import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { UserService } from '../services/user.service';
 import { AuthDecorator } from '../../../common/decorators/auth.decorator';
-import { UserReq } from '../../../common/decorators/user.decorator';
-import { IUserRequestType } from '../../../common/types/request.type';
 import { UpdateProfileDto } from '../dto/user-profile.dto';
 import { SwaggerConsumes } from '../../../common/enums/swagger-consumes.enum';
 import { SendOtpDto } from '../../auth/dto/otp.dto';
@@ -26,16 +24,14 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('me')
-  async getMe(@UserReq() userReq: IUserRequestType) {
-    return this.userService.getMe(String(userReq._id));
+  async getMe() {
+    return this.userService.getMe();
   }
 
-  // TODO: fix upload avatar
   @Patch('profile')
   @ApiConsumes(SwaggerConsumes.Multipart)
   @UseInterceptors(UploadFileS3('avatar'))
   async updateProfile(
-    @UserReq() userReq: IUserRequestType,
     @Body() updateProfileDto: UpdateProfileDto,
     @UploadedFile(
       new ParseFilePipe({
@@ -48,19 +44,12 @@ export class UserController {
     )
     avatar: Express.Multer.File,
   ) {
-    return this.userService.updateProfile(
-      String(userReq._id),
-      updateProfileDto,
-      avatar,
-    );
+    return this.userService.updateProfile(updateProfileDto, avatar);
   }
 
   @Patch('change-mobile')
   @ApiConsumes(SwaggerConsumes.UrlEncoded, SwaggerConsumes.Json)
-  async changeMobile(
-    @UserReq() userReq: IUserRequestType,
-    @Body() sendOtpDto: SendOtpDto,
-  ) {
-    return this.userService.changeMobile(String(userReq._id), sendOtpDto);
+  async changeMobile(@Body() sendOtpDto: SendOtpDto) {
+    return this.userService.changeMobile(sendOtpDto);
   }
 }

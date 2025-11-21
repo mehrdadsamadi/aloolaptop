@@ -1,7 +1,9 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
+  Scope,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -12,18 +14,24 @@ import { UpdateProfileDto } from '../dto/user-profile.dto';
 import { SendOtpDto } from '../../auth/dto/otp.dto';
 import { AuthService } from '../../auth/auth.service';
 import { S3Service } from '../../common/services/s3/s3.service';
+import { REQUEST } from '@nestjs/core';
+import { Request } from 'express';
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class UserService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     @InjectModel(Otp.name) private otpModel: Model<OtpDocument>,
 
+    @Inject(REQUEST) private req: Request,
+
     private readonly authService: AuthService,
     private readonly s3Service: S3Service,
   ) {}
 
-  async getMe(userId: string) {
+  async getMe() {
+    const userId = this.req.user?._id;
+
     const user = await this.userModel
       .findById(userId)
       .populate('addresses')
@@ -35,10 +43,11 @@ export class UserService {
   }
 
   async updateProfile(
-    userId: string,
     updateProfileDto: UpdateProfileDto,
     avatar: Express.Multer.File,
   ) {
+    const userId = this.req.user?._id;
+
     const { firstName, lastName } = updateProfileDto;
 
     let url: string | undefined = undefined;
@@ -69,7 +78,9 @@ export class UserService {
     return { message: UserMessage.ProfileUpdated, user };
   }
 
-  async changeMobile(userId: string, sendOtpDto: SendOtpDto) {
+  async changeMobile(sendOtpDto: SendOtpDto) {
+    const userId = this.req.user?._id;
+
     const { mobile } = sendOtpDto;
 
     const exists = await this.userModel.findOne({ mobile: mobile });
