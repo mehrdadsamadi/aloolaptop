@@ -2,10 +2,16 @@ import { Inject, Injectable, NotFoundException, Scope } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Address, AddressDocument } from '../schemas/address.schema';
-import { CreateAddressDto } from '../dto/user-address.dto';
+import { CreateAddressDto, UpdateAddressDto } from '../dto/user-address.dto';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { UserAddressMessage } from '../../../common/enums/message.enum';
+import { PaginationDto } from '../../../common/dtos/pagination.dto';
+import {
+  paginationGenerator,
+  paginationSolver,
+} from '../../../common/utils/pagination.util';
+import { LocationType } from '../../../common/types/location.type';
 
 @Injectable({ scope: Scope.REQUEST })
 export class AddressService {
@@ -29,7 +35,7 @@ export class AddressService {
       title,
       city,
     } = createAddressDto;
-    const location = this.toGeo(longitude, latitude);
+    const location: LocationType = this.toGeo(longitude, latitude);
 
     const created = await this.addressModel.create({
       address,
@@ -56,10 +62,24 @@ export class AddressService {
     };
   }
 
-  async findAll() {
+  async findAll(paginationDto: PaginationDto) {
     const userId = this.req.user?._id;
 
-    return this.addressModel.find({ userId }).sort({ createdAt: -1 }).lean();
+    const { page, limit, skip } = paginationSolver(paginationDto);
+
+    const count = await this.addressModel.countDocuments();
+
+    const addresses = await this.addressModel
+      .find({ userId })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    return {
+      addresses,
+      pagination: paginationGenerator(count, page, limit),
+    };
   }
 
   async findOne(addressId: string) {
@@ -71,51 +91,63 @@ export class AddressService {
     return address;
   }
 
-  // async update(addressId: string, updateAddressDto: UpdateAddressDto) {
-  //   const userId = this.req.user?._id;
-  //
-  //   const {
-  //     address,
-  //     latitude,
-  //     longitude,
-  //     isDefault,
-  //     state,
-  //     title,
-  //     city,
-  //     postalCode,
-  //   } = updateAddressDto;
-  //   const update: any = { ...updateAddressDto };
-  //
-  //   let location: any | undefined = undefined;
-  //
-  //   // اگر latitude/longitude داده شده، تبدیل کن به location
-  //   if (latitude !== undefined || longitude !== undefined) {
-  //     const lat = latitude ?? null;
-  //     const lng = longitude ?? null;
-  //     if (lat == null || lng == null) {
-  //       throw new NotFoundException(UserAddressMessage.Location);
-  //     }
-  //     location = this.toGeo(lng, lat);
-  //   }
-  //
-  //   // اگر isDefault=true هست باید قبلی‌ها را unset کنیم پس ابتدا آپدیت انجام شود سپس سایر آدرس‌ها
-  //   const updated = await this.addressModel.findOneAndUpdate(
-  //     { _id: addressId, userId },
-  //     { $set: update },
-  //     { new: true },
-  //   );
-  //
-  //   if (!updated) throw new NotFoundException('Address not found');
-  //
-  //   if (updateAddressDto.isDefault) {
-  //     await this.addressModel.updateMany(
-  //       { userId, _id: { $ne: updated._id } },
-  //       { $set: { isDefault: false } },
-  //     );
-  //   }
-  //
-  //   return updated;
-  // }
+  async update(addressId: string, updateAddressDto: UpdateAddressDto) {
+    const userId = this.req.user?._id;
+
+    const {
+      address,
+      latitude,
+      longitude,
+      isDefault,
+      state,
+      title,
+      city,
+      postalCode,
+    } = updateAddressDto;
+
+    let location: LocationType | undefined = undefined;
+
+    // اگر latitude/longitude داده شده، تبدیل کن به location
+    if (latitude !== undefined || longitude !== undefined) {
+      const lat = latitude ?? null;
+      const lng = longitude ?? null;
+      if (lat == null || lng == null) {
+        throw new NotFoundException(UserAddressMessage.Location);
+      }
+      location = this.toGeo(lng, lat);
+    }
+
+    // اگر isDefault=true هست باید قبلی‌ها را unset کنیم پس ابتدا آپدیت انجام شود سپس سایر آدرس‌ها
+    const updated = await this.addressModel.findOneAndUpdate(
+      { _id: addressId, userId },
+      {
+        $set: {
+          address,
+          location,
+          state,
+          title,
+          city,
+          postalCode,
+          ...(isDefault !== undefined && { isDefault: !!isDefault }),
+        },
+      },
+      { new: true },
+    );
+
+    if (!updated) throw new NotFoundException(UserAddressMessage.Notfound);
+
+    if (updateAddressDto.isDefault) {
+      await this.addressModel.updateMany(
+        { userId, _id: { $ne: updated._id } },
+        { $set: { isDefault: false } },
+      );
+    }
+
+    return {
+      message: UserAddressMessage.Updated,
+      address: updated,
+    };
+  }
 
   async remove(addressId: string) {
     const userId = this.req.user?._id;
@@ -124,7 +156,8 @@ export class AddressService {
       _id: addressId,
       userId,
     });
-    if (!removed) throw new NotFoundException('Address not found');
+    if (!removed) throw new NotFoundException(UserAddressMessage.Notfound);
+
     // اگر آدرس حذف شده پیش‌فرض بود و کاربر آدرس‌های دیگری دارد، آدرس اول را پیش‌فرض کن
     if (removed.isDefault) {
       const another = await this.addressModel
@@ -136,23 +169,31 @@ export class AddressService {
         });
       }
     }
-    return { success: true };
+    return {
+      message: UserAddressMessage.Deleted,
+      address: removed,
+    };
   }
 
   async setDefault(addressId: string) {
     const userId = this.req.user?._id;
 
     const address = await this.addressModel.findOne({ _id: addressId, userId });
-    if (!address) throw new NotFoundException('Address not found');
+    if (!address) throw new NotFoundException(UserAddressMessage.Notfound);
 
     // set all to false then set target true
     await this.addressModel.updateMany(
       { userId },
       { $set: { isDefault: false } },
     );
+
     address.isDefault = true;
     await address.save();
-    return address;
+
+    return {
+      message: UserAddressMessage.changeDefault,
+      address,
+    };
   }
 
   // optional: find nearest addresses to a point
@@ -172,7 +213,7 @@ export class AddressService {
       .lean();
   }
 
-  private toGeo(longitude: number, latitude: number) {
+  private toGeo(longitude: number, latitude: number): LocationType {
     return { type: 'Point' as const, coordinates: [longitude, latitude] };
   }
 }

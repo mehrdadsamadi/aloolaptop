@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export class CreateAddressDto {
   @ApiProperty({ example: 'خانه' })
@@ -36,6 +36,7 @@ export class CreateAddressDto {
   @ApiPropertyOptional({ example: true })
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === 'true' || value === true)
   isDefault?: boolean;
 }
 

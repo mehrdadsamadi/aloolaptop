@@ -42,6 +42,7 @@ export const UserAddressMessage = {
   Deleted: 'آدرس با موفقیت حذف شد',
   Notfound: 'آدرس یافت نشد',
   Location: 'طول و عرض جغرافیایی برای ویرایش کردن آدرس لازم است',
+  changeDefault: 'آدرس مورد نظر با موفقیت پیش فرض شد',
 } as const;
 
 export const ExceptionMessage = {
