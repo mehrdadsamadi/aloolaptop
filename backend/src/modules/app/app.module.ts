@@ -3,7 +3,7 @@ import { ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigsModule } from '../configs/configs.module';
 import { AuthModule } from '../auth/auth.module';
-import { UserModule } from '../user/user.module';
+import { UserModule } from '../user/modules/user.module';
 import { CategoryModule } from '../category/category.module';
 import { ProductModule } from '../product/product.module';
 
