@@ -78,3 +78,12 @@ export const ProductMessage = {
   ImageNotfound: 'تصویر محصول یافت نشد',
   DeleteImage: 'تصویر محصول با موفقیت حذف شد',
 } as const;
+
+export const CouponMessage = {
+  Created: 'کد تخفیف با موفقیت ایجاد شد',
+  Updated: 'کد تخفیف با موفقیت ویرایش شد',
+  Deleted: 'کد تخفیف با موفقیت حذف شد',
+  Notfound: 'کد تخفیف یافت نشد',
+  Date: 'تاریخ شروع باید قبل از پایان باشد',
+  ChoosProducts: 'محصولات را انتخاب کنید',
+} as const;
