@@ -12,6 +12,7 @@ import { ReviewService } from './services/review.service';
 import { Otp, OtpSchema } from './schemas/otp.schema';
 import { AuthModule } from '../auth/auth.module';
 import { S3Service } from '../common/services/s3/s3.service';
+import { Product, ProductSchema } from '../product/schema/product.schema';
 
 @Module({
   imports: [
@@ -21,6 +22,8 @@ import { S3Service } from '../common/services/s3/s3.service';
       { name: Otp.name, schema: OtpSchema },
       { name: Address.name, schema: AddressSchema },
       { name: Review.name, schema: ReviewSchema },
+
+      { name: Product.name, schema: ProductSchema },
     ]),
   ],
   controllers: [UserController, AddressController, ReviewController],

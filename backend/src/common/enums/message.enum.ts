@@ -45,6 +45,14 @@ export const UserAddressMessage = {
   changeDefault: 'آدرس مورد نظر با موفقیت پیش فرض شد',
 } as const;
 
+export const UserReviewMessage = {
+  Created: 'دیدگاه شما با موفقیت ثبت شد',
+  Updated: 'دیدگاه شما با موفقیت ویرایش شد',
+  Deleted: 'دیدگاه شما با موفقیت حذف شد',
+  Notfound: 'دیدگاه شما یافت نشد',
+  changeVisibility: 'نمایش دیدگاه با موفقیت تغییر پیدا کرد',
+} as const;
+
 export const ExceptionMessage = {
   Forbidden: 'دسترسی ممنوع',
   Server: 'خطایی رخ داده است، باردیگر تلاش کنید',

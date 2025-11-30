@@ -18,6 +18,9 @@ export class Product {
   @Prop({ type: Types.ObjectId, ref: 'Category', required: true })
   categoryId: Types.ObjectId;
 
+  @Prop({ type: Number, default: 0 })
+  rate: number; // میانگین امتیاز محصول
+
   @Prop({ enum: ProductCondition, required: true })
   condition: ProductCondition;
 

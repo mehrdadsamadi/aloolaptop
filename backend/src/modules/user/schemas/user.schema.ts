@@ -1,10 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import { OtpDocument } from './otp.schema';
 import { Roles } from '../../../common/enums/role.enum';
 import { Profile, ProfileSchema } from './profile.schema';
-import { AddressDocument } from './address.schema';
-import { ReviewDocument } from './review.schema';
+import { OtpDocument } from './otp.schema';
 
 @Schema({ versionKey: false, timestamps: true })
 export class User {
@@ -27,8 +25,8 @@ export class User {
 export type UserDocument = HydratedDocument<User> & {
   // virtual populate
   otp?: OtpDocument | null;
-  addresses?: AddressDocument[] | null;
-  reviews?: ReviewDocument[] | null;
+  // addresses?: AddressDocument[] | null;
+  // reviews?: ReviewDocument[] | null;
 };
 
 export const UserSchema = SchemaFactory.createForClass(User);
@@ -44,20 +42,20 @@ UserSchema.virtual('otp', {
   justOne: true, // چون یک otp برای هر user وجود دارد
 });
 
-UserSchema.virtual('addresses', {
-  ref: 'Address',
-  localField: '_id',
-  foreignField: 'userId',
-});
-
-UserSchema.virtual('reviews', {
-  ref: 'Review', // نام مدل Review
-  localField: '_id', // فیلد داخل User
-  foreignField: 'userId', // فیلد داخل Review که ارتباط رو نگه می‌داره
-});
-
-/**
- * --- تا virtualها در خروجی JSON/OBJ نمایش داده شوند ---
- */
+// UserSchema.virtual('addresses', {
+//   ref: 'Address',
+//   localField: '_id',
+//   foreignField: 'userId',
+// });
+//
+// UserSchema.virtual('reviews', {
+//   ref: 'Review', // نام مدل Review
+//   localField: '_id', // فیلد داخل User
+//   foreignField: 'userId', // فیلد داخل Review که ارتباط رو نگه می‌داره
+// });
+//
+// /**
+//  * --- تا virtualها در خروجی JSON/OBJ نمایش داده شوند ---
+//  */
 UserSchema.set('toObject', { virtuals: true });
 UserSchema.set('toJSON', { virtuals: true });

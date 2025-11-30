@@ -32,10 +32,10 @@ export class UserService {
   async getMe() {
     const userId = this.req.user?._id;
 
-    const user = await this.userModel
-      .findById(userId)
-      .populate('addresses')
-      .populate('reviews');
+    const user = await this.userModel.findById(userId);
+    // .populate('otp')
+    // .populate('addresses')
+    // .populate('reviews');
 
     if (!user) throw new NotFoundException(UserMessage.Notfound);
 
