@@ -126,8 +126,7 @@ export class ProductService {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .populate('categoryId')
-      .lean();
+      .populate('categoryId');
 
     return {
       products,

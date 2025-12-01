@@ -16,5 +16,6 @@ import { Review, ReviewSchema } from '../user/schemas/review.schema';
   ],
   controllers: [ProductController],
   providers: [ProductService],
+  exports: [ProductService, MongooseModule],
 })
 export class ProductModule {}

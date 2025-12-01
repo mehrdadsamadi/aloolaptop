@@ -7,6 +7,7 @@ import { UserModule } from '../user/modules/user.module';
 import { CategoryModule } from '../category/category.module';
 import { ProductModule } from '../product/product.module';
 import { CouponModule } from '../coupon/coupon.module';
+import { CartModule } from '../cart/cart.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { CouponModule } from '../coupon/coupon.module';
     CategoryModule,
     ProductModule,
     CouponModule,
+    CartModule,
   ],
   controllers: [],
   providers: [

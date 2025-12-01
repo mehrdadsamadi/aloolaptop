@@ -14,7 +14,7 @@ import {
 import { CouponType } from '../enums/coupon-type.enum';
 import { DiscountMethod } from '../enums/discount-method.enum';
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { IsStartBeforeEnd } from '../../../common/validators/is-start-before-end.validator';
 
 export class CreateCouponDto {
@@ -42,14 +42,25 @@ export class CreateCouponDto {
   @Max(100, { message: 'درصد تخفیف نمی‌تواند بیش از 100 باشد' })
   value: number;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: [String] })
   @IsOptional()
   @ValidateIf((o) => o.type === CouponType.PRODUCT)
-  @IsArray({ message: 'productIds باید آرایه باشد' })
-  @IsMongoId({
-    each: true,
-    message: 'آیدی محصول معتبر نمیباشد',
+  @Transform(({ value }) => {
+    // اگر رشته است و شبیه JSON آرایه است، parse کن
+    if (typeof value === 'string') {
+      try {
+        const parsed = JSON.parse(value);
+        if (Array.isArray(parsed)) return parsed;
+      } catch (e) {
+        // اگر parse نشد، رشته تکی را آرایه کن
+        return [value];
+      }
+    }
+    // اگر مقدار خود آرایه است
+    return value;
   })
+  @IsArray({ message: 'productIds باید آرایه باشد' })
+  @IsMongoId({ each: true, message: 'آیدی محصول معتبر نمیباشد' })
   productIds?: string[];
 
   @ApiPropertyOptional()
@@ -59,10 +70,11 @@ export class CreateCouponDto {
   @Type(() => Number)
   minOrderAmount?: number;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
+  @IsOptional()
   @IsNumber()
   @Type(() => Number)
-  @Min(1)
+  @Min(0)
   maxUses: number;
 
   @ApiProperty()

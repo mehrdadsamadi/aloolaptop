@@ -27,10 +27,10 @@ export class Product {
   @Prop({ enum: ProductGrade })
   grade?: ProductGrade;
 
-  @Prop({ required: true })
+  @Prop({ type: Number, required: true })
   price: number;
 
-  @Prop({ default: 0 })
+  @Prop({ type: Number, default: 0 })
   stock: number;
 
   @Prop({
@@ -63,7 +63,7 @@ export class Product {
 
 export type ProductDocument = HydratedDocument<Product> & {
   // virtual populate
-  finalPrice?: number;
+  finalPrice: number;
   reviews?: ReviewDocument[] | null;
 };
 

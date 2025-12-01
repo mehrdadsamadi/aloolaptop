@@ -14,7 +14,6 @@ import {
 import { CouponMessage } from '../../common/enums/message.enum';
 import { CreateCouponDto } from './dto/coupon.dto';
 import { CouponType } from './enums/coupon-type.enum';
-import { DiscountMethod } from './enums/discount-method.enum';
 
 @Injectable()
 export class CouponService {
@@ -89,70 +88,6 @@ export class CouponService {
     if (!coupon) throw new NotFoundException(CouponMessage.Notfound);
 
     return coupon;
-  }
-
-  // TODO: این تابع بعد از تکمیل سبد خرید بررسی شود
-  async validate(code: string, cartTotal: number, cartItems: any[]) {
-    const coupon = await this.findByCode(code);
-
-    if (!coupon || !coupon.isActive) {
-      throw new BadRequestException('کد تخفیف معتبر نیست');
-    }
-
-    const now = new Date();
-    if (coupon.startDate > now || coupon.endDate < now) {
-      throw new BadRequestException('کد تخفیف منقضی شده است');
-    }
-
-    if (coupon.usesCount >= coupon.maxUses) {
-      throw new BadRequestException('سقف استفاده از این کد تکمیل شده');
-    }
-
-    let discountAmount = 0;
-
-    if (coupon.type === CouponType.CART) {
-      if (cartTotal < (coupon.minOrderAmount || 0)) {
-        throw new BadRequestException(
-          'مبلغ سفارش کمتر از حداقل لازم برای این کد است',
-        );
-      }
-
-      if (coupon.method === DiscountMethod.PERCENT) {
-        discountAmount = (cartTotal * coupon.value) / 100;
-      } else {
-        discountAmount = coupon.value;
-      }
-    }
-
-    if (
-      coupon.type === CouponType.PRODUCT &&
-      coupon.productIds &&
-      coupon.productIds.length > 0
-    ) {
-      const validProducts = cartItems.filter((item) =>
-        coupon.productIds!.includes(item.productId.toString()),
-      );
-
-      if (validProducts.length === 0) {
-        throw new BadRequestException(
-          'این کد روی محصولات انتخابی شما اعمال نمی‌شود',
-        );
-      }
-
-      validProducts.forEach((item) => {
-        if (coupon.method === DiscountMethod.PERCENT) {
-          discountAmount += ((item.price * coupon.value) / 100) * item.quantity;
-        } else {
-          discountAmount += coupon.value * item.quantity;
-        }
-      });
-    }
-
-    return {
-      coupon,
-      discountAmount,
-      finalAmount: cartTotal - discountAmount,
-    };
   }
 
   // TODO: بعد از پرداخت موفق یکی اضافه بشه
