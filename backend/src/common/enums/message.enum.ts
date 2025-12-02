@@ -75,6 +75,8 @@ export const ProductMessage = {
   Updated: 'محصول با موفقیت ویرایش شد',
   Deleted: 'محصول با موفقیت حذف شد',
   Notfound: 'محصول یافت نشد',
+  OutOfStockByName: (productName: string) =>
+    `موجودی محصول ${productName} کافی نمیباشد`,
   ImageNotfound: 'تصویر محصول یافت نشد',
   DeleteImage: 'تصویر محصول با موفقیت حذف شد',
 } as const;
@@ -99,5 +101,9 @@ export const CartMessage = {
   Deleted: 'محصول از سبد خرید با موفقیت حذف شد',
   Clear: 'سبد خرید با موفقیت حذف شد',
   NotfoundItem: 'این محصول در سبد خرید وجود ندارد',
+  Notfound: 'سبد خرید یافت نشد',
   ApplyCoupon: 'کد تخفیف با موفقیت اعمال شد',
+  MoreThanStock: 'تعداد انتخابی شما از تعداد موجودی این محصول بیشتر است',
+  InvalidCartItemsPrice:
+    'قیمت محصولات داخل سبد خرید تغییر کرده است ، ابتدا بررسی نمایید',
 } as const;

@@ -11,7 +11,11 @@ import { Cart, CartDocument } from './schemas/cart.schema';
 import { Coupon, CouponDocument } from '../coupon/schema/coupon.schema';
 import { DiscountMethod } from '../coupon/enums/discount-method.enum';
 import { CouponType } from '../coupon/enums/coupon-type.enum';
-import { CartMessage, CouponMessage } from '../../common/enums/message.enum';
+import {
+  CartMessage,
+  CouponMessage,
+  ProductMessage,
+} from '../../common/enums/message.enum';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { AddItemDto } from './dto/add-item.dto';
@@ -58,6 +62,10 @@ export class CartService {
 
     const product = await this.productService.findById(productId);
 
+    if (quantity > product.stock) {
+      throw new BadRequestException(CartMessage.MoreThanStock);
+    }
+
     const cart = await this.getOrCreateCart();
 
     const existingItem = cart.items.find(
@@ -65,6 +73,10 @@ export class CartService {
     );
 
     if (existingItem) {
+      if (existingItem.quantity < product.stock) {
+        throw new BadRequestException(CartMessage.MoreThanStock);
+      }
+
       existingItem.quantity += quantity;
       existingItem.totalPrice =
         existingItem.quantity * existingItem.finalUnitPrice;
@@ -124,6 +136,55 @@ export class CartService {
       message: CartMessage.Updated,
       cart,
     };
+  }
+
+  async validateCart() {
+    const userId = this.req.user?._id;
+
+    const cart = await this.cartModel.findOne({ userId });
+    if (!cart) throw new NotFoundException(CartMessage.Notfound);
+
+    let priceChanged = false;
+
+    for (const item of cart.items) {
+      const product = await this.productService.findById(
+        item.productId.toString(),
+      );
+      if (!product) throw new BadRequestException(ProductMessage.Notfound);
+
+      if (product.stock < item.quantity)
+        throw new BadRequestException(
+          ProductMessage.OutOfStockByName(product.name),
+        );
+
+      const finalUnitPrice = product.finalPrice;
+
+      if (finalUnitPrice !== item.finalUnitPrice) {
+        item.unitPrice = product.price;
+        item.discountPercent = product.discountPercent;
+        item.finalUnitPrice = finalUnitPrice;
+        item.totalPrice = item.quantity * finalUnitPrice;
+        priceChanged = true;
+      }
+    }
+
+    if (priceChanged) {
+      cart.finalItemsPrice = cart.items.reduce(
+        (sum, i) => sum + i.totalPrice,
+        0,
+      );
+      cart.totalPrice = cart.finalItemsPrice - cart.discountAmount;
+
+      await cart.save();
+
+      return {
+        updated: true,
+        message: CartMessage.InvalidCartItemsPrice,
+        cart,
+      };
+    }
+
+    return { updated: false, cart };
   }
 
   async clearCart() {
