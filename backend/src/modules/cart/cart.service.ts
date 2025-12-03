@@ -143,6 +143,8 @@ export class CartService {
 
     const cart = await this.cartModel.findOne({ userId });
     if (!cart) throw new NotFoundException(CartMessage.Notfound);
+    if (cart.totalPrice < 1000)
+      throw new BadRequestException(CartMessage.Empty);
 
     let priceChanged = false;
 

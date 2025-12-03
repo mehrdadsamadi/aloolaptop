@@ -106,4 +106,19 @@ export const CartMessage = {
   MoreThanStock: 'تعداد انتخابی شما از تعداد موجودی این محصول بیشتر است',
   InvalidCartItemsPrice:
     'قیمت محصولات داخل سبد خرید تغییر کرده است ، ابتدا بررسی نمایید',
+  Empty: 'سبد خرید خالی است',
+} as const;
+
+export const OrderMessage = {
+  Notfound: 'سفارش یافت نشد',
+} as const;
+
+export const PaymentMessage = {
+  Notfound: 'پرداخت یافت نشد',
+} as const;
+
+export const CheckoutMessage = {
+  Failed: 'پرداخت ناموفق بود',
+  Verify: 'پرداخت با موفقیت انجام شد',
+  VerifyFailed: 'تایید پرداخت ناموفق بود',
 } as const;

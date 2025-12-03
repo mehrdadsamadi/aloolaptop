@@ -82,6 +82,14 @@ export class CouponService {
     };
   }
 
+  async findById(id: string) {
+    const coupon = await this.couponModel.findById(id);
+
+    if (!coupon) throw new NotFoundException(CouponMessage.Notfound);
+
+    return coupon;
+  }
+
   async findByCode(code: string) {
     const coupon = await this.couponModel.findOne({ code: code.toUpperCase() });
 
