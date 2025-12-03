@@ -1,18 +1,31 @@
-import { Inject, Injectable, NotFoundException, Scope } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+  Scope,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Order, OrderDocument } from './schema/order.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { CartService } from '../cart/cart.service';
-import { CartMessage, OrderMessage } from '../../common/enums/message.enum';
+import {
+  CartMessage,
+  OrderMessage,
+  PaymentMessage,
+} from '../../common/enums/message.enum';
 import { OrderStatus } from './enums/order-status.enum';
 import { PaymentStatus } from '../payment/enums/payment-status.enum';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
+import { Payment, PaymentDocument } from '../payment/schema/payment.schema';
 
 @Injectable({ scope: Scope.REQUEST })
 export class OrderService {
   constructor(
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
+    @InjectModel(Payment.name)
+    private readonly paymentModel: Model<PaymentDocument>,
 
     private readonly cartService: CartService,
 
@@ -46,12 +59,56 @@ export class OrderService {
       discountAmount: cart.discountAmount,
       totalPrice: cart.totalPrice,
       couponId: cart.couponId,
-      addressId,
+      addressId: new Types.ObjectId(addressId),
       status: OrderStatus.AWAITING_PAYMENT,
       paymentStatus: PaymentStatus.PENDING,
       trackingCode: this.generateTrackingCode(),
       meta: {},
     });
+  }
+
+  async updateStatus(orderId: string, newStatus: OrderStatus, meta: any = {}) {
+    const order = await this.findById(orderId);
+
+    const validTransitions: Record<OrderStatus, OrderStatus[]> = {
+      [OrderStatus.AWAITING_PAYMENT]: [OrderStatus.CANCELED, OrderStatus.PAID],
+      [OrderStatus.PAID]: [OrderStatus.PROCESSING, OrderStatus.REFUNDED],
+      [OrderStatus.PROCESSING]: [OrderStatus.SHIPPED, OrderStatus.CANCELED],
+      [OrderStatus.SHIPPED]: [OrderStatus.DELIVERED],
+      [OrderStatus.DELIVERED]: [], // نهایی است
+      [OrderStatus.CANCELED]: [],
+      [OrderStatus.REFUNDED]: [],
+    };
+
+    const current = order.status;
+    const allowed = validTransitions[current] ?? [];
+
+    if (!allowed.includes(newStatus)) {
+      throw new BadRequestException(
+        OrderMessage.InvalidChangeStatus(current, newStatus),
+      );
+    }
+
+    // آپدیت وضعیت
+    order.status = newStatus;
+
+    // ثبت لاگ در meta
+    order.meta = {
+      ...order.meta,
+      history: [
+        ...(order.meta.history || []),
+        {
+          from: current,
+          to: newStatus,
+          at: new Date(),
+          meta,
+        },
+      ],
+    };
+
+    await order.save();
+
+    return order;
   }
 
   async findById(id: string) {
@@ -71,6 +128,41 @@ export class OrderService {
     order.meta = { ...order.meta, payment: paymentMeta };
 
     await order.save();
+
+    return order;
+  }
+
+  async markProcessing(orderId: string) {
+    return this.updateStatus(orderId, OrderStatus.PROCESSING);
+  }
+
+  async markShipped(orderId: string, trackingCode: string) {
+    return this.updateStatus(orderId, OrderStatus.SHIPPED, { trackingCode });
+  }
+
+  async markDelivered(orderId: string) {
+    return this.updateStatus(orderId, OrderStatus.DELIVERED);
+  }
+
+  async cancel(orderId: string, reason: string) {
+    return this.updateStatus(orderId, OrderStatus.CANCELED, { reason });
+  }
+
+  async refund(orderId: string, reason: string) {
+    const order = await this.updateStatus(orderId, OrderStatus.REFUNDED, {
+      reason,
+    });
+
+    if (order.status === OrderStatus.REFUNDED) {
+      const payment = await this.paymentModel.findOne({
+        refId: order.meta.payment.refId,
+      });
+      if (!payment) throw new NotFoundException(PaymentMessage.Notfound);
+
+      payment.status = PaymentStatus.REFUNDED;
+
+      await payment.save();
+    }
 
     return order;
   }

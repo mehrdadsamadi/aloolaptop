@@ -5,5 +5,5 @@ export enum OrderStatus {
   SHIPPED = 'shipped',
   DELIVERED = 'delivered',
   CANCELED = 'canceled',
-  REFUNDED = 'refunded',
+  REFUNDED = 'refunded', // بازگشت مبلغ به کاربر
 }

@@ -111,6 +111,8 @@ export const CartMessage = {
 
 export const OrderMessage = {
   Notfound: 'سفارش یافت نشد',
+  InvalidChangeStatus: (current, next) =>
+    `نمیتوان وضعیت سفارش را از ${current} به ${next} تغییر داد`,
 } as const;
 
 export const PaymentMessage = {

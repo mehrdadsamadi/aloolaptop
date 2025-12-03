@@ -2,5 +2,5 @@ export enum PaymentStatus {
   PENDING = 'pending',
   PAID = 'paid',
   FAILED = 'failed',
-  REFUND = 'refunded',
+  REFUNDED = 'refunded', // بازگشت مبلغ به کاربر
 }

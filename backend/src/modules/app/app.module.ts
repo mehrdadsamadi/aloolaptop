@@ -9,6 +9,7 @@ import { ProductModule } from '../product/product.module';
 import { CouponModule } from '../coupon/coupon.module';
 import { CartModule } from '../cart/cart.module';
 import { CheckoutModule } from '../checkout/checkout.module';
+import { OrderModule } from '../order/order.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { CheckoutModule } from '../checkout/checkout.module';
     ProductModule,
     CouponModule,
     CartModule,
+    OrderModule,
     CheckoutModule,
   ],
   controllers: [],

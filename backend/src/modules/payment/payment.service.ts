@@ -57,6 +57,13 @@ export class PaymentService {
     };
   }
 
+  async findById(id: string) {
+    const p = await this.paymentModel.findById(id);
+    if (!p) throw new NotFoundException(PaymentMessage.Notfound);
+
+    return p;
+  }
+
   async findByAuthority(authority: string) {
     const p = await this.paymentModel.findOne({ authority });
     if (!p) throw new NotFoundException(PaymentMessage.Notfound);
@@ -64,9 +71,15 @@ export class PaymentService {
     return p;
   }
 
+  async findByRefId(refId: number) {
+    const p = await this.paymentModel.findOne({ refId });
+    if (!p) throw new NotFoundException(PaymentMessage.Notfound);
+
+    return p;
+  }
+
   async markPaid(paymentId: string, refId: number, meta: any = {}) {
-    const payment = await this.paymentModel.findById(paymentId);
-    if (!payment) throw new NotFoundException(PaymentMessage.Notfound);
+    const payment = await this.findById(paymentId);
 
     payment.status = PaymentStatus.PAID;
     payment.refId = refId;
@@ -79,8 +92,7 @@ export class PaymentService {
   }
 
   async markFailed(paymentId: string, meta: any = {}) {
-    const payment = await this.paymentModel.findById(paymentId);
-    if (!payment) throw new NotFoundException(PaymentMessage.Notfound);
+    const payment = await this.findById(paymentId);
 
     payment.status = PaymentStatus.FAILED;
     payment.meta = { ...payment.meta, ...meta };
