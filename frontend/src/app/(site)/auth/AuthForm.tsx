@@ -1,177 +1,195 @@
 'use client'
 
-import { ArrowLeftIcon, GalleryVerticalEnd } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSeparator } from '@/components/ui/field'
+import { Field, FieldDescription, FieldError, FieldGroup, FieldSet } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { Activity, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { checkOtp, sendOtp } from '@/actions/auth.action'
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '@/components/ui/input-otp'
 import { redirect } from 'next/navigation'
 import { Spinner } from '@/components/ui/spinner'
+import { MobileSchemaType, mobileValidator, OtpSchemaType, otpValidator } from '@/validators/auth.validator'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { GalleryVerticalEnd } from 'lucide-react'
+import { toast } from 'sonner'
+import { convertFaToEn } from '@/lib/utils'
 
 export default function AuthForm() {
   const [authStep, setAuthStep] = useState(1)
   const [loading, setLoading] = useState(false)
-  const [timer, setTimer] = useState(120) // 2 دقیقه
+  const [timer, setTimer] = useState(120)
 
-  const [mobile, setMobile] = useState('')
-  const [code, setCode] = useState('')
+  // ---------------------------
+  // فرم مرحله 1 (شماره موبایل)
+  // ---------------------------
+  const mobileForm = useForm<MobileSchemaType>({
+    resolver: zodResolver(mobileValidator),
+    defaultValues: { mobile: '' },
+  })
 
+  // ---------------------------
+  // فرم مرحله 2 (کد OTP)
+  // ---------------------------
+  const otpForm = useForm<OtpSchemaType>({
+    resolver: zodResolver(otpValidator),
+    defaultValues: { code: '' },
+  })
+
+  // ---------------------------
+  // تایمر
+  // ---------------------------
   useEffect(() => {
     if (authStep !== 2) return
-
     if (timer === 0) return
 
-    const interval = setInterval(() => {
-      setTimer((prev) => prev - 1)
-    }, 1000)
-
+    const interval = setInterval(() => setTimer((p) => p - 1), 1000)
     return () => clearInterval(interval)
   }, [authStep, timer])
 
-  const sendOtpHandler = async (e: React.FormEvent) => {
-    e.preventDefault()
-
+  // ---------------------------
+  // مرحله 1 → ارسال OTP
+  // ---------------------------
+  const sendOtpHandler = async (data: MobileSchemaType) => {
     setLoading(true)
 
-    const res = await sendOtp(mobile)
-    console.log('res', res)
+    const response = await sendOtp(data.mobile)
 
     setLoading(false)
+
+    if (!response.success) {
+      mobileForm.setError('mobile', {
+        message: response.error,
+      })
+
+      return
+    }
 
     setAuthStep(2)
     setTimer(120)
   }
 
-  const checkOtpHandler = async (e: React.FormEvent) => {
-    e.preventDefault()
-
+  // ---------------------------
+  // مرحله 2 → بررسی OTP
+  // ---------------------------
+  const checkOtpHandler = async (data: OtpSchemaType) => {
     setLoading(true)
 
-    const res = await checkOtp({ mobile, code })
-    console.log('res', res)
+    const response = await checkOtp({
+      mobile: mobileForm.getValues('mobile'),
+      code: data.code,
+    })
+
     setLoading(false)
+
+    if (!response.success) {
+      otpForm.setError('code', {
+        message: response.error,
+      })
+      return
+    }
+
+    toast.success('ورود موفقیت آمیز بود')
 
     redirect('/')
   }
 
   return (
     <div className={'flex flex-col gap-6'}>
-      <form onSubmit={authStep === 1 ? sendOtpHandler : checkOtpHandler}>
-        <FieldGroup>
-          <div className="flex flex-col items-center gap-2 text-center">
-            <div className="flex size-8 items-center justify-center rounded-md">
-              <GalleryVerticalEnd className="size-6" />
-            </div>
-            <h1 className="text-xl font-bold">به الو لپتاپ خوش آمدید</h1>
-            <FieldDescription>لطفا شماره موبایل خود را وارد کنید</FieldDescription>
-          </div>
+      <div className="flex flex-col items-center gap-2 text-center">
+        <div className="flex size-8 items-center justify-center rounded-md">
+          <GalleryVerticalEnd className="size-6" />
+        </div>
+        <h1 className="text-xl font-bold">به الو لپتاپ خوش آمدید</h1>
+        <FieldDescription>{authStep === 1 ? 'لطفا شماره موبایل خود را وارد کنید' : 'کد ۵ رقمی ارسال شده را وارد کنید'}</FieldDescription>
+      </div>
 
-          <div className={'flex items-center justify-center w-full'}>
-            <Activity mode={authStep === 1 ? 'visible' : 'hidden'}>
-              <Field>
-                <FieldLabel htmlFor="mobile">موبایل</FieldLabel>
+      {/* ---------------- مرحله ۱ ---------------- */}
+      {authStep === 1 && (
+        <form onSubmit={mobileForm.handleSubmit(sendOtpHandler)}>
+          <FieldGroup>
+            <FieldSet className={'gap-2'}>
+              <Field dir="ltr">
                 <Input
-                  name={'mobile'}
-                  autoFocus
-                  id="mobile"
-                  type="tel"
                   placeholder="09xx xxx xxxx"
-                  required
-                  value={mobile}
-                  onChange={(e) => setMobile(e.target.value)}
+                  {...mobileForm.register('mobile', {
+                    setValueAs: convertFaToEn,
+                  })}
                 />
               </Field>
-            </Activity>
 
-            <Activity mode={authStep === 2 ? 'visible' : 'hidden'}>
-              {authStep === 2 && (
-                <Field dir={'ltr'}>
-                  <InputOTP
-                    autoFocus
-                    name={'code'}
-                    value={code}
-                    onChange={(value) => setCode(value)}
-                    required
-                    id="code"
-                    maxLength={5}
-                    containerClassName={'justify-center'}
-                  >
-                    <InputOTPGroup>
-                      <InputOTPSlot index={0} />
-                    </InputOTPGroup>
-                    <InputOTPSeparator />
-                    <InputOTPGroup>
-                      <InputOTPSlot index={1} />
-                    </InputOTPGroup>
-                    <InputOTPSeparator />
-                    <InputOTPGroup>
-                      <InputOTPSlot index={2} />
-                    </InputOTPGroup>
-                    <InputOTPSeparator />
-                    <InputOTPGroup>
-                      <InputOTPSlot index={3} />
-                    </InputOTPGroup>
-                    <InputOTPSeparator />
-                    <InputOTPGroup>
-                      <InputOTPSlot index={4} />
-                    </InputOTPGroup>
-                  </InputOTP>
-                </Field>
-              )}
-            </Activity>
-          </div>
+              <FieldError className={'text-rose-500'}>{mobileForm.formState.errors.mobile?.message}</FieldError>
+            </FieldSet>
 
-          <Field
-            orientation={'horizontal'}
-            className={'flex justify-center'}
-          >
             <Button
               disabled={loading}
-              type={'submit'}
-              className={'cursor-pointer flex-1'}
+              className="w-full cursor-pointer"
             >
               {loading && <Spinner />}
-              {authStep === 1 ? 'ارسال کد' : 'ورود'}
+              ارسال کد
             </Button>
+          </FieldGroup>
+        </form>
+      )}
 
-            {authStep !== 1 && (
+      {/* ---------------- مرحله ۲ ---------------- */}
+      {authStep === 2 && (
+        <form onSubmit={otpForm.handleSubmit(checkOtpHandler)}>
+          <FieldGroup>
+            <FieldSet className={'gap-2'}>
+              <Field dir="ltr">
+                <InputOTP
+                  maxLength={5}
+                  value={otpForm.watch('code')}
+                  onChange={(val) => otpForm.setValue('code', convertFaToEn(val), { shouldValidate: true })}
+                  containerClassName="justify-center"
+                >
+                  <InputOTPGroup>
+                    <InputOTPSlot index={0} />
+                  </InputOTPGroup>
+                  <InputOTPSeparator />
+                  <InputOTPGroup>
+                    <InputOTPSlot index={1} />
+                  </InputOTPGroup>
+                  <InputOTPSeparator />
+                  <InputOTPGroup>
+                    <InputOTPSlot index={2} />
+                  </InputOTPGroup>
+                  <InputOTPSeparator />
+                  <InputOTPGroup>
+                    <InputOTPSlot index={3} />
+                  </InputOTPGroup>
+                  <InputOTPSeparator />
+                  <InputOTPGroup>
+                    <InputOTPSlot index={4} />
+                  </InputOTPGroup>
+                </InputOTP>
+              </Field>
+
+              <FieldError className={'text-rose-500'}>{otpForm.formState.errors.code?.message}</FieldError>
+            </FieldSet>
+
+            <div className={'flex flex-col gap-2'}>
               <Button
-                className={'cursor-pointer'}
-                variant="ghost"
+                disabled={loading}
+                className="w-full cursor-pointer"
+              >
+                {loading && <Spinner />}
+                ورود
+              </Button>
+
+              <Button
                 type="button"
+                variant="ghost"
                 disabled={timer > 0}
                 onClick={() => setAuthStep(1)}
+                className={`${timer <= 0 && 'cursor-pointer'}`}
               >
-                {timer > 0 ? (
-                  <span className="">
-                    {Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, '0')}
-                  </span>
-                ) : (
-                  <>
-                    تغییر موبایل
-                    <ArrowLeftIcon />
-                  </>
-                )}
+                {timer > 0 ? `${Math.floor(timer / 60)}:${String(timer % 60).padStart(2, '0')}` : 'تغییر موبایل'}
               </Button>
-            )}
-          </Field>
-
-          <FieldSeparator className={'flex items-center'}>
-            <Button
-              className={'cursor-pointer'}
-              variant={'ghost'}
-              size={'sm'}
-            >
-              قوانین و مقررات
-            </Button>
-          </FieldSeparator>
-        </FieldGroup>
-      </form>
-
-      {authStep === 2 && (
-        <FieldDescription className="px-6 text-center">با کلیک بر روی ورود ، شما قوانین و مقررات مارا پذیرفته اید.</FieldDescription>
+            </div>
+          </FieldGroup>
+        </form>
       )}
     </div>
   )

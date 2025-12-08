@@ -19,7 +19,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    let messages: any = [{ field: null, message: ['Internal server error'] }];
+    let messages: any = [
+      { field: null, message: ['خطایی رخ داده است ، باردیگر تلاش کنید'] },
+    ];
 
     if (exception instanceof HttpException) {
       const res = exception.getResponse();

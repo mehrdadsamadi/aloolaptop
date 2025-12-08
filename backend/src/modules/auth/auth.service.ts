@@ -88,6 +88,7 @@ export class AuthService {
 
   async checkOtp(otpDto: CheckOtpDto) {
     const { code, mobile } = otpDto;
+    console.log('otp', otpDto);
 
     const user = await this.userModel
       .findOne({ mobile }) // فیلتر

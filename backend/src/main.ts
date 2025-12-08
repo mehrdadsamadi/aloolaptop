@@ -6,6 +6,7 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
 import * as compression from 'compression';
+import { ConvertNumbersPipe } from './common/pipes/convert-numbers.pipe';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -43,6 +44,9 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+  // --- Convert numbers to English numbers pipe global ---
+  app.useGlobalPipes(new ConvertNumbersPipe());
 
   // --- Global Exception Filter ---
   app.useGlobalFilters(new AllExceptionsFilter());
