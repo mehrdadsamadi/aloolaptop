@@ -122,6 +122,6 @@
     }
 }
 
-html, body {
+html, body, * {
     font-family: var(--font-vazirmatn), sans-serif;
 }

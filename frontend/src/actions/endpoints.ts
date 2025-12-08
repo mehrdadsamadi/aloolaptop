@@ -1,6 +1,6 @@
 export const ENDPOINTS = {
   AUTH: {
-    SEND_OTP: '/auth/send-otp',
-    CHECK_OTP: '/auth/check-otp',
+    SEND_OTP: '/api/auth/send-otp',
+    CHECK_OTP: '/api/auth/check-otp',
   },
 }

@@ -3,22 +3,23 @@
 import { Button } from '@/components/ui/button'
 import { Field, FieldDescription, FieldError, FieldGroup, FieldSet } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { checkOtp, sendOtp } from '@/actions/auth.action'
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '@/components/ui/input-otp'
 import { redirect } from 'next/navigation'
-import { Spinner } from '@/components/ui/spinner'
 import { MobileSchemaType, mobileValidator, OtpSchemaType, otpValidator } from '@/validators/auth.validator'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { GalleryVerticalEnd } from 'lucide-react'
 import { toast } from 'sonner'
 import { convertFaToEn } from '@/lib/utils'
+import { useCountdown } from '@/hooks/useCountdown'
 
 export default function AuthForm() {
   const [authStep, setAuthStep] = useState(1)
   const [loading, setLoading] = useState(false)
-  const [timer, setTimer] = useState(120)
+
+  const { timer, reset } = useCountdown(120, authStep === 2)
 
   // ---------------------------
   // فرم مرحله 1 (شماره موبایل)
@@ -35,17 +36,6 @@ export default function AuthForm() {
     resolver: zodResolver(otpValidator),
     defaultValues: { code: '' },
   })
-
-  // ---------------------------
-  // تایمر
-  // ---------------------------
-  useEffect(() => {
-    if (authStep !== 2) return
-    if (timer === 0) return
-
-    const interval = setInterval(() => setTimer((p) => p - 1), 1000)
-    return () => clearInterval(interval)
-  }, [authStep, timer])
 
   // ---------------------------
   // مرحله 1 → ارسال OTP
@@ -66,7 +56,8 @@ export default function AuthForm() {
     }
 
     setAuthStep(2)
-    setTimer(120)
+    otpForm.reset()
+    reset()
   }
 
   // ---------------------------
@@ -118,14 +109,13 @@ export default function AuthForm() {
                 />
               </Field>
 
-              <FieldError className={'text-rose-500'}>{mobileForm.formState.errors.mobile?.message}</FieldError>
+              <FieldError>{mobileForm.formState.errors.mobile?.message}</FieldError>
             </FieldSet>
 
             <Button
-              disabled={loading}
-              className="w-full cursor-pointer"
+              loading={loading}
+              className="w-full"
             >
-              {loading && <Spinner />}
               ارسال کد
             </Button>
           </FieldGroup>
@@ -166,28 +156,35 @@ export default function AuthForm() {
                 </InputOTP>
               </Field>
 
-              <FieldError className={'text-rose-500'}>{otpForm.formState.errors.code?.message}</FieldError>
+              <FieldError>{otpForm.formState.errors.code?.message}</FieldError>
             </FieldSet>
 
             <div className={'flex flex-col gap-2'}>
               <Button
-                disabled={loading}
-                className="w-full cursor-pointer"
+                loading={loading}
+                className="w-full"
               >
-                {loading && <Spinner />}
                 ورود
               </Button>
 
               <Button
                 type="button"
                 variant="ghost"
-                disabled={timer > 0}
                 onClick={() => setAuthStep(1)}
-                className={`${timer <= 0 && 'cursor-pointer'}`}
               >
-                {timer > 0 ? `${Math.floor(timer / 60)}:${String(timer % 60).padStart(2, '0')}` : 'تغییر موبایل'}
+                تغییر موبایل
               </Button>
             </div>
+
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={timer > 0}
+              onClick={() => sendOtpHandler({ mobile: mobileForm.getValues('mobile') })}
+              className={`${timer > 0 && 'cursor-default'}`}
+            >
+              {timer > 0 ? `${Math.floor(timer / 60)}:${String(timer % 60).padStart(2, '0')}` : 'ارسال مجدد'}
+            </Button>
           </FieldGroup>
         </form>
       )}

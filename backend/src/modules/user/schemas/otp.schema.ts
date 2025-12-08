@@ -18,4 +18,4 @@ export type OtpDocument = HydratedDocument<Otp>;
 export const OtpSchema = SchemaFactory.createForClass(Otp);
 
 OtpSchema.index({ userId: 1 }, { unique: true }); // یا non-unique اگر مایل هستی چند otp داشته باشی
-OtpSchema.index({ expiresIn: 1 }, { expireAfterSeconds: 0 }); // TTL
+OtpSchema.index({ expiresIn: 1 }, { expireAfterSeconds: 60 }); // TTL

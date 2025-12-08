@@ -88,7 +88,6 @@ export class AuthService {
 
   async checkOtp(otpDto: CheckOtpDto) {
     const { code, mobile } = otpDto;
-    console.log('otp', otpDto);
 
     const user = await this.userModel
       .findOne({ mobile }) // فیلتر
@@ -97,8 +96,12 @@ export class AuthService {
 
     const now = new Date();
 
-    if (!user || !user.otp) {
+    if (!user) {
       throw new UnauthorizedException(AuthMessage.NotfoundMobile);
+    }
+
+    if (!user.otp) {
+      throw new UnauthorizedException(AuthMessage.ExpireOtpCode);
     }
 
     const otp = user.otp;

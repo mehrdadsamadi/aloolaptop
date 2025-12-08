@@ -11,6 +11,7 @@ export default function Providers({
       <Toaster
         position="bottom-center"
         closeButton
+        dir={'rtl'}
       />
     </>
   )
