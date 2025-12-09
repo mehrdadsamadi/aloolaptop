@@ -14,8 +14,12 @@ import { GalleryVerticalEnd } from 'lucide-react'
 import { toast } from 'sonner'
 import { convertFaToEn } from '@/lib/utils'
 import { useCountdown } from '@/hooks/useCountdown'
+import { useUser } from '@/hooks/useUser'
+import { getMe } from '@/actions/user.action'
 
 export default function AuthForm() {
+  const { saveUser } = useUser()
+
   const [authStep, setAuthStep] = useState(1)
   const [loading, setLoading] = useState(false)
 
@@ -80,9 +84,19 @@ export default function AuthForm() {
       return
     }
 
+    await getAndSaveUser()
+
     toast.success('ورود موفقیت آمیز بود')
 
     redirect('/')
+  }
+
+  const getAndSaveUser = async () => {
+    const user = await getMe()
+
+    if (user) {
+      saveUser(user)
+    }
   }
 
   return (

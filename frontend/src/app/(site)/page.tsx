@@ -2,9 +2,16 @@
 
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
-import { toast } from 'sonner'
+import { getMe } from '@/actions/user.action'
+import Link from 'next/link'
+import { useUser } from '@/hooks/useUser'
 
 export default function Home() {
+  const { logout } = useUser()
+  const getUser = async () => {
+    const res = await getMe()
+    console.log(res)
+  }
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
@@ -16,7 +23,9 @@ export default function Home() {
           height={20}
           priority
         />
-        <Button onClick={() => toast('سلام به همه رفقا ناب و گل')}>hello mehrdad</Button>
+        <Link href={'/auth'}>auth link</Link>
+        <Button onClick={getUser}>hello mehrdad</Button>
+        <Button onClick={logout}>logout</Button>
         <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
           <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
             To get started, edit the page.tsx file.
