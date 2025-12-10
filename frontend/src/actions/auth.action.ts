@@ -1,7 +1,7 @@
 'use server'
 
 import { ENDPOINTS } from '@/actions/helpers/endpoints'
-import { cookies } from 'next/headers'
+import { handleSetTokensInCookie } from '@/lib/jwtCoockie'
 
 type ApiResponse<T> = {
   success: boolean
@@ -12,6 +12,12 @@ type ApiResponse<T> = {
 type CheckOtpResponse = {
   accessToken: string
   refreshToken: string
+}
+
+interface JwtPayload {
+  exp: number // UNIX timestamp (seconds)
+  iat?: number
+  [key: string]: any
 }
 
 async function postRequest<T>(endpoint: string, body: any, defaultError = 'خطایی رخ داد'): Promise<ApiResponse<T>> {
@@ -50,9 +56,9 @@ export async function checkOtp({ mobile, code }: { mobile: string; code: string 
 
   if (!res.success) return res
 
-  const cookieStore = await cookies()
-  cookieStore.set('access_token', res.data!.accessToken, { httpOnly: true, secure: true, sameSite: 'strict', path: '/' })
-  cookieStore.set('refresh_token', res.data!.refreshToken, { httpOnly: true, secure: true, sameSite: 'strict', path: '/' })
+  const { accessToken, refreshToken } = res.data!
+
+  await handleSetTokensInCookie({ accessToken, refreshToken })
 
   return res
 }

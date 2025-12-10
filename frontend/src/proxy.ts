@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 
 const PUBLIC_ROUTES = ['/auth']
-const PRIVATE_ROUTES = ['/admin', '/auth/logout']
+const PRIVATE_ROUTES = ['/admin']
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl

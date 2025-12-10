@@ -2,6 +2,8 @@
 
 import { cookies } from 'next/headers'
 import { ENDPOINTS } from '@/actions/helpers/endpoints'
+import { redirect } from 'next/navigation'
+import { handleSetTokensInCookie } from '@/lib/jwtCoockie'
 
 export async function apiFetch(input: string, options: RequestInit = {}, retry = true) {
   const cookieStore = await cookies()
@@ -27,7 +29,7 @@ export async function apiFetch(input: string, options: RequestInit = {}, retry =
     const refreshed = await refreshTokens()
 
     if (!refreshed) {
-      return res // کاربر باید دوباره لاگین کند
+      return redirect('/auth') // کاربر باید دوباره لاگین کند
     }
 
     // دوباره fetch با توکن جدید
@@ -56,9 +58,9 @@ async function refreshTokens() {
 
   const data = await res.json()
 
+  const { accessToken, refreshToken: apiRefreshToken } = data
   // ذخیره توکن جدید
-  cookieStore.set('access_token', data.accessToken, { httpOnly: true, secure: true, sameSite: 'strict', path: '/' })
-  cookieStore.set('refresh_token', data.refreshToken, { httpOnly: true, secure: true, sameSite: 'strict', path: '/' })
+  await handleSetTokensInCookie({ accessToken, refreshToken: apiRefreshToken })
 
   return true
 }
