@@ -24,6 +24,7 @@ export default function Home() {
           priority
         />
         <Link href={'/auth'}>auth link</Link>
+        <Link href={'/admin/users'}>admin user link</Link>
         <Button onClick={getUser}>hello mehrdad</Button>
         <Button onClick={logout}>logout</Button>
         <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">

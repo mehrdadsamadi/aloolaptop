@@ -5,7 +5,7 @@ import { Field, FieldDescription, FieldError, FieldGroup, FieldSet } from '@/com
 import { Input } from '@/components/ui/input'
 import { useState } from 'react'
 import { checkOtp, sendOtp } from '@/actions/auth.action'
-import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '@/components/ui/input-otp'
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp'
 import { redirect } from 'next/navigation'
 import { MobileSchemaType, mobileValidator, OtpSchemaType, otpValidator } from '@/validators/auth.validator'
 import { useForm } from 'react-hook-form'
@@ -116,10 +116,12 @@ export default function AuthForm() {
             <FieldSet className={'gap-2'}>
               <Field dir="ltr">
                 <Input
+                  autoFocus
                   placeholder="09xx xxx xxxx"
                   {...mobileForm.register('mobile', {
                     setValueAs: convertFaToEn,
                   })}
+                  type="tel"
                 />
               </Field>
 
@@ -129,6 +131,7 @@ export default function AuthForm() {
             <Button
               loading={loading}
               className="w-full"
+              disabled={mobileForm.formState.isSubmitting || mobileForm.watch('mobile').length !== 11}
             >
               ارسال کد
             </Button>
@@ -143,28 +146,18 @@ export default function AuthForm() {
             <FieldSet className={'gap-2'}>
               <Field dir="ltr">
                 <InputOTP
+                  required
+                  autoFocus
                   maxLength={5}
                   value={otpForm.watch('code')}
                   onChange={(val) => otpForm.setValue('code', convertFaToEn(val), { shouldValidate: true })}
                   containerClassName="justify-center"
                 >
-                  <InputOTPGroup>
+                  <InputOTPGroup className="gap-2.5 *:data-[slot=input-otp-slot]:rounded-md *:data-[slot=input-otp-slot]:border">
                     <InputOTPSlot index={0} />
-                  </InputOTPGroup>
-                  <InputOTPSeparator />
-                  <InputOTPGroup>
                     <InputOTPSlot index={1} />
-                  </InputOTPGroup>
-                  <InputOTPSeparator />
-                  <InputOTPGroup>
                     <InputOTPSlot index={2} />
-                  </InputOTPGroup>
-                  <InputOTPSeparator />
-                  <InputOTPGroup>
                     <InputOTPSlot index={3} />
-                  </InputOTPGroup>
-                  <InputOTPSeparator />
-                  <InputOTPGroup>
                     <InputOTPSlot index={4} />
                   </InputOTPGroup>
                 </InputOTP>
@@ -177,6 +170,7 @@ export default function AuthForm() {
               <Button
                 loading={loading}
                 className="w-full"
+                disabled={otpForm.watch('code').length !== 5 || otpForm.formState.isSubmitting}
               >
                 ورود
               </Button>

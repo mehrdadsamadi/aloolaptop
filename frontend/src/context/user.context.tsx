@@ -1,10 +1,10 @@
 'use client'
 
-import { createContext, ReactNode, useState } from 'react'
+import { createContext, ReactNode, useEffect, useState } from 'react'
 import { Roles } from '@/lib/enums/roles.enum'
 import { toast } from 'sonner'
 
-interface User {
+export interface IUser {
   id: string
   mobile: string
   role: Roles
@@ -19,8 +19,8 @@ interface User {
 }
 
 interface UserContextType {
-  user: User | null
-  saveUser: (user: User) => void
+  user: IUser | null
+  saveUser: (user: IUser) => void
   removeUser: () => void
   logout: () => void
 }
@@ -28,9 +28,17 @@ interface UserContextType {
 export const UserContext = createContext<UserContextType | undefined>(undefined)
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<IUser | null>(null)
 
-  const saveUser = (user: User) => {
+  useEffect(() => {
+    const data = localStorage.getItem('user')
+
+    if (data) {
+      setUser(JSON.parse(data))
+    }
+  }, [])
+
+  const saveUser = (user: IUser) => {
     const { id, role, profile, mobile } = user
 
     const data = { id, role, profile, mobile }
@@ -46,9 +54,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     removeUser()
-    document.location.href = '/auth/logout'
-
     toast.success('شما با موفقیت از حساب کاربری خود خارج شدید')
+
+    document.location.href = '/auth/logout'
   }
 
   return <UserContext.Provider value={{ user, saveUser, removeUser, logout }}>{children}</UserContext.Provider>

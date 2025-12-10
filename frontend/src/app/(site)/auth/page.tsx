@@ -1,6 +1,6 @@
 import AuthForm from '@/app/(site)/auth/AuthForm'
 
-export default async function LoginPage() {
+export default async function AuthPage() {
   // const token = (await cookies()).get('access_token')?.value
   //
   // if (token) redirect('/')

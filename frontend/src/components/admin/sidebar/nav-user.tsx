@@ -1,0 +1,101 @@
+'use client'
+
+import { BadgeCheck, Bell, ChevronsUpDown, LogOut } from 'lucide-react'
+
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar'
+import { useUser } from '@/hooks/useUser'
+import { getFullName } from '@/lib/utils'
+
+export function NavUser() {
+  const { isMobile } = useSidebar()
+  const { logout } = useUser()
+  const { user } = useUser()
+
+  return (
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuButton
+              size="lg"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-pointer"
+            >
+              <Avatar className="h-8 w-8 rounded-lg">
+                <AvatarImage
+                  src={user?.profile.avatar.url}
+                  alt={getFullName(user)}
+                />
+                <AvatarFallback className="rounded-lg">اد</AvatarFallback>
+              </Avatar>
+              <div className="grid flex-1 text-right text-sm leading-tight">
+                <span className="truncate font-medium">{getFullName(user)}</span>
+                <span className="truncate text-xs">{user?.mobile}</span>
+              </div>
+              <ChevronsUpDown className="ml-auto size-4" />
+            </SidebarMenuButton>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            side={isMobile ? 'bottom' : 'right'}
+            align={'start'}
+            sideOffset={4}
+          >
+            <DropdownMenuLabel
+              dir={'rtl'}
+              className="p-0 font-normal"
+            >
+              <div className="flex items-center gap-2 px-1 py-1.5 text-right text-sm">
+                <Avatar className="h-8 w-8 rounded-lg">
+                  <AvatarImage
+                    src={user?.profile.avatar.url}
+                    alt={getFullName(user)}
+                  />
+                  <AvatarFallback className="rounded-lg">اد</AvatarFallback>
+                </Avatar>
+                <div className="grid flex-1 text-right text-sm leading-tight">
+                  <span className="truncate font-medium">{getFullName(user)}</span>
+                  <span className="truncate text-xs">{user?.mobile}</span>
+                </div>
+              </div>
+            </DropdownMenuLabel>
+
+            <DropdownMenuSeparator />
+
+            <DropdownMenuGroup dir={'rtl'}>
+              <DropdownMenuItem className={'cursor-pointer'}>
+                <BadgeCheck />
+                حساب کاربری
+              </DropdownMenuItem>
+              <DropdownMenuItem className={'cursor-pointer'}>
+                <Bell />
+                نوتیفیکیشن ها
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+
+            <DropdownMenuSeparator />
+
+            <DropdownMenuItem
+              onClick={logout}
+              dir={'rtl'}
+              className={'cursor-pointer'}
+              variant={'destructive'}
+            >
+              <LogOut />
+              خروج
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarMenuItem>
+    </SidebarMenu>
+  )
+}
