@@ -6,7 +6,6 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   type SortingState,
   useReactTable,
@@ -14,7 +13,8 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { ArrowUpDown } from 'lucide-react'
+import { ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Pagination, PaginationContent, PaginationItem, PaginationLink } from '@/components/ui/pagination'
 
 /**
  * Strongly‑typed, generic DataTable component.
@@ -22,10 +22,18 @@ import { ArrowUpDown } from 'lucide-react'
 export default function DataTable<TData, TValue>({
   columns,
   data,
+  page,
+  pageLimit,
+  pagesCount,
+  onPageChange,
   globalFilterPlaceholder = 'جستجو',
 }: {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  page: number
+  pageLimit: number
+  pagesCount: number
+  onPageChange: (page: number) => void
   globalFilterPlaceholder?: string
 }) {
   const memoColumns = useMemo(() => columns, [columns])
@@ -37,19 +45,46 @@ export default function DataTable<TData, TValue>({
   const table = useReactTable({
     data: memoData,
     columns: memoColumns,
-    state: { sorting, globalFilter },
+    state: {
+      sorting,
+      globalFilter,
+      pagination: {
+        pageIndex: page - 1,
+        pageSize: pageLimit,
+      },
+    },
+    manualPagination: true,
+    pageCount: pagesCount,
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    // getPaginationRowModel: getPaginationRowModel(),
   })
 
   const headerGroups = table.getHeaderGroups()
   const rows = table.getRowModel().rows
   const pageIndex = table.getState().pagination.pageIndex
   const pageCount = table.getPageCount()
+
+  const renderPageNumbers = () => {
+    return Array.from({ length: pageCount }, (_, i) => {
+      const pageNumber = i + 1
+
+      return (
+        <PaginationItem key={pageNumber}>
+          <PaginationLink
+            isActive={pageNumber === page}
+            onClick={() => onPageChange(pageNumber)}
+            className={'cursor-pointer'}
+          >
+            {pageNumber}
+          </PaginationLink>
+        </PaginationItem>
+      )
+    })
+  }
 
   return (
     <div className="space-y-4 bg-gray-50 p-4 rounded-xl h-[calc(100%-44px)]">
@@ -116,28 +151,59 @@ export default function DataTable<TData, TValue>({
       </div>
 
       <div className="flex items-center justify-between py-2">
-        <div className="text-sm text-muted-foreground">
-          صفحه {pageIndex + 1} از {pageCount}
+        <div className="text-sm text-muted-foreground min-w-fit">
+          صفحه {pageIndex} از {pageCount}
         </div>
 
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            قبلی
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            بعدی
-          </Button>
-        </div>
+        <Pagination className={'w-full'}>
+          <PaginationContent className={'w-full justify-center gap-4'}>
+            <PaginationItem>
+              <PaginationLink
+                onClick={() => onPageChange(page - 1)}
+                aria-disabled={page === 1}
+                className={page === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+              >
+                <ChevronRight className="" />
+                قبلی
+              </PaginationLink>
+            </PaginationItem>
+
+            {renderPageNumbers()}
+
+            <PaginationItem>
+              <PaginationItem className={'w-fit'}>
+                <PaginationLink
+                  onClick={() => onPageChange(page + 1)}
+                  aria-disabled={page === pageCount}
+                  className={page === pageCount ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                >
+                  بعدی
+                  <ChevronLeft className="" />
+                </PaginationLink>
+              </PaginationItem>
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+
+        {/*<div className="flex gap-2">*/}
+        {/*  <Button*/}
+        {/*    variant="outline"*/}
+        {/*    size="sm"*/}
+        {/*    onClick={() => onPageChange(pageIndex - 1)}*/}
+        {/*    disabled={pageIndex === 1}*/}
+        {/*  >*/}
+        {/*    قبلی*/}
+        {/*  </Button>*/}
+
+        {/*  <Button*/}
+        {/*    variant="outline"*/}
+        {/*    size="sm"*/}
+        {/*    onClick={() => onPageChange(pageIndex + 1)}*/}
+        {/*    disabled={pageIndex >= pageCount}*/}
+        {/*  >*/}
+        {/*    بعدی*/}
+        {/*  </Button>*/}
+        {/*</div>*/}
       </div>
     </div>
   )

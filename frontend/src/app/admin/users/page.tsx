@@ -1,36 +1,11 @@
-'use client'
-import DataTable from '@/components/common/dataTable'
+import UsersPage from '@/app/admin/users/UsersPage'
 
-export default function UsersPage() {
-  const userColumns = [
-    {
-      accessorKey: 'firstName',
-      header: 'نام',
-      cell: ({ row }) => row.original.firstName,
-    },
-    {
-      accessorKey: 'lastName',
-      header: 'نام خانوادگی',
-      cell: ({ row }) => row.original.lastName,
-    },
-    {
-      accessorKey: 'mobile',
-      header: 'موبایل',
-    },
-  ]
-  const users = [
-    { id: 1, firstName: 'مهدی', lastName: 'علیزاده', mobile: '09120000000' },
-    { id: 2, firstName: 'محمد', lastName: 'قاسمی', mobile: '09124444444' },
-  ]
-
+export default async function AdminUsersPage() {
   return (
-    <div className="h-full">
+    <section className="h-full">
       <h1 className="text-xl mb-4">لیست کاربران</h1>
 
-      <DataTable
-        columns={userColumns}
-        data={users}
-      />
-    </div>
+      <UsersPage />
+    </section>
   )
 }

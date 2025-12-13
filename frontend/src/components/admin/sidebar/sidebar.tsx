@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { AudioWaveform, ListOrderedIcon, Settings2, SquareTerminal, UsersIcon } from 'lucide-react'
+import { AudioWaveform, LayoutDashboardIcon, ListOrderedIcon, Settings2, SquareTerminal, UsersIcon } from 'lucide-react'
 
 import { Sidebar as ShadSidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from '@/components/ui/sidebar'
 import { FavoriteSwitcher } from '@/components/admin/sidebar/favorite-switcher'
@@ -29,10 +29,16 @@ const data = {
   ],
   navMain: [
     {
+      title: 'داشبورد',
+      url: '/admin',
+      icon: LayoutDashboardIcon,
+      isActive: true,
+    },
+    {
       title: 'کاربران',
       url: '/admin/users',
       icon: UsersIcon,
-      isActive: true,
+      isActive: false,
     },
     {
       title: 'محصولات',

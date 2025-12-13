@@ -13,6 +13,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar'
+import { usePathname } from 'next/navigation'
 
 export function NavMain({
   items,
@@ -28,6 +29,9 @@ export function NavMain({
     }[]
   }[]
 }) {
+  const pathname = usePathname()
+  const isActive = (url: string) => pathname === url
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>داشبورد</SidebarGroupLabel>
@@ -53,7 +57,10 @@ export function NavMain({
                   <SidebarMenuSub className={'border-l-0 border-r'}>
                     {item.items?.map((subItem, index) => (
                       <SidebarMenuSubItem key={index}>
-                        <SidebarMenuSubButton asChild>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={isActive(item.url)}
+                        >
                           <a href={subItem.url}>
                             <span>{subItem.title}</span>
                           </a>
@@ -66,7 +73,10 @@ export function NavMain({
             </Collapsible>
           ) : (
             <SidebarMenuItem key={i}>
-              <SidebarMenuButton asChild>
+              <SidebarMenuButton
+                asChild
+                isActive={isActive(item.url)}
+              >
                 <a href={item.url}>
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>

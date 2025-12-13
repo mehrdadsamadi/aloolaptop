@@ -16,6 +16,11 @@ import { AuthService } from '../../auth/auth.service';
 import { S3Service } from '../../common/services/s3/s3.service';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
+import {
+  paginationGenerator,
+  paginationSolver,
+} from '../../../common/utils/pagination.util';
+import { PaginationDto } from '../../../common/dtos/pagination.dto';
 
 @Injectable({ scope: Scope.REQUEST })
 export class UserService {
@@ -28,6 +33,24 @@ export class UserService {
     private readonly authService: AuthService,
     private readonly s3Service: S3Service,
   ) {}
+
+  async usersList(paginationDto: PaginationDto) {
+    const { page, limit, skip } = paginationSolver(paginationDto);
+
+    const count = await this.userModel.countDocuments();
+
+    const users = await this.userModel
+      .find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    return {
+      users,
+      pagination: paginationGenerator(count, page, limit),
+    };
+  }
 
   async getMe() {
     const userId = this.req.user?._id;

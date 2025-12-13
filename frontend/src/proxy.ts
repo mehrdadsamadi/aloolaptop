@@ -1,6 +1,9 @@
 // proxy.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { Roles } from '@/lib/enums/roles.enum'
+import { jwtDecode } from 'jwt-decode'
+import { JwtPayload } from '@/lib/jwtCoockie'
 
 const PUBLIC_ROUTES = ['/auth']
 const PRIVATE_ROUTES = ['/admin']
@@ -11,6 +14,9 @@ export async function proxy(request: NextRequest) {
   // مثال ساده: بررسی کوکی "token" برای تشخیص لاگین بودن
   const token = request.cookies.get('access_token')?.value
   const isLoggedIn = Boolean(token)
+
+  const payload = token ? jwtDecode<JwtPayload>(token) : null
+  const role = payload?.role
 
   // اگر کاربر خواست لاگ اوت کنه
   if (pathname === '/auth/logout') {
@@ -36,6 +42,10 @@ export async function proxy(request: NextRequest) {
     if (!isLoggedIn) {
       // اگر کاربر لاگین نیست — هدایت به صفحه ورود
       return NextResponse.redirect(new URL('/auth', request.url))
+    }
+
+    if (pathname.startsWith('/admin') && role !== Roles.ADMIN) {
+      return NextResponse.redirect(new URL('/403', request.url))
     }
 
     return NextResponse.next()

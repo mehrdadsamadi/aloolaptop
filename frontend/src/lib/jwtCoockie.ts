@@ -1,10 +1,16 @@
 import { cookies } from 'next/headers'
 import { jwtDecode } from 'jwt-decode'
+import { Roles } from '@/lib/enums/roles.enum'
 
-interface JwtPayload {
+interface TokensPayload {
+  userId: string
+  mobile: string
+  role: Roles
+}
+
+export interface JwtPayload extends TokensPayload {
   exp: number
   iat?: number
-  [key: string]: any
 }
 
 interface SetJwtCookieOptions {

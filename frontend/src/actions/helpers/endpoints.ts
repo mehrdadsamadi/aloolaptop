@@ -6,5 +6,6 @@ export const ENDPOINTS = {
   },
   USER: {
     ME: '/api/user/me',
+    LIST: ({ page = 1, limit = 20 }: { page?: number; limit?: number }) => `/api/user/list?page=${page}&limit=${limit}`,
   },
 }

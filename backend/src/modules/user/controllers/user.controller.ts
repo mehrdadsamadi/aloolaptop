@@ -6,6 +6,7 @@ import {
   MaxFileSizeValidator,
   ParseFilePipe,
   Patch,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -16,12 +17,23 @@ import { UpdateProfileDto } from '../dto/user-profile.dto';
 import { SwaggerConsumes } from '../../../common/enums/swagger-consumes.enum';
 import { SendOtpDto } from '../../auth/dto/otp.dto';
 import { UploadFileS3 } from '../../../common/interceptors/upload-file.interceptor';
+import { CanAccess } from '../../../common/decorators/role.decorator';
+import { Roles } from '../../../common/enums/role.enum';
+import { Pagination } from '../../../common/decorators/pagination.decorator';
+import { PaginationDto } from '../../../common/dtos/pagination.dto';
 
 @Controller('user')
 @ApiTags('User')
 @AuthDecorator()
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Get('list')
+  @CanAccess(Roles.ADMIN)
+  @Pagination()
+  async usersList(@Query() paginationDto: PaginationDto) {
+    return this.userService.usersList(paginationDto);
+  }
 
   @Get('me')
   async getMe() {

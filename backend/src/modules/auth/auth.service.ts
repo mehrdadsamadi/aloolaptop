@@ -13,10 +13,12 @@ import { randomInt } from 'crypto';
 import { ConfigService } from '@nestjs/config';
 import { AuthMessage, UserMessage } from '../../common/enums/message.enum';
 import axios from 'axios';
+import { Roles } from '../../common/enums/role.enum';
 
 interface TokensPayload {
   userId: string;
   mobile: string;
+  role: Roles;
 }
 
 @Injectable()
@@ -130,6 +132,7 @@ export class AuthService {
     const { accessToken, refreshToken } = this.generateJwtTokens({
       userId: String(user._id),
       mobile,
+      role: user.role,
     });
 
     return {
@@ -163,6 +166,7 @@ export class AuthService {
       return this.generateJwtTokens({
         userId: String(user._id),
         mobile: user.mobile,
+        role: user.role,
       });
     } catch (error) {
       throw new UnauthorizedException(AuthMessage.InvalidRefreshToken);
