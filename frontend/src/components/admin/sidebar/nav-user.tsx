@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar'
 import { useUser } from '@/hooks/useUser'
-import { getFullName } from '@/lib/utils'
+import { getFullName, getImageUrl } from '@/lib/utils'
 
 export function NavUser() {
   const { isMobile } = useSidebar()
@@ -32,7 +32,7 @@ export function NavUser() {
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage
-                  src={user?.profile.avatar.url}
+                  src={getImageUrl(user?.profile?.avatar?.url)}
                   alt={getFullName(user)}
                 />
                 <AvatarFallback className="rounded-lg">اد</AvatarFallback>
@@ -57,7 +57,7 @@ export function NavUser() {
               <div className="flex items-center gap-2 px-1 py-1.5 text-right text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage
-                    src={user?.profile.avatar.url}
+                    src={getImageUrl(user?.profile?.avatar?.url)}
                     alt={getFullName(user)}
                   />
                   <AvatarFallback className="rounded-lg">اد</AvatarFallback>

@@ -113,7 +113,7 @@ export default function DataTable<TData, TValue>({
                         onClick={header.column.getToggleSortingHandler()}
                       >
                         {flexRender(header.column.columnDef.header, header.getContext())}
-                        <ArrowUpDown className="ml-1 h-4 w-4" />
+                        {header.column.columnDef.enableSorting && <ArrowUpDown className="size-4" />}
                       </Button>
                     )}
                   </TableHead>
@@ -171,39 +171,17 @@ export default function DataTable<TData, TValue>({
             {renderPageNumbers()}
 
             <PaginationItem>
-              <PaginationItem className={'w-fit'}>
-                <PaginationLink
-                  onClick={() => onPageChange(page + 1)}
-                  aria-disabled={page === pageCount}
-                  className={page === pageCount ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                >
-                  بعدی
-                  <ChevronLeft className="" />
-                </PaginationLink>
-              </PaginationItem>
+              <PaginationLink
+                onClick={() => onPageChange(page + 1)}
+                aria-disabled={page === pageCount}
+                className={page === pageCount ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+              >
+                بعدی
+                <ChevronLeft className="" />
+              </PaginationLink>
             </PaginationItem>
           </PaginationContent>
         </Pagination>
-
-        {/*<div className="flex gap-2">*/}
-        {/*  <Button*/}
-        {/*    variant="outline"*/}
-        {/*    size="sm"*/}
-        {/*    onClick={() => onPageChange(pageIndex - 1)}*/}
-        {/*    disabled={pageIndex === 1}*/}
-        {/*  >*/}
-        {/*    قبلی*/}
-        {/*  </Button>*/}
-
-        {/*  <Button*/}
-        {/*    variant="outline"*/}
-        {/*    size="sm"*/}
-        {/*    onClick={() => onPageChange(pageIndex + 1)}*/}
-        {/*    disabled={pageIndex >= pageCount}*/}
-        {/*  >*/}
-        {/*    بعدی*/}
-        {/*  </Button>*/}
-        {/*</div>*/}
       </div>
     </div>
   )

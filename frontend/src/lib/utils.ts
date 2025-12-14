@@ -9,6 +9,8 @@ export function cn(...inputs: ClassValue[]) {
 export const convertFaToEn = (str: string) => str.replace(/[۰-۹]/g, (d) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)))
 
 export const getFullName = (user: IUser | null) => {
+  if (user?.profile?.firstName === undefined) return ''
+
   return user?.profile?.firstName + ' ' + user?.profile?.lastName
 }
 
@@ -18,4 +20,8 @@ export function formatPersianDate(date: string | Date) {
     month: 'long',
     year: 'numeric',
   }).format(new Date(date))
+}
+
+export function getImageUrl(url: string | undefined) {
+  return url ?? '/images/image-placeholder.jpeg'
 }

@@ -4,6 +4,7 @@ import {
   FileTypeValidator,
   Get,
   MaxFileSizeValidator,
+  Param,
   ParseFilePipe,
   Patch,
   Query,
@@ -21,6 +22,7 @@ import { CanAccess } from '../../../common/decorators/role.decorator';
 import { Roles } from '../../../common/enums/role.enum';
 import { Pagination } from '../../../common/decorators/pagination.decorator';
 import { PaginationDto } from '../../../common/dtos/pagination.dto';
+import { ChangeUserRoleDto } from '../dto/change-user-role.dto';
 
 @Controller('user')
 @ApiTags('User')
@@ -33,6 +35,16 @@ export class UserController {
   @Pagination()
   async usersList(@Query() paginationDto: PaginationDto) {
     return this.userService.usersList(paginationDto);
+  }
+
+  @Patch(':id/change-role')
+  @ApiConsumes(SwaggerConsumes.UrlEncoded, SwaggerConsumes.Json)
+  @CanAccess(Roles.ADMIN)
+  async changeUserRole(
+    @Param('id') userId: string,
+    @Body() changeUserRoleDto: ChangeUserRoleDto,
+  ) {
+    return this.userService.changeUserRole(userId, changeUserRoleDto);
   }
 
   @Get('me')

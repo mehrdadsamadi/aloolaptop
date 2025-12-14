@@ -34,6 +34,9 @@ export const AuthMessage = {
 export const UserMessage = {
   Notfound: 'کاربری یافت نشد',
   ProfileUpdated: 'پروفایل شما با موفقیت ویرایش شد',
+  ChangeOwnRole: 'شما نمیتوانید نقش خود را تغییر دهید',
+  RoleAlreadyAssign: 'کاربر این نقش را از قبل دارد',
+  RoleUpdated: 'نقش کاربر با موفقیت ویرایش شد',
 } as const;
 
 export const UserAddressMessage = {

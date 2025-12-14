@@ -8,7 +8,6 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from '../schemas/user.schema';
-import { Otp, OtpDocument } from '../schemas/otp.schema';
 import { AuthMessage, UserMessage } from '../../../common/enums/message.enum';
 import { UpdateProfileDto } from '../dto/user-profile.dto';
 import { SendOtpDto } from '../../auth/dto/otp.dto';
@@ -21,12 +20,12 @@ import {
   paginationSolver,
 } from '../../../common/utils/pagination.util';
 import { PaginationDto } from '../../../common/dtos/pagination.dto';
+import { ChangeUserRoleDto } from '../dto/change-user-role.dto';
 
 @Injectable({ scope: Scope.REQUEST })
 export class UserService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
-    @InjectModel(Otp.name) private otpModel: Model<OtpDocument>,
 
     @Inject(REQUEST) private req: Request,
 
@@ -49,6 +48,33 @@ export class UserService {
     return {
       users,
       pagination: paginationGenerator(count, page, limit),
+    };
+  }
+
+  async changeUserRole(
+    targetUserId: string,
+    changeUserRoleDto: ChangeUserRoleDto,
+  ) {
+    const userId = this.req.user?._id;
+
+    // جلوگیری از تغییر نقش خود ادمین
+    if (userId?.toString() === targetUserId) {
+      throw new BadRequestException(UserMessage.ChangeOwnRole);
+    }
+
+    const user = await this.userModel.findById(targetUserId);
+    if (!user) throw new NotFoundException(UserMessage.Notfound);
+
+    if (user.role === changeUserRoleDto.role) {
+      throw new BadRequestException(UserMessage.RoleAlreadyAssign);
+    }
+
+    user.role = changeUserRoleDto.role;
+    await user.save();
+
+    return {
+      message: UserMessage.RoleUpdated,
+      user,
     };
   }
 
