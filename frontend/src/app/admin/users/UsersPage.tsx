@@ -20,10 +20,12 @@ import {
 import { Button } from '@/components/ui/button'
 import { ChevronDown } from 'lucide-react'
 import { toast } from 'sonner'
-import { useLoading } from '@/hooks/useLoading'
+import LoadingSection from '@/components/common/loadingSection'
+import { useConfirm } from '@/hooks/useConfirm'
+import NoData from '@/components/common/noData'
 
 export default function UsersPage() {
-  const { showLoading, hideLoading } = useLoading()
+  const { confirm } = useConfirm()
 
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const [users, setUsers] = useState<User[] | null>(null)
@@ -83,7 +85,15 @@ export default function UsersPage() {
             <DropdownMenuSeparator />
             <DropdownMenuRadioGroup
               value={row.original.role}
-              onValueChange={(value: string) => changeRole(row.original._id, value as Roles)}
+              onValueChange={(value: string) => {
+                confirm({
+                  title: 'تغییر نقش کاربر',
+                  description: `آیا از تغییر نقش این کاربر به "${ROLE_NAME_CONSTANTS[value as Roles]}" مطمئن هستید؟`,
+                  confirmText: 'بله، تغییر بده',
+                  cancelText: 'لغو',
+                  onConfirm: () => changeRole(row.original._id, value as Roles),
+                })
+              }}
               className={'space-y-2'}
               dir={'rtl'}
             >
@@ -124,8 +134,6 @@ export default function UsersPage() {
   ]
 
   const usersList = async () => {
-    showLoading()
-
     const res = await getUsersList({
       page,
       limit,
@@ -134,8 +142,6 @@ export default function UsersPage() {
     setUsers(res.users)
 
     setPagesCount(res?.pagination?.pagesCount)
-
-    hideLoading()
   }
 
   useEffect(() => {
@@ -161,7 +167,9 @@ export default function UsersPage() {
   return (
     <>
       {users === null ? (
-        <div>null</div>
+        <LoadingSection />
+      ) : users.length === 0 ? (
+        <NoData />
       ) : (
         <DataTable
           columns={userColumns}

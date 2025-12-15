@@ -2,6 +2,7 @@ import { Toaster } from '@/components/ui/sonner'
 import { UserProvider } from '@/context/user.context'
 import { LoadingProvider } from '@/context/loading.context'
 import LoadingOverlay from '@/components/common/loadingOverlay'
+import { ConfirmDialogProvider } from '@/context/confirmDialog.context'
 
 export default function Providers({
   children,
@@ -10,17 +11,19 @@ export default function Providers({
 }>) {
   return (
     <LoadingProvider>
-      <UserProvider>
-        {children}
+      <ConfirmDialogProvider>
+        <UserProvider>
+          {children}
 
-        <Toaster
-          position="bottom-center"
-          closeButton
-          dir={'rtl'}
-        />
+          <Toaster
+            position="bottom-center"
+            closeButton
+            dir={'rtl'}
+          />
 
-        <LoadingOverlay />
-      </UserProvider>
+          <LoadingOverlay />
+        </UserProvider>
+      </ConfirmDialogProvider>
     </LoadingProvider>
   )
 }
