@@ -57,7 +57,7 @@ export class CategoryController {
   @CanAccess(Roles.ADMIN)
   @Pagination()
   findAll(@Query() paginationDto: PaginationDto) {
-    return this.categoryService.findAll({ paginationDto });
+    return this.categoryService.findAll({ paginationDto, activeOnly: false });
   }
 
   @Get('tree')

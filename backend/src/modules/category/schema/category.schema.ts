@@ -45,7 +45,10 @@ export class Category {
   meta?: { title?: string; description?: string; keywords?: string[] };
 }
 
-export type CategoryDocument = HydratedDocument<Category>;
+export type CategoryDocument = HydratedDocument<Category> & {
+  // virtual populate
+  parent?: CategoryDocument | null;
+};
 
 export const CategorySchema = SchemaFactory.createForClass(Category);
 
@@ -53,3 +56,13 @@ export const CategorySchema = SchemaFactory.createForClass(Category);
 CategorySchema.index({ slug: 1 }, { unique: true });
 CategorySchema.index({ name: 'text', description: 'text' });
 CategorySchema.index({ parentId: 1, order: 1 });
+
+CategorySchema.virtual('parent', {
+  ref: 'Category',
+  localField: 'parentId',
+  foreignField: '_id',
+  justOne: true,
+});
+
+CategorySchema.set('toObject', { virtuals: true });
+CategorySchema.set('toJSON', { virtuals: true });

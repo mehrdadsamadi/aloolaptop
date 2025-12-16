@@ -107,7 +107,10 @@ export class CategoryService {
       .sort({ order: 1, name: 1 })
       .skip(skip)
       .limit(limit)
-      .lean();
+      .populate({
+        path: 'parent',
+        select: '_id name',
+      });
 
     // 3) برگردوندن لیست و اطلاعات pagination
     return {

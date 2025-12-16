@@ -1,9 +1,4 @@
-export interface IUserRoot {
-  users: User[]
-  pagination: Pagination
-}
-
-export interface User {
+export interface IUser {
   _id: string
   mobile: string
   mobileVerified: boolean

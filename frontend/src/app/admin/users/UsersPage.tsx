@@ -1,11 +1,12 @@
 'use client'
+
 import DataTable from '@/components/common/dataTable'
 import { changeUserRole, getUsersList } from '@/actions/user.action'
 import { useEffect, useState } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { formatPersianDate, getImageUrl } from '@/lib/utils'
 import { ColumnDef } from '@tanstack/react-table'
-import { User } from '@/types/admin/user.type'
+import { IUser } from '@/types/admin/user.type'
 import { ROLE_NAME_CONSTANTS } from '@/lib/constants/role.constant'
 import { Roles } from '@/lib/enums/roles.enum'
 import {
@@ -28,12 +29,12 @@ export default function UsersPage() {
   const { confirm } = useConfirm()
 
   const [loadingId, setLoadingId] = useState<string | null>(null)
-  const [users, setUsers] = useState<User[] | null>(null)
+  const [users, setUsers] = useState<IUser[] | null>(null)
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(20)
   const [pagesCount, setPagesCount] = useState(1)
 
-  const userColumns: ColumnDef<User>[] = [
+  const userColumns: ColumnDef<IUser>[] = [
     {
       accessorKey: 'avatar',
       header: 'تصویر',
