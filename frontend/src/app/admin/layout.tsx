@@ -1,18 +1,16 @@
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { Sidebar } from '@/components/admin/sidebar/sidebar'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb'
-import { cookies } from 'next/headers'
-import { jwtDecode } from 'jwt-decode'
-import { JwtPayload } from '@/lib/jwtCoockie'
-import { Roles } from '@/lib/enums/roles.enum'
-import { redirect } from 'next/navigation'
 
 export default async function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
-  const cookieStore = await cookies()
-
-  const payload = jwtDecode<JwtPayload>(cookieStore.get('access_token')?.value ?? '')
-
-  if (payload.role !== Roles.ADMIN) redirect('/403')
+  // const cookieStore = await cookies()
+  //
+  // const act = cookieStore.get('access_token')?.value
+  // if (!act) redirect('/auth')
+  //
+  // const payload = jwtDecode<JwtPayload>(act)
+  //
+  // if (payload.role !== Roles.ADMIN) redirect('/403')
 
   return (
     <SidebarProvider>

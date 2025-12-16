@@ -39,7 +39,7 @@ export async function apiFetch(input: string, options: RequestInit = {}, retry =
   return res
 }
 
-async function refreshTokens() {
+export async function refreshTokens() {
   const cookieStore = await cookies()
   const refreshToken = cookieStore.get('refresh_token')?.value
 

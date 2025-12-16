@@ -4,15 +4,27 @@ import { cookies } from 'next/headers'
 import { Roles } from '@/lib/enums/roles.enum'
 import { jwtDecode } from 'jwt-decode'
 import { JwtPayload } from '@/lib/jwtCoockie'
+import { refreshTokens } from '@/actions/helpers/fetchClient'
 
 const PUBLIC_ROUTES = ['/auth']
 const PRIVATE_ROUTES = ['/admin']
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
+  const cookieStore = await cookies()
 
   // مثال ساده: بررسی کوکی "token" برای تشخیص لاگین بودن
-  const token = request.cookies.get('access_token')?.value
+  let token = request.cookies.get('access_token')?.value
+  if (!token && pathname !== '/auth') {
+    const refreshed = await refreshTokens()
+
+    if (!refreshed) return NextResponse.redirect(new URL('/auth', request.url))
+
+    const act = cookieStore.get('access_token')!.value
+    request.cookies.set('access_token', act)
+  }
+
+  token = request.cookies.get('access_token')?.value
   const isLoggedIn = Boolean(token)
 
   const payload = token ? jwtDecode<JwtPayload>(token) : null
@@ -20,8 +32,6 @@ export async function proxy(request: NextRequest) {
 
   // اگر کاربر خواست لاگ اوت کنه
   if (pathname === '/auth/logout') {
-    const cookieStore = await cookies()
-
     cookieStore.delete('access_token')
     cookieStore.delete('refresh_token')
 

@@ -15,9 +15,11 @@ import {
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar'
 import { useUser } from '@/hooks/useUser'
 import { getFullName, getImageUrl } from '@/lib/utils'
+import { useConfirm } from '@/hooks/useConfirm'
 
 export function NavUser() {
   const { isMobile } = useSidebar()
+  const { confirm } = useConfirm()
   const { logout } = useUser()
   const { user } = useUser()
 
@@ -85,7 +87,15 @@ export function NavUser() {
             <DropdownMenuSeparator />
 
             <DropdownMenuItem
-              onClick={logout}
+              onClick={() => {
+                confirm({
+                  title: 'خروج',
+                  description: `آیا برای خروج مطمئن هستید؟`,
+                  confirmText: 'بله',
+                  cancelText: 'خیر',
+                  onConfirm: logout,
+                })
+              }}
               dir={'rtl'}
               className={'cursor-pointer'}
               variant={'destructive'}
