@@ -1,3 +1,5 @@
+import { IImage } from '@/types/image.type'
+
 export interface ICategory {
   _id: string
   name: string
@@ -5,30 +7,33 @@ export interface ICategory {
   description: string
   parentId: string | null
   parent: Parent | null
-  attributes: Attribute[]
+  attributes: ICategoryAttribute[]
   isActive: boolean
   order: number
-  image: Image
+  image: IImage
   createdAt: string
   updatedAt: string
 }
 
-export interface Attribute {
+export interface ICategoryAttribute {
   key: string
   label: string
-  type: string
-  options: string[]
+  type: AttributeType
+  options?: string[]
   showInFilter: boolean
   required: boolean
-}
-
-export interface Image {
-  url: string
-  key: string
 }
 
 export interface Parent {
   id: string
   _id: string
   name: string
+}
+
+export enum AttributeType {
+  STRING = 'string',
+  NUMBER = 'number',
+  BOOLEAN = 'boolean',
+  SELECT = 'select',
+  RANGE = 'range',
 }

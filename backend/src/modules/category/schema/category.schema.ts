@@ -5,8 +5,8 @@ import { ImageSchema, ImageSubSchema } from '../../common/schemas/image.schema';
 
 export class CategoryAttribute {
   @Prop({ required: true }) key: string;
-  @Prop() label?: string;
-  @Prop({ enum: AttributeType }) type?: AttributeType;
+  @Prop({ required: true }) label: string;
+  @Prop({ enum: AttributeType, required: true }) type: AttributeType;
   @Prop([String]) options?: string[];
   @Prop({ default: true }) showInFilter?: boolean;
   @Prop({ default: true }) required?: boolean;

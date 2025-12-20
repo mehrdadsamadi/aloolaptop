@@ -17,3 +17,9 @@ export async function deleteCategory(categoryId: string) {
 
   return res.json()
 }
+
+export async function getCategoryById(categoryId: string) {
+  const res = await apiFetch(ENDPOINTS.CATEGORIES.GET_BY_ID(categoryId), { method: 'GET' })
+
+  return res.json()
+}

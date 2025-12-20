@@ -14,6 +14,7 @@ import { PencilIcon, Trash2Icon } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { useConfirm } from '@/hooks/useConfirm'
 import { toast } from 'sonner'
+import CategoryAttributesCell from '@/app/admin/categories/_components/CategoryAttributesCell'
 
 export default function CategoriesPage() {
   const { confirm } = useConfirm()
@@ -51,7 +52,7 @@ export default function CategoriesPage() {
     {
       accessorKey: 'parentId',
       header: 'دسته بندی والد',
-      cell: ({ row }) => row.original?.parent?.name,
+      cell: ({ row }) => row.original?.parent?.name ?? '—',
       enableSorting: true,
     },
     {
@@ -66,12 +67,12 @@ export default function CategoriesPage() {
       cell: ({ row }) => <p className={'truncate max-w-[200px]'}>{row.original?.description}</p>,
       enableSorting: true,
     },
-    // {
-    //   accessorKey: 'attributes',
-    //   header: 'ویژگی ها',
-    //   cell: ({ row }) => row.original?.attributes,
-    //   enableSorting: true,
-    // },
+    {
+      accessorKey: 'attributes',
+      header: 'ویژگی ها',
+      cell: ({ row }) => <CategoryAttributesCell attributes={row.original.attributes} />,
+      enableSorting: true,
+    },
     {
       accessorKey: 'isActive',
       header: 'وضعیت',
