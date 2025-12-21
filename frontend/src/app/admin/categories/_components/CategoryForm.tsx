@@ -9,6 +9,7 @@ import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from '@/compo
 import { InputGroup, InputGroupTextarea } from '@/components/ui/input-group'
 import AttributesBuilder from './AttributesBuilder'
 import { CategoryFormValues, categorySchema } from '@/validators/category.validator'
+import { AsyncCombobox } from '@/components/input/asyncCombobox'
 
 interface Props {
   initialValues?: CategoryFormValues
@@ -24,7 +25,7 @@ export default function CategoryForm({ initialValues, onSubmit, isEdit }: Props)
       slug: '',
       description: '',
       parentId: null,
-      order: 0,
+      order: 1,
       isActive: true,
       attributes: [],
     },
@@ -35,6 +36,10 @@ export default function CategoryForm({ initialValues, onSubmit, isEdit }: Props)
     control,
     formState: { isSubmitting },
   } = form
+
+  const handleSelectionChange = (value: string) => {
+    console.log('مقدار انتخاب شده:', value)
+  }
 
   return (
     <form
@@ -85,10 +90,17 @@ export default function CategoryForm({ initialValues, onSubmit, isEdit }: Props)
                 <FieldLabel htmlFor="form-rhf-demo-order">ترتیب</FieldLabel>
                 <Input
                   {...field}
+                  value={field.value ?? ''}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    // اگر رشته خالی بود مقدار null بذار یا 0
+                    field.onChange(value === '' ? null : parseInt(value, 10))
+                  }}
                   type={'number'}
                   id="form-rhf-demo-order"
                   aria-invalid={fieldState.invalid}
                   placeholder="ترتیب"
+                  min={1}
                 />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
@@ -117,31 +129,39 @@ export default function CategoryForm({ initialValues, onSubmit, isEdit }: Props)
           )}
         />
 
-        <div className={'max-w-[8rem]'}>
-          <Controller
-            name="isActive"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field
-                orientation="horizontal"
-                data-invalid={fieldState.invalid}
-              >
-                <FieldContent>
-                  <FieldLabel htmlFor="form-rhf-switch-isActive">فعال باشد</FieldLabel>
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </FieldContent>
-                <Switch
-                  dir={'ltr'}
-                  id="form-rhf-switch-isActive"
-                  className={'cursor-pointer'}
-                  name={field.name}
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                  aria-invalid={fieldState.invalid}
-                />
-              </Field>
-            )}
+        <div className={'grid grid-cols-2 gap-2'}>
+          <AsyncCombobox
+            apiUrl="/api/categories" // آدرس API شما
+            placeholder="دسته بندی والد"
+            onValueChange={handleSelectionChange}
           />
+
+          <div className={'max-w-[8rem] border rounded-lg p-2'}>
+            <Controller
+              name="isActive"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field
+                  orientation="horizontal"
+                  data-invalid={fieldState.invalid}
+                >
+                  <FieldContent>
+                    <FieldLabel htmlFor="form-rhf-switch-isActive">فعال باشد</FieldLabel>
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </FieldContent>
+                  <Switch
+                    dir={'ltr'}
+                    id="form-rhf-switch-isActive"
+                    className={'cursor-pointer'}
+                    name={field.name}
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    aria-invalid={fieldState.invalid}
+                  />
+                </Field>
+              )}
+            />
+          </div>
         </div>
 
         <AttributesBuilder control={control} />

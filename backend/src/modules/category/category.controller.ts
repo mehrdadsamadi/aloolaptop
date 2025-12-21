@@ -25,7 +25,9 @@ import { SwaggerConsumes } from '../../common/enums/swagger-consumes.enum';
 import { EXAMPLE_CATEGORY } from './examples/category.example';
 import { UploadFileS3 } from '../../common/interceptors/upload-file.interceptor';
 import { Pagination } from '../../common/decorators/pagination.decorator';
-import { PaginationDto } from '../../common/dtos/pagination.dto';
+import { FilterCategory } from '../../common/decorators/filter.decorator';
+import { FilterCategoryDto } from '../../common/dtos/filter.dto';
+import { extractFilters } from '../../common/utils/functions.util';
 
 @Controller('categories')
 @ApiTags('Categories')
@@ -46,6 +48,7 @@ export class CategoryController {
           new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 10 }),
           new FileTypeValidator({ fileType: 'image/(png|jpeg|jpg|webp)' }),
         ],
+        fileIsRequired: false,
       }),
     )
     image: Express.Multer.File,
@@ -56,8 +59,15 @@ export class CategoryController {
   @Get()
   @CanAccess(Roles.ADMIN)
   @Pagination()
-  findAll(@Query() paginationDto: PaginationDto) {
-    return this.categoryService.findAll({ paginationDto, activeOnly: false });
+  @FilterCategory()
+  findAll(@Query() filterDto: FilterCategoryDto) {
+    const { paginationDto, filter } = extractFilters(filterDto);
+
+    return this.categoryService.findAll({
+      paginationDto,
+      filter,
+      activeOnly: false,
+    });
   }
 
   @Get('tree')

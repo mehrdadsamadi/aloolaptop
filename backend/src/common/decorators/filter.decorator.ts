@@ -11,3 +11,9 @@ export function FilterProduct() {
     ApiQuery({ name: 'isActive', required: false, type: 'boolean' }),
   );
 }
+
+export function FilterCategory() {
+  return applyDecorators(
+    ApiQuery({ name: 'name', required: false, type: 'string' }),
+  );
+}

@@ -33,7 +33,7 @@ class AttributeDto {
   @ApiPropertyOptional({ example: ['4GB', '8GB', '16GB'] })
   @IsOptional()
   @IsArray()
-  options?: string[];
+  options?: string[] | number[] | string | number | boolean;
 
   @ApiPropertyOptional({ example: true })
   @IsOptional()

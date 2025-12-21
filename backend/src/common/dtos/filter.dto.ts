@@ -1,7 +1,13 @@
 import { ProductCondition } from '../../modules/product/enums/product-condition.enum';
 import { ProductGrade } from '../../modules/product/enums/product-grade.enum';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsEnum, IsMongoId, IsOptional } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsMongoId,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 import { PaginationDto } from './pagination.dto';
 
@@ -26,4 +32,11 @@ export class FilterProductDto extends PaginationDto {
   @Transform(({ value }) => value === 'true' || value === '1' || value === true)
   @IsBoolean()
   isActive?: boolean;
+}
+
+export class FilterCategoryDto extends PaginationDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  name?: string;
 }

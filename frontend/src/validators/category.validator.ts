@@ -6,7 +6,7 @@ export const categorySchema = z.object({
   slug: z.string().min(1, 'اسلاگ الزامی است'),
   description: z.string().optional(),
   parentId: z.string().nullable().optional(),
-  order: z.number().min(0),
+  order: z.number().min(1),
   isActive: z.boolean(),
   image: z.any().optional(),
 
@@ -15,7 +15,7 @@ export const categorySchema = z.object({
       key: z.string().min(1),
       label: z.string().min(1),
       type: z.enum(AttributeType),
-      options: z.array(z.string()).optional(),
+      options: z.any().optional(),
       required: z.boolean(),
       showInFilter: z.boolean(),
     })

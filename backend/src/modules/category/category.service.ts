@@ -24,6 +24,7 @@ import {
   makeSlug,
   parseAttributes,
 } from '../../common/utils/functions.util';
+import { FilterProductDto } from '../../common/dtos/filter.dto';
 
 @Injectable()
 export class CategoryService {
@@ -56,7 +57,13 @@ export class CategoryService {
       if (!parent) throw new NotFoundException(CategoryMessage.NotfoundParent);
     }
 
-    const { url, key } = await this.s3Service.uploadFile(image, 'categories');
+    let url: string | undefined = undefined;
+    let key: string | undefined = undefined;
+    if (image) {
+      const uploaded = await this.s3Service.uploadFile(image, 'categories');
+      url = uploaded.url;
+      key = uploaded.key;
+    }
 
     const slug = makeSlug(name, CSlug);
     // ensure unique slug (append number if needed)
@@ -76,7 +83,7 @@ export class CategoryService {
       isActive,
       order,
       description,
-      image: { url, key },
+      ...(image && { image: { url, key } }),
       attributes,
     });
 
@@ -89,21 +96,25 @@ export class CategoryService {
   async findAll({
     activeOnly = true,
     paginationDto,
+    filter: outerFilter = {},
   }: {
     activeOnly?: boolean;
     paginationDto: PaginationDto;
+    filter?: FilterProductDto;
   }) {
     const { page, limit, skip } = paginationSolver(paginationDto);
 
     const filter: CategoryDocument | { isActive?: boolean } = {};
     if (activeOnly) filter.isActive = true;
 
+    const finalFilter = { ...filter, ...outerFilter };
+
     // 1) تعداد کلی مطابق فیلتر
-    const count = await this.categoryModel.countDocuments(filter);
+    const count = await this.categoryModel.countDocuments(finalFilter);
 
     // 2) گرفتن صفحه مورد نظر با skip/limit و مرتب‌سازی
     const categories = await this.categoryModel
-      .find(filter)
+      .find(finalFilter)
       .sort({ order: 1, name: 1 })
       .skip(skip)
       .limit(limit)

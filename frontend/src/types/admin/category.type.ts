@@ -19,7 +19,7 @@ export interface ICategoryAttribute {
   key: string
   label: string
   type: AttributeType
-  options?: string[]
+  options?: string[] | number[] | string | number | boolean
   showInFilter: boolean
   required: boolean
 }
@@ -36,4 +36,15 @@ export enum AttributeType {
   BOOLEAN = 'boolean',
   SELECT = 'select',
   RANGE = 'range',
+}
+
+export interface ICreateCategoryDto {
+  name: string
+  slug?: string
+  description?: string
+  parentId?: string | null
+  attributes?: ICategoryAttribute[]
+  isActive?: boolean
+  order?: number
+  image?: string
 }

@@ -1,4 +1,4 @@
-import { HydratedDocument, Types } from 'mongoose';
+import { HydratedDocument, Schema as MongooseSchema, Types } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { AttributeType } from '../enums/attribute-type.enum';
 import { ImageSchema, ImageSubSchema } from '../../common/schemas/image.schema';
@@ -7,7 +7,12 @@ export class CategoryAttribute {
   @Prop({ required: true }) key: string;
   @Prop({ required: true }) label: string;
   @Prop({ enum: AttributeType, required: true }) type: AttributeType;
-  @Prop([String]) options?: string[];
+  @Prop({ type: MongooseSchema.Types.Mixed }) options?:
+    | string[]
+    | number[]
+    | string
+    | number
+    | boolean;
   @Prop({ default: true }) showInFilter?: boolean;
   @Prop({ default: true }) required?: boolean;
 }
