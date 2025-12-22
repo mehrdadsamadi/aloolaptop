@@ -15,8 +15,9 @@ import { Badge } from '@/components/ui/badge'
 import { useConfirm } from '@/hooks/useConfirm'
 import { toast } from 'sonner'
 import CategoryAttributesCell from '@/app/admin/categories/_components/CategoryAttributesCell'
+import ButtonLink from '@/components/common/ButtonLink'
 
-export default function CategoriesPage() {
+export default function AdminCategories() {
   const { confirm } = useConfirm()
 
   const [loadingId, setLoadingId] = useState<string | null>(null)
@@ -92,12 +93,13 @@ export default function CategoriesPage() {
       cell: ({ row }) => {
         return (
           <div className={'flex items-center gap-2'}>
-            <Button
-              variant="outline"
-              size="icon"
+            <ButtonLink
+              size={'icon'}
+              variant={'outline'}
+              href={`/admin/categories/edit/${row.original._id}`}
             >
               <PencilIcon />
-            </Button>
+            </ButtonLink>
 
             <Button
               disabled={!row.original.isActive}

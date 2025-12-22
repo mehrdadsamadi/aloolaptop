@@ -1,5 +1,5 @@
-import CategoryForm from '@/app/admin/categories/_components/CategoryForm'
 import { getCategoryById } from '@/actions/category.action'
+import EditCategory from '@/app/admin/categories/edit/[id]/EditCategory'
 
 export default async function EditCategoryPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -7,14 +7,5 @@ export default async function EditCategoryPage({ params }: { params: Promise<{ i
 
   console.log('category', category)
 
-  return (
-    <CategoryForm
-      isEdit
-      // initialValues={mapCategoryToForm(category)}
-      onSubmit={async (values) => {
-        // await updateCategory(params.id, values)
-        console.log('values', values)
-      }}
-    />
-  )
+  return <EditCategory category={category} />
 }

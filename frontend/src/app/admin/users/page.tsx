@@ -1,4 +1,4 @@
-import UsersPage from '@/app/admin/users/UsersPage'
+import AdminUsers from '@/app/admin/users/AdminUsers'
 
 export default async function AdminUsersPage() {
   return (
@@ -7,7 +7,7 @@ export default async function AdminUsersPage() {
         <h1 className="text-lg">لیست کاربران</h1>
       </div>
 
-      <UsersPage />
+      <AdminUsers />
     </section>
   )
 }

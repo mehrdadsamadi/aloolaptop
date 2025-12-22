@@ -25,7 +25,7 @@ import LoadingSection from '@/components/common/loadingSection'
 import { useConfirm } from '@/hooks/useConfirm'
 import NoData from '@/components/common/noData'
 
-export default function UsersPage() {
+export default function AdminUsers() {
   const { confirm } = useConfirm()
 
   const [loadingId, setLoadingId] = useState<string | null>(null)
