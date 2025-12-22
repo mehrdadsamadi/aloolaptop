@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { Category, CategoryDocument } from './schema/category.schema';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -24,7 +24,7 @@ import {
   makeSlug,
   parseAttributes,
 } from '../../common/utils/functions.util';
-import { FilterProductDto } from '../../common/dtos/filter.dto';
+import { FilterCategoryDto } from '../../common/dtos/filter.dto';
 
 @Injectable()
 export class CategoryService {
@@ -100,14 +100,27 @@ export class CategoryService {
   }: {
     activeOnly?: boolean;
     paginationDto: PaginationDto;
-    filter?: FilterProductDto;
+    filter?: FilterCategoryDto;
   }) {
     const { page, limit, skip } = paginationSolver(paginationDto);
 
-    const filter: CategoryDocument | { isActive?: boolean } = {};
-    if (activeOnly) filter.isActive = true;
+    const finalFilter: FilterQuery<CategoryDocument> = {};
 
-    const finalFilter = { ...filter, ...outerFilter };
+    if (activeOnly) {
+      finalFilter.isActive = true;
+    }
+
+    if (outerFilter.name) {
+      finalFilter.name = {
+        $regex: outerFilter.name,
+        $options: 'i',
+      };
+    }
+
+    // سایر فیلترهای ساده (بدون regex)
+    const { name, ...restFilters } = outerFilter;
+
+    Object.assign(finalFilter, restFilters);
 
     // 1) تعداد کلی مطابق فیلتر
     const count = await this.categoryModel.countDocuments(finalFilter);
@@ -144,8 +157,10 @@ export class CategoryService {
     if (!isValidObjectId(id))
       throw new BadRequestException(ExceptionMessage.InvalidId);
 
-    const c = await this.categoryModel.findOne({ _id: id, isActive: true });
+    const c = await this.categoryModel.findOne({ _id: id });
     if (!c) throw new NotFoundException(CategoryMessage.Notfound);
+
+    if (!c?.isActive) throw new BadRequestException(CategoryMessage.Inactive);
 
     return c;
   }

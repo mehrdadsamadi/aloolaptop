@@ -9,8 +9,11 @@ export async function apiFetch(input: string, options: RequestInit = {}, retry =
   const cookieStore = await cookies()
   const accessToken = cookieStore.get('access_token')?.value
 
-  const headers = {
-    'Content-Type': 'application/json',
+  const headers: HeadersInit = {
+    // فقط برای JSON Content-Type ست می‌کنیم
+    ...(options.body instanceof FormData
+      ? {} // برای FormData بدون Content-Type
+      : { 'Content-Type': 'application/json' }),
     ...(options.headers || {}),
     ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
   }
@@ -63,4 +66,9 @@ export async function refreshTokens() {
   await handleSetTokensInCookie({ accessToken, refreshToken: apiRefreshToken })
 
   return true
+}
+
+export async function getData(url: string) {
+  const res = await apiFetch(url)
+  return res.json()
 }

@@ -61,8 +61,7 @@ export class ProductService {
       if (!isValidObjectId(categoryId))
         throw new BadRequestException(CategoryMessage.InvalidId);
 
-      const category = await this.categoryService.findByIdVisitor(categoryId);
-      if (!category) throw new NotFoundException(CategoryMessage.Notfound);
+      await this.categoryService.findByIdVisitor(categoryId);
     }
 
     const slug = makeSlug(name, PSlug);

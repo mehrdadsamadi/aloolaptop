@@ -1,15 +1,13 @@
 import CategoriesPage from '@/app/admin/categories/CategoriesPage'
-import Link from 'next/link'
+import ButtonLink from '@/components/common/ButtonLink'
 
 export default async function AdminUsersPage() {
   return (
     <section className="h-full">
-      <div className={'flex items-center justify-between w-full'}>
-        <h1 className="text-xl mb-4">لیست دسته بندی ها</h1>
+      <div className={'flex items-center justify-between w-full mb-4 bg-gray-50 rounded-lg p-3'}>
+        <h1 className="text-lg">لیست دسته بندی ها</h1>
 
-        {/*<Button asChild>*/}
-        <Link href="/admin/categories/create">ایجاد دسته بندی</Link>
-        {/*</Button>*/}
+        <ButtonLink href="/admin/categories/create">ایجاد دسته بندی</ButtonLink>
       </div>
 
       <CategoriesPage />

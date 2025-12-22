@@ -5,22 +5,55 @@ import { createCategory } from '@/actions/category.action'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { CategoryFormValues } from '@/validators/category.validator'
+import { showError } from '@/lib/utils'
 
 export default function CreateCategoryPage() {
   const router = useRouter()
 
-  const handleCreateCategory = async (data: CategoryFormValues) => {
-    const res = await createCategory(data)
+  const handleCreateCategory = async (data: CategoryFormValues, imageFile?: File | null) => {
+    try {
+      // ایجاد FormData
+      const formData = new FormData()
 
-    if (res?.ok === false) {
-      toast.error('مشکلی رخ داده است، مقادیر را بررسی کنید')
+      // 1. اضافه کردن فایل تصویر (اگر وجود دارد)
+      if (imageFile) {
+        formData.append('image', imageFile)
+      } else if (data.image) {
+        // اگر در حالت ویرایش باشیم و image یک URL باشد
+        formData.append('imageUrl', data.image)
+      }
 
-      return
+      // 2. اضافه کردن بقیه فیلدها
+      formData.append('name', data.name)
+      formData.append('slug', data.slug)
+      formData.append('description', data.description || '')
+      formData.append('isActive', String(data.isActive))
+      formData.append('order', String(data.order))
+
+      // parentId
+      if (data.parentId) {
+        formData.append('parentId', data.parentId)
+      }
+
+      // attributes
+      if (data.attributes && data.attributes.length > 0) {
+        formData.append('attributes', JSON.stringify(data.attributes))
+      }
+
+      // 3. فراخوانی action
+      const res = await createCategory(formData)
+
+      if (res?.ok === false) {
+        showError(res.messages)
+        return
+      }
+
+      toast.success(res?.message || 'دسته‌بندی با موفقیت ایجاد شد')
+      router.push('/admin/categories')
+    } catch (error) {
+      console.error('Error creating category:', error)
+      toast.error('خطا در ایجاد دسته‌بندی')
     }
-
-    toast.success(res?.message)
-
-    router.push('/admin/categories')
   }
 
   return <CategoryForm onSubmit={handleCreateCategory} />

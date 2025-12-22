@@ -44,7 +44,7 @@ export default function AttributesBuilder({ control }: Props) {
           <AlertTitle>ویژگی اضافه نشده است</AlertTitle>
         </Alert>
       ) : (
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
           {fields.map((field, index) => (
             <AttributeItem
               key={field.id}

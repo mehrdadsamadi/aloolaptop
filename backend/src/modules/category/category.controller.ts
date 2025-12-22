@@ -45,7 +45,7 @@ export class CategoryController {
     @UploadedFile(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 10 }),
+          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 5 }),
           new FileTypeValidator({ fileType: 'image/(png|jpeg|jpg|webp)' }),
         ],
         fileIsRequired: false,
@@ -99,7 +99,7 @@ export class CategoryController {
     @UploadedFile(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 10 }),
+          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 5 }),
           new FileTypeValidator({ fileType: 'image/(png|jpeg|jpg|webp)' }),
         ],
         fileIsRequired: false,

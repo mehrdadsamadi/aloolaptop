@@ -71,6 +71,7 @@ export const CategoryMessage = {
   NotfoundParent: 'دسته بندی والد یافت نشد',
   InvalidId: 'ایدی دسته بندی معتبر نمیباشد',
   InvalidParentId: 'ایدی دسته بندی والد معتبر نمیباشد',
+  Inactive: 'دسته بندی فعال نمیباشد',
 } as const;
 
 export const ProductMessage = {

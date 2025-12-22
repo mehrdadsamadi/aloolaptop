@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import { IUser } from '@/context/user.context'
+import { toast } from 'sonner'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -24,4 +25,8 @@ export function formatPersianDate(date: string | Date) {
 
 export function getImageUrl(url: string | undefined) {
   return url ?? '/images/image-placeholder.jpeg'
+}
+
+export function showError(messages: string[]) {
+  messages.forEach((message) => toast.error(message))
 }

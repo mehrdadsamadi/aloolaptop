@@ -8,7 +8,7 @@ export const categorySchema = z.object({
   parentId: z.string().nullable().optional(),
   order: z.number().min(1),
   isActive: z.boolean(),
-  image: z.any().optional(),
+  image: z.string().optional(),
 
   attributes: z.array(
     z.object({

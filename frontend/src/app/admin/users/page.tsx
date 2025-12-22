@@ -3,7 +3,9 @@ import UsersPage from '@/app/admin/users/UsersPage'
 export default async function AdminUsersPage() {
   return (
     <section className="h-full">
-      <h1 className="text-xl mb-4">لیست کاربران</h1>
+      <div className={'flex items-center justify-between w-full mb-4 bg-gray-50 rounded-lg p-3'}>
+        <h1 className="text-lg">لیست کاربران</h1>
+      </div>
 
       <UsersPage />
     </section>

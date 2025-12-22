@@ -3,7 +3,6 @@
 import { IPagination } from '@/types/pagination.type'
 import { apiFetch } from '@/actions/helpers/fetchClient'
 import { ENDPOINTS } from '@/actions/helpers/endpoints'
-import { ICreateCategoryDto } from '@/types/admin/category.type'
 
 export async function getCategoriesList(pagination: IPagination) {
   const { page = 1, limit = 20 } = pagination
@@ -25,8 +24,9 @@ export async function getCategoryById(categoryId: string) {
   return res.json()
 }
 
-export async function createCategory(categoryData: ICreateCategoryDto) {
-  const res = await apiFetch(ENDPOINTS.CATEGORIES.CREATE, { method: 'POST', body: JSON.stringify(categoryData) })
+export async function createCategory(formData: FormData) {
+  console.log('formData', formData)
+  const res = await apiFetch(ENDPOINTS.CATEGORIES.CREATE, { method: 'POST', body: formData })
 
   return res.json()
 }

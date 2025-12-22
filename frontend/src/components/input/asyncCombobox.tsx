@@ -6,11 +6,14 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { apiFetch } from '@/actions/helpers/fetchClient' // نوع داده‌ای برای آیتم‌های شما
+import { getData } from '@/actions/helpers/fetchClient'
+import { FieldContent, FieldLabel } from '@/components/ui/field'
 
 interface AsyncComboboxProps {
   /** آدرس API برای جستجو */
   apiUrl: string
+  /** عنوان کمبوباکس */
+  label: string
   /** پارامترهای ثابت (fixed) برای اضافه شدن به درخواست */
   fixedFilters?: Record<string, string>
   /** مقدار اولیه انتخاب شده */
@@ -23,6 +26,7 @@ interface AsyncComboboxProps {
 
 export function AsyncCombobox({
   apiUrl,
+  label,
   fixedFilters = {},
   initialValue = '',
   placeholder = 'جستجو کنید...',
@@ -52,19 +56,16 @@ export function AsyncCombobox({
         ...fixedFilters, // اضافه کردن فیلترهای ثابت شما
       })
 
-      const response = await apiFetch(`${apiUrl}?${params.toString()}`, { method: 'GET' })
-      console.log('res', response)
-      if (response?.ok === false) throw new Error('خطا در دریافت داده‌ها')
-
-      const data: { categories: any[]; pagination: { pagesCount: number } } = await response.json()
+      const res = await getData(`${apiUrl}?${params.toString()}`)
+      if (res?.ok === false) throw new Error('خطا در دریافت داده‌ها')
 
       if (isNewSearch) {
-        setItems(data.categories)
+        setItems(res?.categories)
       } else {
-        setItems((prev) => [...prev, ...data.categories])
+        setItems((prev) => [...prev, ...res?.categories])
       }
 
-      setHasMore(pageNum < data.pagination.pagesCount)
+      setHasMore(pageNum < res?.pagination?.pagesCount)
       setPage(pageNum)
     } catch (error) {
       console.error('خطا در واکشی:', error)
@@ -86,7 +87,7 @@ export function AsyncCombobox({
       if (searchQuery.trim() !== '' || open) {
         fetchItems(searchQuery, 1, true)
       } else {
-        setItems([])
+        // setItems([])
       }
     }, 300) // تأخیر 300 میلی‌ثانیه
 
@@ -119,67 +120,74 @@ export function AsyncCombobox({
   }
 
   // پیدا کردن عنوان (label) برای مقدار انتخاب شده
-  const selectedItemLabel = selectedValue ? items.find((item) => item.value === selectedValue)?.label : placeholder
+  const selectedItemLabel = selectedValue ? items.find((item) => item?._id === selectedValue)?.name : placeholder
 
   return (
-    <Popover
-      open={open}
-      onOpenChange={setOpen}
-    >
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-full justify-between"
-        >
-          <span className="truncate">{selectedItemLabel}</span>
-          <ChevronsUpDown className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent
-        className="w-full p-0"
-        align="start"
+    <div className={'w-full'}>
+      <Popover
+        open={open}
+        onOpenChange={setOpen}
       >
-        <Command shouldFilter={false}>
-          <CommandInput
-            placeholder={placeholder}
-            value={searchQuery}
-            onValueChange={setSearchQuery}
-          />
-          <CommandList
-            onScroll={handleScroll}
-            className="max-h-[300px]"
+        <FieldContent className={'mb-3'}>
+          <FieldLabel>{label}</FieldLabel>
+        </FieldContent>
+
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-full justify-between"
           >
-            {isLoading && items.length === 0 ? (
-              <div className="flex justify-center py-6">
-                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-              </div>
-            ) : (
-              <>
-                <CommandEmpty>{isLoading ? 'در حال جستجو...' : 'نتیجه‌ای یافت نشد.'}</CommandEmpty>
-                <CommandGroup>
-                  {items.map((item) => (
-                    <CommandItem
-                      key={item._id}
-                      value={item._id}
-                      onSelect={handleSelect}
-                    >
-                      <Check className={cn('ml-2 h-4 w-4', selectedValue === item._id ? 'opacity-100' : 'opacity-0')} />
-                      {item.name}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-                {isLoading && items.length > 0 && (
-                  <div className="flex justify-center py-2">
-                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                  </div>
-                )}
-              </>
-            )}
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+            <span className="truncate">{selectedItemLabel}</span>
+            <ChevronsUpDown className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent
+          className="w-full p-0"
+          align="start"
+        >
+          <Command shouldFilter={false}>
+            <CommandInput
+              placeholder={placeholder}
+              value={searchQuery}
+              onValueChange={setSearchQuery}
+            />
+            <CommandList
+              onScroll={handleScroll}
+              className="max-h-[300px]"
+            >
+              {isLoading && items.length === 0 ? (
+                <div className="flex justify-center py-6">
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                </div>
+              ) : (
+                <>
+                  <CommandEmpty>{isLoading ? 'در حال جستجو...' : 'نتیجه‌ای یافت نشد.'}</CommandEmpty>
+                  <CommandGroup>
+                    {items.map((item) => (
+                      <CommandItem
+                        key={item._id}
+                        value={item._id}
+                        onSelect={handleSelect}
+                        className={'cursor-pointer'}
+                      >
+                        <Check className={cn('ml-2 h-4 w-4', selectedValue === item._id ? 'opacity-100' : 'opacity-0')} />
+                        {item.name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                  {isLoading && items.length > 0 && (
+                    <div className="flex justify-center py-2">
+                      <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                    </div>
+                  )}
+                </>
+              )}
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+    </div>
   )
 }
