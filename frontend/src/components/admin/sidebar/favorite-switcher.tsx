@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar'
+import Link from 'next/link'
 
 export function FavoriteSwitcher({
   favorites,
@@ -60,11 +61,14 @@ export function FavoriteSwitcher({
                 onClick={() => setActiveTeam(fav)}
                 className="gap-2 p-2 cursor-pointer"
                 dir={'rtl'}
+                asChild
               >
-                <div className="flex size-6 items-center justify-center rounded-md border">
-                  <fav.icon className="size-3.5 shrink-0" />
-                </div>
-                {fav.name}
+                <Link href={fav.url}>
+                  <div className="flex size-6 items-center justify-center rounded-md border">
+                    <fav.icon className="size-3.5 shrink-0" />
+                  </div>
+                  {fav.name}
+                </Link>
               </DropdownMenuItem>
             ))}
 

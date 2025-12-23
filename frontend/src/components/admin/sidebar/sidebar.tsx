@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { AudioWaveform, LayoutDashboardIcon, ListIcon, ListOrderedIcon, Settings2, SquareTerminal, UsersIcon } from 'lucide-react'
+import { BoxesIcon, LayoutDashboardIcon, ListIcon, Settings2, UsersIcon } from 'lucide-react'
 
 import { Sidebar as ShadSidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from '@/components/ui/sidebar'
 import { FavoriteSwitcher } from '@/components/admin/sidebar/favorite-switcher'
@@ -17,14 +17,14 @@ const data = {
       url: '/admin/users',
     },
     {
-      name: 'محصولات',
-      icon: AudioWaveform,
-      url: '/admin/products',
+      name: 'دسته بندی ها',
+      icon: ListIcon,
+      url: '/admin/categories',
     },
     {
-      name: 'سفارشات',
-      icon: ListOrderedIcon,
-      url: '/admin/orders',
+      name: 'محصولات',
+      icon: BoxesIcon,
+      url: '/admin/products',
     },
   ],
   navMain: [
@@ -48,23 +48,9 @@ const data = {
     },
     {
       title: 'محصولات',
-      url: '#',
-      icon: SquareTerminal,
+      url: '/admin/products',
+      icon: BoxesIcon,
       isActive: false,
-      items: [
-        {
-          title: 'تست',
-          url: '#',
-        },
-        {
-          title: 'تست',
-          url: '#',
-        },
-        {
-          title: 'تست',
-          url: '#',
-        },
-      ],
     },
     {
       title: 'تنظیمات',

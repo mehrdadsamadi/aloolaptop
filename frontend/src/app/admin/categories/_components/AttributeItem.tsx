@@ -138,6 +138,7 @@ export default function AttributeItem({ index, control, onRemove }: AttributeIte
                     <Switch
                       dir={'ltr'}
                       className={'cursor-pointer'}
+                      checked={field.value}
                       onCheckedChange={field.onChange}
                     />
                   </Field>

@@ -87,7 +87,7 @@ export default function DataTable<TData, TValue>({
   }
 
   return (
-    <div className="space-y-4 bg-gray-50 p-4 rounded-xl h-[calc(100%-44px)]">
+    <div className="space-y-4 bg-gray-50 p-4 rounded-xl h-[calc(100%-76px)]">
       <div className="flex items-center justify-between">
         <Input
           placeholder={globalFilterPlaceholder}
@@ -152,7 +152,7 @@ export default function DataTable<TData, TValue>({
 
       <div className="flex items-center justify-between py-2">
         <div className="text-sm text-muted-foreground min-w-fit">
-          صفحه {pageIndex} از {pageCount}
+          صفحه {pageIndex + 1} از {pageCount}
         </div>
 
         <Pagination className={'w-full'}>

@@ -16,4 +16,8 @@ export const ENDPOINTS = {
     CREATE: '/api/categories',
     UPDATE_BY_ID: (categoryId: string) => `/api/categories/${categoryId}`,
   },
+  PRODUCTS: {
+    LIST: ({ page = 1, limit = 20 }: { page?: number; limit?: number }) => `/api/products?page=${page}&limit=${limit}`,
+    DELETE: (productId: string) => `/api/products/${productId}`,
+  },
 }

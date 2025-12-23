@@ -65,7 +65,7 @@ export default function RootLayout({
         />
       </head>
 
-      <body className={`${vazir.variable} antialiased`}>
+      <body className={`${vazir.variable} antialiased overflow-x-hidden`}>
         <Providers>{children}</Providers>
       </body>
     </html>

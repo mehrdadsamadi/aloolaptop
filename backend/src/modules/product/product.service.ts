@@ -125,7 +125,7 @@ export class ProductService {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .populate('categoryId');
+      .populate({ path: 'categoryId', select: '_id name' });
 
     return {
       products,

@@ -42,16 +42,23 @@ function renderByType(attr: ICategoryAttribute) {
       )
 
     case AttributeType.STRING:
-      return <Badge variant="outline">متنی</Badge>
+      return <Badge variant="secondary">{attr?.options}</Badge>
 
     case AttributeType.NUMBER:
-      return <Badge variant="outline">عددی</Badge>
+      return <Badge variant="secondary">{attr?.options}</Badge>
 
     case AttributeType.BOOLEAN:
-      return <Badge variant="outline">بلی / خیر</Badge>
+      return <Badge variant="secondary">{attr?.options ? 'بله' : 'خیر'}</Badge>
 
     case AttributeType.RANGE:
-      return <Badge variant="outline">بازه‌ای</Badge>
+      return (
+        <div className={'flex items-center gap-1'}>
+          <p>از</p>
+          <Badge variant="secondary">{attr?.options?.[0]}</Badge>
+          <p>تا</p>
+          <Badge variant="secondary">{attr?.options?.[1]}</Badge>
+        </div>
+      )
 
     default:
       return null

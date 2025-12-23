@@ -118,20 +118,6 @@ export default function AdminUsers() {
       cell: ({ row }) => formatPersianDate(row.original.createdAt),
       enableSorting: true,
     },
-    // {
-    //   id: 'actions',
-    //   cell: ({ row }) => {
-    //     const user = row.original
-    //     return (
-    //       <Button
-    //         variant="outline"
-    //         size="icon"
-    //       >
-    //         <CircleFadingArrowUpIcon />
-    //       </Button>
-    //     )
-    //   },
-    // },
   ]
 
   const usersList = async () => {
