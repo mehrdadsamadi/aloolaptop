@@ -42,10 +42,6 @@ export default function CategoryForm({ initialValues, onSubmit, isEdit }: Props)
     formState: { isSubmitting },
   } = form
 
-  const handleSelectionChange = (value: string) => {
-    form.setValue('parentId', value)
-  }
-
   // تابع جدید برای ارسال فرم
   const handleFormSubmit = async (values: CategoryFormValues) => {
     // ارسال هم داده‌های فرم و هم فایل تصویر
@@ -58,7 +54,7 @@ export default function CategoryForm({ initialValues, onSubmit, isEdit }: Props)
       className={'flex flex-col gap-4 h-full justify-between'}
     >
       <FieldGroup>
-        <div className={'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2'}>
+        <div className={'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-2'}>
           <Controller
             name="name"
             control={form.control}
@@ -140,7 +136,7 @@ export default function CategoryForm({ initialValues, onSubmit, isEdit }: Props)
           )}
         />
 
-        <div className={'grid grid-cols-2 gap-2'}>
+        <div className={'grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-2'}>
           <Controller
             name="image"
             control={form.control}
@@ -148,7 +144,7 @@ export default function CategoryForm({ initialValues, onSubmit, isEdit }: Props)
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel>تصویر دسته‌بندی</FieldLabel>
                 <ImageUpload
-                  value={imageFile || field.value} // ارسال فایل یا URL قبلی
+                  value={imageFile || field.value?.url} // ارسال فایل یا URL قبلی
                   onChange={(file) => {
                     if (file) {
                       // اگر فایل جدید انتخاب شده
@@ -171,11 +167,26 @@ export default function CategoryForm({ initialValues, onSubmit, isEdit }: Props)
           />
 
           <div className={'flex flex-col gap-4'}>
-            <AsyncCombobox
-              apiUrl="/api/categories" // آدرس API شما
-              label={'دسته بندی والد'}
-              placeholder="دسته بندی والد"
-              onValueChange={handleSelectionChange}
+            <Controller
+              name={'parentId'}
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldContent>
+                    <FieldLabel htmlFor="form-rhf-switch-isActive">دسته بندی والد</FieldLabel>
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </FieldContent>
+
+                  <AsyncCombobox
+                    apiUrl="/api/categories" // آدرس API شما
+                    apiField={'categories'}
+                    queryField={'name'}
+                    placeholder="دسته بندی والد"
+                    initialValue={field.value || ''}
+                    onValueChange={field.onChange}
+                  />
+                </Field>
+              )}
             />
 
             <div className={' border rounded-lg p-2'}>

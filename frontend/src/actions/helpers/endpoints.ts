@@ -14,5 +14,6 @@ export const ENDPOINTS = {
     DELETE: (categoryId: string) => `/api/categories/${categoryId}`,
     GET_BY_ID: (categoryId: string) => `/api/categories/${categoryId}`,
     CREATE: '/api/categories',
+    UPDATE_BY_ID: (categoryId: string) => `/api/categories/${categoryId}`,
   },
 }

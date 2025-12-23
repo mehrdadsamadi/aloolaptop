@@ -25,8 +25,13 @@ export async function getCategoryById(categoryId: string) {
 }
 
 export async function createCategory(formData: FormData) {
-  console.log('formData', formData)
   const res = await apiFetch(ENDPOINTS.CATEGORIES.CREATE, { method: 'POST', body: formData })
+
+  return res.json()
+}
+
+export async function updateCategory(categoryId: string, formData: FormData) {
+  const res = await apiFetch(ENDPOINTS.CATEGORIES.UPDATE_BY_ID(categoryId), { method: 'PATCH', body: formData })
 
   return res.json()
 }

@@ -4,7 +4,7 @@ import CategoryForm from '@/app/admin/categories/_components/CategoryForm'
 import { ICategory } from '@/types/admin/category.type'
 import { useRouter } from 'next/navigation'
 import { CategoryFormValues } from '@/validators/category.validator'
-import { createCategory } from '@/actions/category.action'
+import { updateCategory } from '@/actions/category.action'
 import { showError } from '@/lib/utils'
 import { toast } from 'sonner'
 
@@ -21,7 +21,7 @@ export default function EditCategory({ category }: { category: ICategory }) {
         formData.append('image', imageFile)
       } else if (data.image) {
         // اگر در حالت ویرایش باشیم و image یک URL باشد
-        formData.append('imageUrl', data.image)
+        formData.append('image', data.image)
       }
 
       // 2. اضافه کردن بقیه فیلدها
@@ -42,14 +42,14 @@ export default function EditCategory({ category }: { category: ICategory }) {
       }
 
       // 3. فراخوانی action
-      const res = await createCategory(formData)
+      const res = await updateCategory(category?._id, formData)
 
       if (res?.ok === false) {
         showError(res.messages)
         return
       }
 
-      toast.success(res?.message || 'دسته‌بندی با موفقیت ایجاد شد')
+      toast.success(res?.message || 'دسته‌بندی با موفقیت ویرایش شد')
       router.push('/admin/categories')
     } catch (error) {
       console.error('Error creating category:', error)
@@ -61,10 +61,7 @@ export default function EditCategory({ category }: { category: ICategory }) {
     <CategoryForm
       isEdit
       initialValues={category}
-      onSubmit={async (values) => {
-        // await updateCategory(params.id, values)
-        console.log('values', values)
-      }}
+      onSubmit={handleEditCategory}
     />
   )
 }

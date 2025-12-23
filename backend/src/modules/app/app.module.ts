@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigsModule } from '../configs/configs.module';
 import { AuthModule } from '../auth/auth.module';
@@ -13,6 +13,25 @@ import { OrderModule } from '../order/order.module';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          name: 'short',
+          ttl: 1000, // 1 ثانیه
+          limit: 10, // 10 درخواست در ثانیه
+        },
+        {
+          name: 'medium',
+          ttl: 60000, // 1 دقیقه
+          limit: 100, // 100 درخواست در دقیقه
+        },
+        {
+          name: 'long',
+          ttl: 3600000, // 1 ساعت
+          limit: 1000, // 1000 درخواست در ساعت
+        },
+      ],
+    }),
     ConfigsModule,
     AuthModule,
     UserModule,

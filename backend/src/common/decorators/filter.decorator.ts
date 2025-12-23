@@ -14,6 +14,7 @@ export function FilterProduct() {
 
 export function FilterCategory() {
   return applyDecorators(
+    ApiQuery({ name: '_id', required: false, type: 'string' }),
     ApiQuery({ name: 'name', required: false, type: 'string' }),
   );
 }

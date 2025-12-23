@@ -18,7 +18,7 @@ export default function AttributesBuilder({ control }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center bg-gray-50 rounded-lg p-3 gap-2">
         <h3 className="font-semibold">ویژگی‌ها</h3>
         <Button
           type="button"

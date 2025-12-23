@@ -38,5 +38,10 @@ export class FilterCategoryDto extends PaginationDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  _id?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
   name?: string;
 }

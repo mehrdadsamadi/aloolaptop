@@ -5,7 +5,5 @@ export default async function EditCategoryPage({ params }: { params: Promise<{ i
   const { id } = await params
   const category = await getCategoryById(id)
 
-  console.log('category', category)
-
   return <EditCategory category={category} />
 }

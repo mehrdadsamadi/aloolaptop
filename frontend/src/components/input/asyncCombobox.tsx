@@ -7,26 +7,21 @@ import { Button } from '@/components/ui/button'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { getData } from '@/actions/helpers/fetchClient'
-import { FieldContent, FieldLabel } from '@/components/ui/field'
 
 interface AsyncComboboxProps {
-  /** آدرس API برای جستجو */
   apiUrl: string
-  /** عنوان کمبوباکس */
-  label: string
-  /** پارامترهای ثابت (fixed) برای اضافه شدن به درخواست */
+  apiField: string
+  queryField: string
   fixedFilters?: Record<string, string>
-  /** مقدار اولیه انتخاب شده */
   initialValue?: string
-  /** placeholder برای اینپوت */
   placeholder?: string
-  /** تابعی که هنگام تغییر مقدار انتخاب شده فراخوانی می‌شود */
   onValueChange?: (value: string) => void
 }
 
 export function AsyncCombobox({
   apiUrl,
-  label,
+  apiField,
+  queryField,
   fixedFilters = {},
   initialValue = '',
   placeholder = 'جستجو کنید...',
@@ -34,14 +29,72 @@ export function AsyncCombobox({
 }: AsyncComboboxProps) {
   const [open, setOpen] = React.useState(false)
   const [selectedValue, setSelectedValue] = React.useState<string>(initialValue)
+  const [selectedItem, setSelectedItem] = React.useState<any>(null)
   const [searchQuery, setSearchQuery] = React.useState('')
   const [items, setItems] = React.useState<any[]>([])
   const [isLoading, setIsLoading] = React.useState(false)
   const [page, setPage] = React.useState(1)
   const [hasMore, setHasMore] = React.useState(true)
 
-  // استفاده از ref برای ذخیره تایمر debounce
   const debounceTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
+
+  // استفاده از ref برای جلوگیری از رندرهای اضافی
+  const initialValueRef = React.useRef<string | undefined>(initialValue)
+
+  // استفاده از ref برای پیگیری اینکه آیا initialValue رو لود کرده‌ایم یا نه
+  const hasLoadedInitialRef = React.useRef(false)
+
+  // تابع برای بارگذاری آیتم انتخاب شده
+  const loadSelectedItem = React.useCallback(
+    async (itemId: string) => {
+      if (!itemId) {
+        setSelectedItem(null)
+        return
+      }
+
+      try {
+        const params = new URLSearchParams({
+          _id: itemId,
+          limit: '1',
+          ...fixedFilters,
+        })
+
+        const res = await getData(`${apiUrl}?${params.toString()}`)
+        if (res?.[apiField]?.[0]) {
+          setSelectedItem(res?.[apiField]?.[0])
+        } else {
+          // اگر آیتم پیدا نشد، مقدار رو پاک کن
+          setSelectedItem(null)
+        }
+      } catch (error) {
+        console.error('خطا در بارگذاری آیتم انتخاب شده:', error)
+        setSelectedItem(null)
+      }
+    },
+    [apiUrl, fixedFilters]
+  )
+
+  // بارگذاری اولیه فقط یک بار
+  React.useEffect(() => {
+    if (initialValue && !hasLoadedInitialRef.current) {
+      hasLoadedInitialRef.current = true
+      loadSelectedItem(initialValue)
+    }
+  }, [initialValue, loadSelectedItem])
+
+  // وقتی initialValue تغییر کرد (مثلاً از بیرون)
+  React.useEffect(() => {
+    if (initialValue !== initialValueRef.current) {
+      initialValueRef.current = initialValue
+      setSelectedValue(initialValue || '')
+
+      if (initialValue) {
+        loadSelectedItem(initialValue)
+      } else {
+        setSelectedItem(null)
+      }
+    }
+  }, [initialValue, loadSelectedItem])
 
   // تابع اصلی برای دریافت داده از API
   const fetchItems = async (query: string, pageNum: number, isNewSearch: boolean) => {
@@ -50,26 +103,35 @@ export function AsyncCombobox({
     setIsLoading(true)
     try {
       const params = new URLSearchParams({
-        ...(query && { name: query }),
+        ...(query && { [queryField]: query }),
         page: pageNum.toString(),
         limit: '20',
-        ...fixedFilters, // اضافه کردن فیلترهای ثابت شما
+        ...fixedFilters,
       })
 
       const res = await getData(`${apiUrl}?${params.toString()}`)
       if (res?.ok === false) throw new Error('خطا در دریافت داده‌ها')
 
-      if (isNewSearch) {
-        setItems(res?.categories)
-      } else {
-        setItems((prev) => [...prev, ...res?.categories])
+      const newItems = res?.[apiField] || []
+
+      // اگر آیتم انتخاب شده در نتایج جدید است، آن را آپدیت کن
+      if (selectedValue) {
+        const foundItem = newItems.find((item) => item._id === selectedValue)
+        if (foundItem && (!selectedItem || selectedItem._id !== selectedValue)) {
+          setSelectedItem(foundItem)
+        }
       }
 
-      setHasMore(pageNum < res?.pagination?.pagesCount)
+      if (isNewSearch) {
+        setItems(newItems)
+      } else {
+        setItems((prev) => [...prev, ...newItems])
+      }
+
+      setHasMore(pageNum < (res?.pagination?.pagesCount || 0))
       setPage(pageNum)
     } catch (error) {
       console.error('خطا در واکشی:', error)
-      // در اینجا می‌توانید state خطا نیز مدیریت کنید
     } finally {
       setIsLoading(false)
     }
@@ -77,21 +139,16 @@ export function AsyncCombobox({
 
   // استفاده از debounce برای جستجو
   React.useEffect(() => {
-    // پاک کردن تایمر قبلی
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current)
     }
 
-    // تنظیم تایمر جدید
     debounceTimeoutRef.current = setTimeout(() => {
       if (searchQuery.trim() !== '' || open) {
         fetchItems(searchQuery, 1, true)
-      } else {
-        // setItems([])
       }
-    }, 300) // تأخیر 300 میلی‌ثانیه
+    }, 300)
 
-    // پاک‌سازی تایمر هنگام unmount
     return () => {
       if (debounceTimeoutRef.current) {
         clearTimeout(debounceTimeoutRef.current)
@@ -102,7 +159,7 @@ export function AsyncCombobox({
   // مدیریت اسکرول برای بارگذاری تدریجی
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const element = e.currentTarget
-    const isAtBottom = element.scrollHeight - element.scrollTop === element.clientHeight
+    const isAtBottom = Math.abs(element.scrollHeight - element.scrollTop - element.clientHeight) < 10
 
     if (isAtBottom && hasMore && !isLoading) {
       fetchItems(searchQuery, page + 1, false)
@@ -111,83 +168,94 @@ export function AsyncCombobox({
 
   // مدیریت انتخاب یک آیتم
   const handleSelect = (currentValue: string) => {
-    const newValue = currentValue === selectedValue ? '' : currentValue
-    setSelectedValue(newValue)
-    setOpen(false)
-    if (onValueChange) {
-      onValueChange(newValue)
+    const selected = items.find((item) => item._id === currentValue)
+
+    if (selected) {
+      const newValue = currentValue === selectedValue ? '' : currentValue
+      setSelectedValue(newValue)
+      setSelectedItem(newValue ? selected : null)
+      setOpen(false)
+      setSearchQuery('')
+      if (onValueChange) {
+        onValueChange(newValue)
+      }
+    }
+  }
+
+  // وقتی Popover باز می‌شود، جستجو را پاک کن
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen)
+    if (!isOpen) {
+      setSearchQuery('')
     }
   }
 
   // پیدا کردن عنوان (label) برای مقدار انتخاب شده
-  const selectedItemLabel = selectedValue ? items.find((item) => item?._id === selectedValue)?.name : placeholder
+  const selectedItemLabel = selectedItem?.[queryField] || placeholder
 
   return (
-    <div className={'w-full'}>
-      <Popover
-        open={open}
-        onOpenChange={setOpen}
-      >
-        <FieldContent className={'mb-3'}>
-          <FieldLabel>{label}</FieldLabel>
-        </FieldContent>
-
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-full justify-between"
-          >
-            <span className="truncate">{selectedItemLabel}</span>
-            <ChevronsUpDown className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent
-          className="w-full p-0"
-          align="start"
+    <Popover
+      open={open}
+      onOpenChange={handleOpenChange}
+    >
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-full justify-between"
         >
-          <Command shouldFilter={false}>
-            <CommandInput
-              placeholder={placeholder}
-              value={searchQuery}
-              onValueChange={setSearchQuery}
-            />
-            <CommandList
-              onScroll={handleScroll}
-              className="max-h-[300px]"
-            >
-              {isLoading && items.length === 0 ? (
-                <div className="flex justify-center py-6">
-                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                </div>
-              ) : (
-                <>
-                  <CommandEmpty>{isLoading ? 'در حال جستجو...' : 'نتیجه‌ای یافت نشد.'}</CommandEmpty>
-                  <CommandGroup>
-                    {items.map((item) => (
-                      <CommandItem
-                        key={item._id}
-                        value={item._id}
-                        onSelect={handleSelect}
-                        className={'cursor-pointer'}
-                      >
-                        <Check className={cn('ml-2 h-4 w-4', selectedValue === item._id ? 'opacity-100' : 'opacity-0')} />
-                        {item.name}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                  {isLoading && items.length > 0 && (
-                    <div className="flex justify-center py-2">
-                      <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                    </div>
-                  )}
-                </>
-              )}
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-    </div>
+          <span className="truncate">
+            {selectedItemLabel}
+            {selectedValue && !selectedItem && <span className="text-muted-foreground text-xs mr-2"> (در حال بارگذاری...)</span>}
+          </span>
+          <ChevronsUpDown className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent
+        className="w-full p-0"
+        align="start"
+      >
+        <Command shouldFilter={false}>
+          <CommandInput
+            placeholder={placeholder}
+            value={searchQuery}
+            onValueChange={setSearchQuery}
+          />
+          <CommandList
+            onScroll={handleScroll}
+            className="max-h-[300px]"
+          >
+            {isLoading && items.length === 0 ? (
+              <div className="flex justify-center py-6">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              </div>
+            ) : (
+              <>
+                <CommandEmpty>{isLoading ? 'در حال جستجو...' : 'نتیجه‌ای یافت نشد.'}</CommandEmpty>
+                <CommandGroup>
+                  {items.map((item) => (
+                    <CommandItem
+                      key={item._id}
+                      value={item._id}
+                      onSelect={handleSelect}
+                      className={'cursor-pointer'}
+                    >
+                      <Check className={cn('ml-2 h-4 w-4', selectedValue === item._id ? 'opacity-100' : 'opacity-0')} />
+                      {item?.[queryField]}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+                {isLoading && items.length > 0 && (
+                  <div className="flex justify-center py-2">
+                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                  </div>
+                )}
+              </>
+            )}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }

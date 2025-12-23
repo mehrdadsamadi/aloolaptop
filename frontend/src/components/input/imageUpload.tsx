@@ -210,11 +210,11 @@ export function ImageUpload({ value, onChange, maxSize = 5, accept = 'image/*', 
         </div>
       )}
 
-      {!error && preview && !selectedFile && (
-        <div className="text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/30 p-3 rounded-lg">
-          تصویر قبلاً آپلود شده است
-        </div>
-      )}
+      {/*{!error && preview && !selectedFile && (*/}
+      {/*  <div className="text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/30 p-3 rounded-lg">*/}
+      {/*    تصویر قبلاً آپلود شده است*/}
+      {/*  </div>*/}
+      {/*)}*/}
     </div>
   )
 }
