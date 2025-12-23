@@ -7,7 +7,12 @@ export default async function AdminCategoriesPage() {
       <div className={'flex items-center justify-between w-full mb-4 bg-gray-50 rounded-lg p-3'}>
         <h1 className="text-lg">لیست دسته بندی ها</h1>
 
-        <ButtonLink href="/admin/categories/create">ایجاد دسته بندی</ButtonLink>
+        <ButtonLink
+          variant={'outline'}
+          href="/admin/categories/create"
+        >
+          ایجاد دسته بندی
+        </ButtonLink>
       </div>
 
       <AdminCategories />
