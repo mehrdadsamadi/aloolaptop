@@ -9,7 +9,7 @@ export default async function AdminProductsPage() {
 
         <ButtonLink
           variant={'outline'}
-          href="/admin/categories/create"
+          href="/admin/products/create"
         >
           ایجاد محصول
         </ButtonLink>

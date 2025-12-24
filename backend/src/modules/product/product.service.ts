@@ -137,7 +137,9 @@ export class ProductService {
     if (!isValidObjectId(id))
       throw new NotFoundException(ExceptionMessage.InvalidId);
 
-    const product = await this.productModel.findById(id).populate('categoryId');
+    const product = await this.productModel
+      .findById(id)
+      .populate({ path: 'categoryId', select: '_id name' });
     if (!product) throw new NotFoundException(ProductMessage.Notfound);
 
     return product;

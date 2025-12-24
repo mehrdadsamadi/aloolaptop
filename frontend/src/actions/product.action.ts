@@ -17,3 +17,22 @@ export async function deleteProduct(productId: string) {
 
   return res.json()
 }
+
+export async function createProduct(formData: FormData) {
+  const res = await apiFetch(ENDPOINTS.PRODUCTS.CREATE, { method: 'POST', body: formData })
+
+  return res.json()
+}
+
+export async function getProductById(productId: string) {
+  const res = await apiFetch(ENDPOINTS.PRODUCTS.GET_BY_ID(productId), { method: 'GET' })
+
+  return res.json()
+}
+
+export async function updateProduct(productId: string, formData: FormData) {
+  console.log('formData', formData)
+  const res = await apiFetch(ENDPOINTS.PRODUCTS.UPDATE_BY_ID(productId), { method: 'PATCH', body: formData })
+
+  return res.json()
+}

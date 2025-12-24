@@ -3,7 +3,10 @@ import { AttributeType } from '@/types/admin/category.type'
 
 export const categorySchema = z.object({
   name: z.string().min(1, 'نام دسته‌بندی الزامی است'),
-  slug: z.string().min(1, 'اسلاگ الزامی است'),
+  slug: z
+    .string()
+    .min(1, 'اسلاگ الزامی است')
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'اسلاگ باید شامل حروف کوچک، اعداد و خط تیره باشد'),
   description: z.string().optional(),
   parentId: z.string().nullable().optional(),
   order: z.number().min(1),

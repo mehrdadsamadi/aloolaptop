@@ -14,7 +14,7 @@ export interface IProduct {
   images: IImage[]
   isActive: boolean
   discountPercent: number
-  discountExpiresAt: string
+  discountExpiresAt: Date
   createdAt: string
   updatedAt: string
   rate: number

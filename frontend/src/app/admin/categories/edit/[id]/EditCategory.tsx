@@ -53,7 +53,7 @@ export default function EditCategory({ category }: { category: ICategory }) {
       router.push('/admin/categories')
     } catch (error) {
       console.error('Error creating category:', error)
-      toast.error('خطا در ایجاد دسته‌بندی')
+      toast.error('خطا در ویرایش دسته‌بندی')
     }
   }
 

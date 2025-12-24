@@ -34,7 +34,7 @@ export default function AdminProducts() {
       header: 'تصویر',
       cell: ({ row }) => (
         <Avatar>
-          <AvatarImage src={getImageUrl(row.original?.images?.[0].url)} />
+          <AvatarImage src={getImageUrl(row.original?.images?.[0]?.url)} />
           <AvatarFallback>IM</AvatarFallback>
         </Avatar>
       ),
@@ -66,7 +66,7 @@ export default function AdminProducts() {
     },
     {
       accessorKey: 'condition',
-      header: 'نوع محصول',
+      header: 'وضعیت محصول',
       cell: ({ row }) => CONDITION_CONSTANTS[row.original?.condition],
       enableSorting: true,
     },
@@ -157,7 +157,6 @@ export default function AdminProducts() {
             </ButtonLink>
 
             <Button
-              disabled={!row.original.isActive}
               variant="destructive"
               size="icon"
               loading={loadingId === row.original._id}
@@ -199,10 +198,15 @@ export default function AdminProducts() {
 
     const response = await deleteProduct(productId)
 
-    setProducts((prev) => {
-      if (!prev || !response?.product) return prev
+    if (response?.ok === false) {
+      toast.error(response.message)
+      return
+    }
 
-      return prev.filter((prd) => prd._id !== response.product._id)
+    setProducts((prev) => {
+      if (!prev) return prev
+
+      return prev.filter((prd) => prd._id !== productId)
     })
 
     toast.success(response.message)
