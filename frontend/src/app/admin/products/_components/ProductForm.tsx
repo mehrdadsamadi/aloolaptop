@@ -11,12 +11,11 @@ import { AsyncCombobox } from '@/components/input/asyncCombobox'
 import { useEffect, useState } from 'react'
 import { ProductFormValues, productSchema } from '@/validators/product.validator'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { CalendarHijri as Calendar } from '@/components/ui/calendar'
+import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { CalendarIcon } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, formatPersianDate } from '@/lib/utils'
 import { format } from 'date-fns'
-import { faIR } from 'date-fns/locale'
 import AttributesForm from './AttributesForm'
 import { ProductCondition, ProductGrade } from '@/types/admin/product.type'
 import ImagesUploader from '@/components/input/ImagesUploader'
@@ -292,35 +291,49 @@ export default function ProductForm({ initialValues, onSubmit, isEdit }: Props) 
             <Controller
               name="discountExpiresAt"
               control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="product-discount-expiry">انقضای تخفیف</FieldLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn('w-full justify-start text-right font-normal', !field.value && 'text-muted-foreground')}
+              render={({ field, fieldState }) => {
+                // تاریخ نمایشی (اگر null باشه، تاریخ امروز رو نشون بده)
+                const displayDate = field.value || new Date()
+
+                // تابع مدیریت انتخاب تاریخ
+                const handleDateSelect = (date: Date | undefined) => {
+                  // اگر تاریخ انتخاب شده با تاریخ امروز یکسان باشه، null بفرست
+                  // اینطوری کاربر می‌تونه تاریخ رو حذف کنه
+                  if (date && format(date, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')) {
+                    field.onChange(null)
+                  } else {
+                    field.onChange(date)
+                  }
+                }
+
+                return (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="product-discount-expiry">انقضای تخفیف</FieldLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn('w-full justify-start text-right font-normal', !field.value && 'text-muted-foreground')}
+                        >
+                          <CalendarIcon className="ml-2 h-4 w-4" />
+                          {formatPersianDate(displayDate)}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        className="w-auto p-0"
+                        align="start"
                       >
-                        <CalendarIcon className="ml-2 h-4 w-4" />
-                        {field.value ? format(field.value, 'PPP', { locale: faIR }) : <span>انتخاب تاریخ</span>}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent
-                      className="w-auto p-0"
-                      align="start"
-                    >
-                      <Calendar
-                        mode="single"
-                        selected={field.value || undefined}
-                        onSelect={field.onChange}
-                        initialFocus
-                        locale={faIR}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
+                        <Calendar
+                          mode="single"
+                          selected={field.value || new Date()}
+                          onSelect={handleDateSelect}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )
+              }}
             />
           </div>
         </div>

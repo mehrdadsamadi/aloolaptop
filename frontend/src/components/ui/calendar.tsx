@@ -8,24 +8,6 @@ import { DayPicker } from 'react-day-picker/persian'
 import { cn } from '@/lib/utils'
 import { Button, buttonVariants } from '@/components/ui/button'
 
-export function CalendarHijri() {
-  const [date, setDate] = React.useState<Date | undefined>(new Date(2025, 5, 12))
-
-  return (
-    <Calendar
-      mode="single"
-      defaultMonth={date}
-      selected={date}
-      onSelect={setDate}
-      className="rounded-lg border shadow-sm"
-    />
-  )
-}
-
-// ----------------------------------------------------------------------------
-// The code below is for this example only.
-// For your own calendar, you would edit the calendar.tsx component directly.
-// ----------------------------------------------------------------------------
 function Calendar({
   className,
   classNames,
@@ -75,7 +57,7 @@ function Calendar({
           'relative has-focus:border-ring border border-input shadow-xs has-focus:ring-ring/50 has-focus:ring-[3px] rounded-md',
           defaultClassNames.dropdown_root
         ),
-        dropdown: cn('absolute inset-0 opacity-0', defaultClassNames.dropdown),
+        dropdown: cn('absolute bg-popover inset-0 opacity-0', defaultClassNames.dropdown),
         caption_label: cn(
           'select-none font-medium',
           captionLayout === 'label'
@@ -90,7 +72,10 @@ function Calendar({
         week_number_header: cn('select-none w-(--cell-size)', defaultClassNames.week_number_header),
         week_number: cn('text-[0.8rem] select-none text-muted-foreground', defaultClassNames.week_number),
         day: cn(
-          'relative w-full h-full p-0 text-center [&:first-child[data-selected=true]_button]:rounded-l-md [&:last-child[data-selected=true]_button]:rounded-r-md group/day aspect-square select-none',
+          'relative w-full h-full p-0 text-center [&:last-child[data-selected=true]_button]:rounded-r-md group/day aspect-square select-none',
+          props.showWeekNumber
+            ? '[&:nth-child(2)[data-selected=true]_button]:rounded-l-md'
+            : '[&:first-child[data-selected=true]_button]:rounded-l-md',
           defaultClassNames.day
         ),
         range_start: cn('rounded-l-md bg-accent', defaultClassNames.range_start),
@@ -181,3 +166,5 @@ function CalendarDayButton({ className, day, modifiers, ...props }: React.Compon
     />
   )
 }
+
+export { Calendar, CalendarDayButton }
