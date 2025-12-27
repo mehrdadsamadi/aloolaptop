@@ -37,7 +37,22 @@ export const productSchema = z.object({
 
   discountPercent: z.number().min(0, 'درصد تخفیف نمی‌تواند منفی باشد').max(100, 'درصد تخفیف نمی‌تواند بیشتر از ۱۰۰ باشد'),
 
-  discountExpiresAt: z.date().optional().nullable().default(null),
+  discountExpiresAt: z
+    .union([
+      z.string(), // قبول کردن string
+      z.date(), // قبول کردن Date object
+    ])
+    .optional()
+    .nullable()
+    .default(null)
+    .transform((val) => {
+      if (!val) return null
+      // تبدیل string به Date
+      if (typeof val === 'string') {
+        return new Date(val)
+      }
+      return val
+    }),
 })
 
 export type ProductFormValues = z.infer<typeof productSchema>

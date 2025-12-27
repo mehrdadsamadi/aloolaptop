@@ -75,6 +75,11 @@ export class CreateProductDto {
   )
   attributes?: AttributeDto[];
 
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  existingImages?: string;
+
   @ApiPropertyOptional({ format: 'binary' })
   @IsOptional()
   @IsArray()

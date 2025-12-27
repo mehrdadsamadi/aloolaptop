@@ -39,7 +39,7 @@ export default function ProductForm({ initialValues, onSubmit, isEdit }: Props) 
       description: '',
       categoryId: '',
       condition: ProductCondition.NEW,
-      grade: ProductGrade.A_DOUBLE_PLUS,
+      grade: null,
       price: 0,
       stock: null,
       attributes: [],
@@ -54,9 +54,9 @@ export default function ProductForm({ initialValues, onSubmit, isEdit }: Props) 
   useEffect(() => {
     if (initialValues?.images) {
       const serverImages = initialValues.images.map((img) => ({
-        url: img.url,
-        key: img.key,
-        alt: img.alt,
+        url: img?.url,
+        key: img?.key,
+        alt: img?.alt,
       }))
       setImages(serverImages)
     }
@@ -68,6 +68,12 @@ export default function ProductForm({ initialValues, onSubmit, isEdit }: Props) 
     formState: { isSubmitting },
   } = form
 
+  useEffect(() => {
+    if (form.watch('condition') === ProductCondition.NEW) {
+      form.setValue('grade', null)
+    }
+  }, [form, form.watch('condition')])
+
   // تابع برای ارسال فرم
   const handleFormSubmit = async (values: ProductFormValues) => {
     // ارسال هم داده‌های فرم و هم فایل‌های تصویر جدید
@@ -78,16 +84,19 @@ export default function ProductForm({ initialValues, onSubmit, isEdit }: Props) 
   const handleImagesChange = (updatedImages: any[]) => {
     setImages(updatedImages)
 
-    // استخراج فایل‌های جدید
-    const files = updatedImages.filter((img) => img.file).map((img) => img.file)
+    // جدا کردن تصاویر قدیمی و جدید
+    const oldImages = updatedImages.filter((img) => img.url && !img.file)
+    const newImages = updatedImages.filter((img) => img.file)
 
+    // ذخیره فایل‌های جدید
+    const files = newImages.map((img) => img.file)
     setNewImageFiles(files)
 
-    // آپدیت فیلد images در فرم
+    // آپدیت فیلد images در فرم (هم تصاویر قدیمی هم جدید)
     const formImages = updatedImages.map((img) => ({
-      url: img.url,
-      key: img.key || img.file?.name,
-      alt: img.alt || img.file?.name,
+      url: img?.url || '',
+      key: img?.key || '',
+      alt: img?.alt || '',
     }))
 
     form.setValue('images', formImages)
@@ -241,6 +250,7 @@ export default function ProductForm({ initialValues, onSubmit, isEdit }: Props) 
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="product-grade">درجه کیفیت</FieldLabel>
                   <Select
+                    disabled={form.watch('condition') === ProductCondition.NEW}
                     onValueChange={field.onChange}
                     value={field.value}
                   >

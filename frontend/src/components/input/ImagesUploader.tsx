@@ -185,31 +185,31 @@ export default function ImagesUploader({
             </p>
           </div>
 
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="mt-4"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={disabled || images.length >= maxFiles}
-          >
-            <ImagePlus className="w-4 h-4 ml-2" />
-            انتخاب تصاویر
-          </Button>
-
-          {images.length > 0 && (
+          <div className={'flex gap-4 items-center mt-4'}>
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               size="sm"
-              className="mt-2"
-              onClick={handleRemoveAll}
-              disabled={disabled}
+              onClick={() => fileInputRef.current?.click()}
+              disabled={disabled || images.length >= maxFiles}
             >
-              <X className="w-4 h-4 ml-2" />
-              حذف همه تصاویر
+              <ImagePlus className="w-4 h-4 ml-2" />
+              انتخاب تصاویر
             </Button>
-          )}
+
+            {images.length > 0 && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleRemoveAll}
+                disabled={disabled}
+              >
+                <X className="w-4 h-4 ml-2" />
+                حذف همه تصاویر
+              </Button>
+            )}
+          </div>
         </div>
 
         <input
@@ -247,7 +247,7 @@ export default function ImagesUploader({
                     width={200}
                     height={200}
                     className="w-full h-full object-cover"
-                    unoptimized={img.url.startsWith('blob:')} // فقط برای blobها unoptimized
+                    unoptimized={img?.url?.startsWith('blob:')} // فقط برای blobها unoptimized
                   />
                 </div>
 

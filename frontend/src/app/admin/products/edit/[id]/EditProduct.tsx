@@ -13,29 +13,33 @@ export default function EditProduct({ product }: { product: IProduct }) {
 
   const handleEditProduct = async (values: ProductFormValues, imageFiles?: File[]) => {
     try {
-      // ارسال داده‌ها به API
+      // ایجاد FormData جدید
       const formData = new FormData()
 
-      // اضافه کردن داده‌های فرم
+      // اضافه کردن فیلدهای اصلی (به جز images)
       Object.entries(values).forEach(([key, value]) => {
-        if (value !== null && value !== undefined) {
-          if (typeof value === 'object') {
+        if (key !== 'images' && value !== null && value !== undefined) {
+          if (typeof value === 'object' && !(value instanceof Date)) {
             formData.append(key, JSON.stringify(value))
+          } else if (value instanceof Date) {
+            formData.append(key, value.toISOString())
           } else {
             formData.append(key, value.toString())
           }
         }
       })
 
-      // اضافه کردن تصاویر
-      if (imageFiles) {
-        console.log('imageFiles', imageFiles)
-        console.log('formData.images', formData.get('images'))
-        imageFiles
-          .filter((file) => !file?.alt)
-          .forEach((file, index) => {
-            formData.append(`images`, file)
-          })
+      // اضافه کردن تصاویر قدیمی به صورت JSON
+      if (values.images && values.images.length > 0) {
+        const existingImages = values.images.filter((img) => img.url && !img.file && img?.key?.length > 0)
+        formData.append('existingImages', JSON.stringify(existingImages))
+      }
+
+      // اضافه کردن تصاویر جدید به صورت فایل
+      if (imageFiles && imageFiles.length > 0) {
+        imageFiles.forEach((file, index) => {
+          formData.append(`images`, file) // نام فیلد متفاوت از existingImages
+        })
       }
 
       const res = await updateProduct(product?._id, formData)
@@ -56,7 +60,11 @@ export default function EditProduct({ product }: { product: IProduct }) {
   return (
     <ProductForm
       isEdit
-      initialValues={{ ...product, categoryId: product?.categoryId?._id }}
+      initialValues={{
+        ...product,
+        categoryId: product?.categoryId?._id,
+        images: product.images || [],
+      }}
       onSubmit={handleEditProduct}
     />
   )

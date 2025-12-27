@@ -8,7 +8,7 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
     <SidebarProvider>
       <Sidebar side={'right'} />
 
-      <SidebarInset>
+      <SidebarInset className={'overflow-auto'}>
         <header className="flex h-16 shrink-0 items-center gap-4 border-b px-4">
           <SidebarTrigger className="-mr-1 ml-auto rotate-180" />
 

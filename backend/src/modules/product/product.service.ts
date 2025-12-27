@@ -165,7 +165,18 @@ export class ProductService {
       isActive,
       condition,
       name,
+      existingImages,
     } = updateDto;
+
+    // پارس کردن existingImages
+    let existingImagesParsed: ImageType[] = [];
+    if (existingImages) {
+      try {
+        existingImagesParsed = JSON.parse(existingImages);
+      } catch (error) {
+        throw new BadRequestException('فرمت تصاویر قدیمی نامعتبر است');
+      }
+    }
 
     // parse attributes if needed
     if (attributes) {
@@ -176,7 +187,7 @@ export class ProductService {
     if (slug) slug = makeSlug(slug);
 
     // upload new images if provided (append to images array)
-    const uploadedImages: ImageType[] = [];
+    const uploadedImages: ImageType[] = [...existingImagesParsed];
 
     if (imageFiles && imageFiles.length) {
       for (const file of imageFiles) {
