@@ -47,11 +47,11 @@ export class CouponService {
     }
 
     const coupon = await this.couponModel.create({
-      code: code.toUpperCase(),
+      code: code.toUpperCase().replace(/ /g, '_'),
       endDate,
       startDate,
       productIds,
-      minOrderAmount,
+      minOrderAmount: minOrderAmount || 0,
       type,
       method,
       value,
