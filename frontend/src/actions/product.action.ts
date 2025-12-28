@@ -18,6 +18,12 @@ export async function deleteProduct(productId: string) {
   return res.json()
 }
 
+export async function deleteProductImage(productId: string, imageKey: string) {
+  const res = await apiFetch(ENDPOINTS.PRODUCTS.DELETE_IMAGE(productId, imageKey), { method: 'DELETE' })
+
+  return res.json()
+}
+
 export async function createProduct(formData: FormData) {
   const res = await apiFetch(ENDPOINTS.PRODUCTS.CREATE, { method: 'POST', body: formData })
 

@@ -18,8 +18,9 @@ import { cn, formatPersianDate } from '@/lib/utils'
 import { format } from 'date-fns'
 import AttributesForm from './AttributesForm'
 import { ProductCondition, ProductGrade } from '@/types/admin/product.type'
-import ImagesUploader from '@/components/input/ImagesUploader'
+import ImagesUploader, { ImageItem } from '@/components/input/imagesUploader'
 import { CONDITION_CONSTANTS } from '@/lib/constants/product.constant'
+import { NumberInput } from '@/components/input/numberInput'
 
 interface Props {
   initialValues?: ProductFormValues
@@ -28,7 +29,7 @@ interface Props {
 }
 
 export default function ProductForm({ initialValues, onSubmit, isEdit }: Props) {
-  const [images, setImages] = useState<any[]>([])
+  const [images, setImages] = useState<ImageItem[]>([])
   const [newImageFiles, setNewImageFiles] = useState<File[]>([])
 
   const form = useForm<ProductFormValues>({
@@ -81,7 +82,7 @@ export default function ProductForm({ initialValues, onSubmit, isEdit }: Props) 
   }
 
   // تابع مدیریت تغییر تصاویر
-  const handleImagesChange = (updatedImages: any[]) => {
+  const handleImagesChange = (updatedImages: ImageItem[]) => {
     setImages(updatedImages)
 
     // جدا کردن تصاویر قدیمی و جدید
@@ -172,14 +173,9 @@ export default function ProductForm({ initialValues, onSubmit, isEdit }: Props) 
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="product-price">قیمت (تومان)</FieldLabel>
-                  <Input
-                    {...field}
-                    value={field.value ?? ''}
-                    onChange={(e) => {
-                      const value = e.target.value
-                      field.onChange(value === '' ? null : parseInt(value, 10))
-                    }}
-                    type="number"
+                  <NumberInput
+                    value={field.value}
+                    onChange={field.onChange}
                     id="product-price"
                     aria-invalid={fieldState.invalid}
                     placeholder="قیمت محصول"
@@ -196,14 +192,9 @@ export default function ProductForm({ initialValues, onSubmit, isEdit }: Props) 
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="product-stock">موجودی</FieldLabel>
-                  <Input
-                    {...field}
-                    value={field.value ?? ''}
-                    onChange={(e) => {
-                      const value = e.target.value
-                      field.onChange(value === '' ? null : parseInt(value, 10))
-                    }}
-                    type="number"
+                  <NumberInput
+                    value={field.value}
+                    onChange={field.onChange}
                     id="product-stock"
                     aria-invalid={fieldState.invalid}
                     placeholder="تعداد موجود"

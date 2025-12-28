@@ -10,8 +10,8 @@ import { CreateCouponDto } from './dto/coupon.dto';
 import { SwaggerConsumes } from '../../common/enums/swagger-consumes.enum';
 import { EXAMPLE_COUPON, EXAMPLE_COUPON_CART } from './examples/coupon.example';
 
-@Controller('coupon')
-@ApiTags('Coupon')
+@Controller('coupons')
+@ApiTags('Coupons')
 @AuthDecorator()
 export class CouponController {
   constructor(private readonly couponService: CouponService) {}

@@ -8,6 +8,7 @@ import { AttributeType } from '@/types/admin/category.type'
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import React from 'react'
+import { NumberInput } from '@/components/input/numberInput'
 
 interface AttributeItemProps {
   index: number
@@ -108,16 +109,11 @@ export default function AttributeItem({ index, control, onRemove }: AttributeIte
               control={control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <Input
-                    {...field}
+                  <NumberInput
+                    value={field.value}
+                    onChange={field.onChange}
+                    aria-invalid={fieldState.invalid}
                     placeholder="مقدار"
-                    type={'number'}
-                    value={field.value ?? ''}
-                    onChange={(e) => {
-                      const value = e.target.value
-                      // اگر رشته خالی بود مقدار null بذار یا 0
-                      field.onChange(value === '' ? null : parseInt(value, 10))
-                    }}
                   />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
@@ -180,34 +176,24 @@ export default function AttributeItem({ index, control, onRemove }: AttributeIte
               <Controller
                 name={`attributes.${index}.options.0`}
                 control={control}
-                render={({ field }) => (
-                  <Input
-                    type="number"
+                render={({ field, fieldState }) => (
+                  <NumberInput
+                    value={field.value}
+                    onChange={field.onChange}
+                    aria-invalid={fieldState.invalid}
                     placeholder="حداقل"
-                    {...field}
-                    value={field.value ?? ''}
-                    onChange={(e) => {
-                      const value = e.target.value
-                      // اگر رشته خالی بود مقدار null بذار یا 0
-                      field.onChange(value === '' ? null : parseInt(value, 10))
-                    }}
                   />
                 )}
               />
               <Controller
                 name={`attributes.${index}.options.1`}
                 control={control}
-                render={({ field }) => (
-                  <Input
-                    type="number"
+                render={({ field, fieldState }) => (
+                  <NumberInput
+                    value={field.value}
+                    onChange={field.onChange}
+                    aria-invalid={fieldState.invalid}
                     placeholder="حداکثر"
-                    {...field}
-                    value={field.value ?? ''}
-                    onChange={(e) => {
-                      const value = e.target.value
-                      // اگر رشته خالی بود مقدار null بذار یا 0
-                      field.onChange(value === '' ? null : parseInt(value, 10))
-                    }}
                   />
                 )}
               />

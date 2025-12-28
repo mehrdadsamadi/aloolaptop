@@ -1,4 +1,4 @@
-// components/input/ImagesUploader.tsx
+// components/input/imagesUploader.tsx
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Image as ImageIcon, ImagePlus, X } from 'lucide-react'
 import Image from 'next/image'
 
-interface ImageItem {
+export interface ImageItem {
   id?: string
   url: string
   key?: string
