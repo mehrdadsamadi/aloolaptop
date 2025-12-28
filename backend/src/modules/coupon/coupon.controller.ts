@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiConsumes, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { CouponService } from './coupon.service';
 import { AuthDecorator } from '../../common/decorators/auth.decorator';
@@ -37,5 +45,11 @@ export class CouponController {
   @CanAccess(Roles.ADMIN)
   findByCode(@Param('code') code: string) {
     return this.couponService.findByCode(code);
+  }
+
+  @Patch(':id/toggle-active')
+  @CanAccess(Roles.ADMIN)
+  toggleActive(@Param('id') id: string) {
+    return this.couponService.toggleActive(id);
   }
 }

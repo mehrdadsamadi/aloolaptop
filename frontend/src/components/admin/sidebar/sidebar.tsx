@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { BoxesIcon, LayoutDashboardIcon, ListIcon, Settings2, UsersIcon } from 'lucide-react'
+import { BoxesIcon, LayoutDashboardIcon, ListIcon, Settings2, TicketPercentIcon, UsersIcon } from 'lucide-react'
 
 import { Sidebar as ShadSidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from '@/components/ui/sidebar'
 import { FavoriteSwitcher } from '@/components/admin/sidebar/favorite-switcher'
@@ -50,6 +50,12 @@ const data = {
       title: 'محصولات',
       url: '/admin/products',
       icon: BoxesIcon,
+      isActive: false,
+    },
+    {
+      title: 'کوپن تخفیف',
+      url: '/admin/coupons',
+      icon: TicketPercentIcon,
       isActive: false,
     },
     {

@@ -24,4 +24,10 @@ export const ENDPOINTS = {
     CREATE: '/api/products',
     UPDATE_BY_ID: (productId: string) => `/api/products/${productId}`,
   },
+  COUPONS: {
+    LIST: ({ page = 1, limit = 20 }: { page?: number; limit?: number }) => `/api/coupons?page=${page}&limit=${limit}`,
+    GET_BY_CODE: (code: string) => `/api/coupons/${code}`,
+    CREATE: '/api/coupons',
+    TOGGLE_ACTIVE: (couponId: string) => `/api/coupons/${couponId}/toggle-active`,
+  },
 }

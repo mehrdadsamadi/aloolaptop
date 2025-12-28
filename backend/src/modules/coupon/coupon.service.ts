@@ -74,7 +74,7 @@ export class CouponService {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .lean();
+      .populate({ path: 'productIds', select: '_id name' });
 
     return {
       coupons,
@@ -98,7 +98,22 @@ export class CouponService {
     return coupon;
   }
 
-  // TODO: بعد از پرداخت موفق یکی اضافه بشه
+  async toggleActive(id: string) {
+    const coupon = await this.findById(id);
+
+    const message = coupon?.isActive
+      ? CouponMessage.InActive
+      : CouponMessage.Active;
+
+    coupon.isActive = !coupon.isActive;
+    await coupon.save();
+
+    return {
+      message,
+      coupon,
+    };
+  }
+
   async increaseUsage(code: string) {
     return this.couponModel.updateOne(
       { code: code.toUpperCase() },
