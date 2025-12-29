@@ -7,15 +7,14 @@ import { Input } from '@/components/ui/input'
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { useEffect, useState } from 'react'
 import { CouponFormValues, couponSchema } from '@/validators/coupon.validator'
-import { Badge } from '@/components/ui/badge'
-import { CalendarIcon, X } from 'lucide-react'
+import { CalendarIcon } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { CouponType, DiscountMethod } from '@/types/admin/coupon.type'
 import { NumberInput } from '@/components/input/numberInput'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn, formatPersianDate } from '@/lib/utils'
 import { Calendar } from '@/components/ui/calendar'
-import { AsyncCombobox } from '@/components/input/asyncCombobox'
+import { AsyncMultipleCombobox } from '@/components/input/asyncMultipleCombobox'
 
 interface Props {
   initialValues?: CouponFormValues
@@ -186,42 +185,15 @@ export default function CouponForm({ initialValues, onSubmit, isEdit }: Props) {
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="product-select">انتخاب محصولات</FieldLabel>
-                <AsyncCombobox
+                <AsyncMultipleCombobox
                   apiUrl="/api/products"
                   apiField="products"
-                  queryField="name"
+                  queryField={'name'}
                   placeholder="جستجو و انتخاب محصولات"
-                  multiple
-                  selectedValues={selectedProducts}
-                  onValuesChange={(values) => setSelectedProducts(values)}
-                  disabled={isSubmitting}
+                  initialValue={field.value || []} // مقدار اولیه به صورت آرایه
+                  onValueChange={(value) => setSelectedProducts(value)}
                 />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-
-                {/* نمایش محصولات انتخاب شده */}
-                {selectedProducts.length > 0 && (
-                  <div className="mt-3 space-y-2">
-                    <p className="text-sm text-muted-foreground">محصولات انتخاب شده:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedProducts.map((productId) => (
-                        <Badge
-                          key={productId}
-                          variant="secondary"
-                          className="px-3 py-1"
-                        >
-                          {productId}
-                          <button
-                            type="button"
-                            onClick={() => removeProduct(productId)}
-                            className="mr-2 hover:text-destructive"
-                          >
-                            <X className="h-3 w-3" />
-                          </button>
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </Field>
             )}
           />

@@ -9,6 +9,7 @@ export function FilterProduct() {
     ApiQuery({ name: 'condition', required: false, enum: ProductCondition }),
     ApiQuery({ name: 'grade', required: false, enum: ProductGrade }),
     ApiQuery({ name: 'isActive', required: false, type: 'boolean' }),
+    ApiQuery({ name: 'name', required: false, type: 'boolean' }),
   );
 }
 

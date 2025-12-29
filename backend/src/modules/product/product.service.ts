@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product, ProductDocument } from './schema/product.schema';
@@ -119,9 +119,22 @@ export class ProductService {
   }) {
     const { page, limit, skip } = paginationSolver(paginationDto);
 
-    const count = await this.productModel.countDocuments(filter);
+    const finalFilter: FilterQuery<ProductDocument> = {};
+
+    if (filter.name) {
+      finalFilter.name = {
+        $regex: filter.name,
+        $options: 'i',
+      };
+    }
+
+    const { name, ...restFilters } = filter;
+
+    Object.assign(finalFilter, restFilters);
+
+    const count = await this.productModel.countDocuments(finalFilter);
     const products = await this.productModel
-      .find(filter)
+      .find(finalFilter)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)

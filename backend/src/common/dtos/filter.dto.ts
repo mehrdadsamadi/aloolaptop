@@ -32,6 +32,11 @@ export class FilterProductDto extends PaginationDto {
   @Transform(({ value }) => value === 'true' || value === '1' || value === true)
   @IsBoolean()
   isActive?: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  name?: string;
 }
 
 export class FilterCategoryDto extends PaginationDto {
