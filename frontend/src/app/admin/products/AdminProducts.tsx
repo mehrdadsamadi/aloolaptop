@@ -218,7 +218,7 @@ export default function AdminProducts() {
     <>
       {products === null ? (
         <LoadingSection />
-      ) : products.length === 0 ? (
+      ) : products?.length === 0 ? (
         <NoData />
       ) : (
         <DataTable

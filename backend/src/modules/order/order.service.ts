@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Order, OrderDocument } from './schema/order.schema';
-import { Model, Types } from 'mongoose';
+import { FilterQuery, Model, Types } from 'mongoose';
 import { CartService } from '../cart/cart.service';
 import {
   CartMessage,
@@ -19,6 +19,12 @@ import { PaymentStatus } from '../payment/enums/payment-status.enum';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { Payment, PaymentDocument } from '../payment/schema/payment.schema';
+import { PaginationDto } from '../../common/dtos/pagination.dto';
+import {
+  paginationGenerator,
+  paginationSolver,
+} from '../../common/utils/pagination.util';
+import { FilterOrderDto } from '../../common/dtos/filter.dto';
 
 @Injectable({ scope: Scope.REQUEST })
 export class OrderService {
@@ -108,7 +114,44 @@ export class OrderService {
 
     await order.save();
 
-    return order;
+    return {
+      message: OrderMessage.ChangedStatus,
+      order,
+    };
+  }
+
+  async findAll({
+    paginationDto,
+    filter,
+  }: {
+    paginationDto: PaginationDto;
+    filter?: FilterOrderDto;
+  }) {
+    const { page, limit, skip } = paginationSolver(paginationDto);
+
+    const finalFilter: FilterQuery<OrderDocument> = {};
+
+    if (filter?.status) {
+      finalFilter.status = filter.status;
+    }
+
+    const count = await this.orderModel.countDocuments(finalFilter);
+
+    const orders = await this.orderModel
+      .find(finalFilter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate([
+        { path: 'addressId' },
+        { path: 'userId', select: 'profile mobile' },
+        { path: 'couponId', select: 'code' },
+      ]);
+
+    return {
+      orders,
+      pagination: paginationGenerator(count, page, limit),
+    };
   }
 
   async findById(id: string) {
@@ -149,13 +192,17 @@ export class OrderService {
   }
 
   async refund(orderId: string, reason: string) {
-    const order = await this.updateStatus(orderId, OrderStatus.REFUNDED, {
-      reason,
-    });
+    const { order, message } = await this.updateStatus(
+      orderId,
+      OrderStatus.REFUNDED,
+      {
+        reason,
+      },
+    );
 
     if (order.status === OrderStatus.REFUNDED) {
       const payment = await this.paymentModel.findOne({
-        refId: order.meta.payment.refId,
+        refId: order?.meta?.payment?.refId,
       });
       if (!payment) throw new NotFoundException(PaymentMessage.Notfound);
 
@@ -164,7 +211,10 @@ export class OrderService {
       await payment.save();
     }
 
-    return order;
+    return {
+      message,
+      order,
+    };
   }
 
   private generateTrackingCode() {

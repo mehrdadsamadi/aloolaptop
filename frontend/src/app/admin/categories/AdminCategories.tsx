@@ -159,7 +159,7 @@ export default function AdminCategories() {
     <>
       {categories === null ? (
         <LoadingSection />
-      ) : categories.length === 0 ? (
+      ) : categories?.length === 0 ? (
         <NoData />
       ) : (
         <DataTable

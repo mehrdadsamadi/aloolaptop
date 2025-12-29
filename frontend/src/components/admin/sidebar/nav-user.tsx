@@ -35,12 +35,12 @@ export function NavUser() {
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage
                   src={getImageUrl(user?.profile?.avatar?.url)}
-                  alt={getFullName(user)}
+                  alt={getFullName(user?.profile ?? null)}
                 />
                 <AvatarFallback className="rounded-lg">اد</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-right text-sm leading-tight">
-                <span className="truncate font-medium">{getFullName(user)}</span>
+                <span className="truncate font-medium">{getFullName(user?.profile ?? null)}</span>
                 <span className="truncate text-xs">{user?.mobile}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
@@ -60,12 +60,12 @@ export function NavUser() {
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage
                     src={getImageUrl(user?.profile?.avatar?.url)}
-                    alt={getFullName(user)}
+                    alt={getFullName(user?.profile ?? null)}
                   />
                   <AvatarFallback className="rounded-lg">اد</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-right text-sm leading-tight">
-                  <span className="truncate font-medium">{getFullName(user)}</span>
+                  <span className="truncate font-medium">{getFullName(user?.profile ?? null)}</span>
                   <span className="truncate text-xs">{user?.mobile}</span>
                 </div>
               </div>

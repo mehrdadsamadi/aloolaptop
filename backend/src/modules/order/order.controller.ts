@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Query } from '@nestjs/common';
 import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { AuthDecorator } from '../../common/decorators/auth.decorator';
 import { OrderService } from './order.service';
@@ -9,12 +9,26 @@ import {
   ChangeToShippedDto,
 } from './dto/change-status.dto';
 import { SwaggerConsumes } from '../../common/enums/swagger-consumes.enum';
+import { Pagination } from '../../common/decorators/pagination.decorator';
+import { FilterOrder } from '../../common/decorators/filter.decorator';
+import { FilterOrderDto } from '../../common/dtos/filter.dto';
+import { extractFilters } from '../../common/utils/functions.util';
 
-@Controller('order')
-@ApiTags('Order')
+@Controller('orders')
+@ApiTags('Orders')
 @AuthDecorator()
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
+
+  @Get()
+  @Pagination()
+  @CanAccess(Roles.ADMIN)
+  @FilterOrder()
+  findAll(@Query() filterDto: FilterOrderDto) {
+    const { paginationDto, filter } = extractFilters(filterDto);
+
+    return this.orderService.findAll({ paginationDto, filter });
+  }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
@@ -43,7 +57,7 @@ export class OrderController {
     return this.orderService.markDelivered(id);
   }
 
-  @Patch(':id/cancel')
+  @Patch(':id/canceled')
   @CanAccess(Roles.ADMIN)
   @ApiConsumes(SwaggerConsumes.UrlEncoded, SwaggerConsumes.Json)
   cancel(
@@ -53,7 +67,7 @@ export class OrderController {
     return this.orderService.cancel(id, changeToCanceledOrRefundDto.reason);
   }
 
-  @Patch(':id/refund')
+  @Patch(':id/refunded')
   @CanAccess(Roles.ADMIN)
   @ApiConsumes(SwaggerConsumes.UrlEncoded, SwaggerConsumes.Json)
   refund(

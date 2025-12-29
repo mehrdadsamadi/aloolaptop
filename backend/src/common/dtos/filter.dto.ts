@@ -10,6 +10,7 @@ import {
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { PaginationDto } from './pagination.dto';
+import { OrderStatus } from '../../modules/order/enums/order-status.enum';
 
 export class FilterProductDto extends PaginationDto {
   @ApiPropertyOptional()
@@ -49,4 +50,11 @@ export class FilterCategoryDto extends PaginationDto {
   @IsOptional()
   @IsString()
   name?: string;
+}
+
+export class FilterOrderDto extends PaginationDto {
+  @ApiPropertyOptional({ enum: OrderStatus })
+  @IsOptional()
+  @IsEnum(OrderStatus)
+  status?: OrderStatus;
 }

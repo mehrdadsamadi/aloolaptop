@@ -179,7 +179,7 @@ export default function AdminCoupons() {
     <>
       {coupons === null ? (
         <LoadingSection />
-      ) : coupons.length === 0 ? (
+      ) : coupons?.length === 0 ? (
         <NoData />
       ) : (
         <DataTable

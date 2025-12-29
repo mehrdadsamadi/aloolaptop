@@ -155,7 +155,7 @@ export default function AdminUsers() {
     <>
       {users === null ? (
         <LoadingSection />
-      ) : users.length === 0 ? (
+      ) : users?.length === 0 ? (
         <NoData />
       ) : (
         <DataTable

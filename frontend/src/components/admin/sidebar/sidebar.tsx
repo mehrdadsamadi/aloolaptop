@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { BoxesIcon, LayoutDashboardIcon, ListIcon, Settings2, TicketPercentIcon, UsersIcon } from 'lucide-react'
+import { BoxesIcon, LaptopMinimalIcon, LayoutDashboardIcon, ListIcon, TicketPercentIcon, UsersIcon } from 'lucide-react'
 
 import { Sidebar as ShadSidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from '@/components/ui/sidebar'
 import { FavoriteSwitcher } from '@/components/admin/sidebar/favorite-switcher'
@@ -59,25 +59,37 @@ const data = {
       isActive: false,
     },
     {
-      title: 'تنظیمات',
-      url: '#',
-      icon: Settings2,
+      title: 'سفارشات',
+      url: '/admin/orders',
+      icon: LaptopMinimalIcon,
       items: [
         {
-          title: 'تست',
-          url: '#',
+          title: 'منتظر پرداخت',
+          url: '/admin/orders?status=awaiting_payment',
         },
         {
-          title: 'تست',
-          url: '#',
+          title: 'پرداخت شده',
+          url: '/admin/orders?status=paid',
         },
         {
-          title: 'تست',
-          url: '#',
+          title: 'درحال پردازش',
+          url: '/admin/orders?status=processing',
         },
         {
-          title: 'تست',
-          url: '#',
+          title: 'ارسال شده',
+          url: '/admin/orders?status=shipped',
+        },
+        {
+          title: 'تحویل داده شده',
+          url: '/admin/orders?status=delivered',
+        },
+        {
+          title: 'لغو شده',
+          url: '/admin/orders?status=canceled',
+        },
+        {
+          title: 'برگشت خورده',
+          url: '/admin/orders?status=refunded',
         },
       ],
     },

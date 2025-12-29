@@ -1,3 +1,5 @@
+import { OrderStatus } from '@/types/admin/order.type'
+
 export const ENDPOINTS = {
   AUTH: {
     SEND_OTP: '/api/auth/send-otp',
@@ -29,5 +31,10 @@ export const ENDPOINTS = {
     GET_BY_CODE: (code: string) => `/api/coupons/${code}`,
     CREATE: '/api/coupons',
     TOGGLE_ACTIVE: (couponId: string) => `/api/coupons/${couponId}/toggle-active`,
+  },
+  ORDERS: {
+    LIST: ({ page = 1, limit = 20, status }: { page?: number; limit?: number; status: OrderStatus }) =>
+      `/api/orders?status=${status}&page=${page}&limit=${limit}`,
+    CHANGE_STATUS: (orderId: string, status: OrderStatus) => `/api/orders/${orderId}/${status}`,
   },
 }

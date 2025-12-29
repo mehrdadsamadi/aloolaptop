@@ -2,6 +2,7 @@ import { applyDecorators } from '@nestjs/common';
 import { ApiQuery } from '@nestjs/swagger';
 import { ProductGrade } from '../../modules/product/enums/product-grade.enum';
 import { ProductCondition } from '../../modules/product/enums/product-condition.enum';
+import { OrderStatus } from '../../modules/order/enums/order-status.enum';
 
 export function FilterProduct() {
   return applyDecorators(
@@ -17,5 +18,16 @@ export function FilterCategory() {
   return applyDecorators(
     ApiQuery({ name: '_id', required: false, type: 'string' }),
     ApiQuery({ name: 'name', required: false, type: 'string' }),
+  );
+}
+
+export function FilterOrder() {
+  return applyDecorators(
+    ApiQuery({
+      name: 'status',
+      required: false,
+      type: 'enum',
+      enum: OrderStatus,
+    }),
   );
 }
