@@ -25,6 +25,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { ORDER_STATUS_CONSTANTS, PAYMENT_STATUS_CONSTANTS } from '@/lib/constants/order.constant'
 import { changeOrderStatus, getOrdersList } from '@/actions/order.action'
 import ReasonDialog from '@/app/admin/orders/_components/ReasonDialog'
+import TrackingCodeDialog from '@/app/admin/orders/_components/TrackingCodeDialog'
 
 // اضافه کردن transitions
 const ORDER_STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
@@ -45,6 +46,11 @@ const getAllowedStatuses = (currentStatus: OrderStatus): OrderStatus[] => {
 // تابع کمکی برای بررسی نیاز به دلیل
 const requiresReason = (newStatus: OrderStatus): boolean => {
   return newStatus === OrderStatus.CANCELED || newStatus === OrderStatus.REFUNDED
+}
+
+// تابع کمکی برای بررسی نیاز به کد رهگیری
+const requiresTrackingCode = (newStatus: OrderStatus): boolean => {
+  return newStatus === OrderStatus.SHIPPED
 }
 
 // تابع کمکی برای گرفتن متن مناسب برای دیالوگ
@@ -87,6 +93,13 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
     orderId: '',
     newStatus: '' as OrderStatus,
     config: getReasonDialogConfig(OrderStatus.CANCELED),
+  })
+
+  // State برای مدیریت دیالوگ کد رهگیری
+  const [trackingCodeDialogState, setTrackingCodeDialogState] = useState({
+    open: false,
+    orderId: '',
+    newStatus: '' as OrderStatus,
   })
 
   const [loadingId, setLoadingId] = useState<string | null>(null)
@@ -246,7 +259,7 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
         if (!prevOrders || !response?.order) return prevOrders
 
         // به‌روزرسانی سفارش در لیست
-        return prevOrders.map((order) => (order._id === response.order?._id ? response.order : order))
+        return prevOrders.filter((order) => order._id !== response.order?._id)
       })
 
       toast.success(response.message)
@@ -267,6 +280,14 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
         orderId,
         newStatus,
         config: getReasonDialogConfig(newStatus),
+      })
+    }
+    // اگر وضعیت جدید نیاز به کد رهگیری دارد
+    else if (requiresTrackingCode(newStatus)) {
+      setTrackingCodeDialogState({
+        open: true,
+        orderId,
+        newStatus,
       })
     } else {
       // برای سایر وضعیت‌ها، مستقیماً تغییر را اعمال کن
@@ -296,6 +317,22 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
     setReasonDialogState((prev) => ({ ...prev, open: false }))
   }
 
+  // هندلر تایید دیالوگ کد رهگیری
+  const handleTrackingCodeSubmit = (trackingCode: string) => {
+    const { orderId, newStatus } = trackingCodeDialogState
+
+    // ایجاد meta با کد رهگیری
+    const meta: HistoryMeta = {
+      trackingCode: trackingCode.trim(),
+    }
+
+    // فراخوانی تابع تغییر وضعیت با meta
+    changeStatus(orderId, newStatus, meta)
+
+    // بستن دیالوگ
+    setTrackingCodeDialogState((prev) => ({ ...prev, open: false }))
+  }
+
   return (
     <>
       {orders === null ? (
@@ -313,6 +350,7 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
         />
       )}
 
+      {/* دیالوگ دلیل */}
       <ReasonDialog
         open={reasonDialogState.open}
         onOpenChange={(open) => setReasonDialogState((prev) => ({ ...prev, open }))}
@@ -321,6 +359,15 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
         label={reasonDialogState.config.label}
         placeholder={reasonDialogState.config.placeholder}
         confirmText={reasonDialogState.config.confirmText}
+      />
+
+      {/* دیالوگ کد رهگیری */}
+      <TrackingCodeDialog
+        open={trackingCodeDialogState.open}
+        onOpenChange={(open) => setTrackingCodeDialogState((prev) => ({ ...prev, open }))}
+        onConfirm={handleTrackingCodeSubmit}
+        title="ثبت کد رهگیری پستی"
+        description={`برای تغییر وضعیت سفارش به "${ORDER_STATUS_CONSTANTS[OrderStatus.SHIPPED]}"، کد رهگیری را وارد کنید`}
       />
     </>
   )
