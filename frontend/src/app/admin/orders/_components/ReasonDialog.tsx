@@ -58,7 +58,6 @@ export default function ReasonDialog({
 
   return (
     <Dialog
-      trigger={<div />}
       title={title}
       open={open}
       onOpenChange={onOpenChange}

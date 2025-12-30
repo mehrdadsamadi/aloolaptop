@@ -63,7 +63,6 @@ export default function TrackingCodeDialog({
 
   return (
     <Dialog
-      trigger={<div />}
       title={title}
       description={description}
       open={open}

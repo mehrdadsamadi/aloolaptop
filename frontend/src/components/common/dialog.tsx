@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils'
 
 interface DialogProps {
   // کنترل‌کننده‌های اصلی
-  trigger: React.ReactNode
+  trigger?: React.ReactNode
   title: string
   description?: string
   children: React.ReactNode
@@ -95,12 +95,14 @@ export function Dialog({
       open={dialogOpen}
       onOpenChange={handleOpenChange}
     >
-      <DialogTrigger
-        asChild
-        className={triggerClassName}
-      >
-        {trigger}
-      </DialogTrigger>
+      {open === undefined && trigger && (
+        <DialogTrigger
+          asChild
+          className={triggerClassName}
+        >
+          {trigger}
+        </DialogTrigger>
+      )}
       {showOverlay ? (
         <DialogContent
           dir={'rtl'}

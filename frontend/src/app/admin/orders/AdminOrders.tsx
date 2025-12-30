@@ -14,12 +14,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
-import { ChevronDown, EyeIcon } from 'lucide-react'
+import { ChevronDown, EyeIcon, MapPinIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import LoadingSection from '@/components/common/loadingSection'
 import { useConfirm } from '@/hooks/useConfirm'
 import NoData from '@/components/common/noData'
-import { HistoryMeta, IOrder, Item, OrderStatus } from '@/types/admin/order.type'
+import { AddressId, HistoryMeta, IOrder, Item, OrderStatus } from '@/types/admin/order.type'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { ORDER_STATUS_CONSTANTS, PAYMENT_STATUS_CONSTANTS } from '@/lib/constants/order.constant'
@@ -28,6 +28,7 @@ import ReasonDialog from '@/app/admin/orders/_components/ReasonDialog'
 import TrackingCodeDialog from '@/app/admin/orders/_components/TrackingCodeDialog'
 import { Badge } from '@/components/ui/badge'
 import OrderItemsDialog from '@/app/admin/orders/_components/OrderItemsDialog'
+import AddressDialog from '@/app/admin/orders/_components/AddressDialog'
 
 // اضافه کردن transitions
 const ORDER_STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
@@ -110,6 +111,14 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
   }>({
     open: false,
     items: [],
+  })
+
+  const [addressDialogState, setAddressDialogState] = useState<{
+    open: boolean
+    address: AddressId | null
+  }>({
+    open: false,
+    address: null,
   })
 
   const [loadingId, setLoadingId] = useState<string | null>(null)
@@ -208,12 +217,51 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
       ),
       enableSorting: true,
     },
-    // {
-    //   accessorKey: 'addressId',
-    //   header: 'آدرس',
-    //   cell: ({ row }) => row.original.addressId,
-    //   enableSorting: true,
-    // },
+    {
+      accessorKey: 'addressId',
+      header: 'آدرس',
+      cell: ({ row }) => {
+        const address = row.original.addressId
+
+        return (
+          <div className="flex items-center justify-between">
+            <div className={'flex items-center gap-1'}>
+              <MapPinIcon className="size-5" />
+
+              <span className="font-semibold truncate">{address?.title || ''}</span>
+            </div>
+
+            <div className="text-sm text-muted-foreground truncate">
+              {address ? (
+                <div className={'flex items-center'}>
+                  <span className="font-medium">{address.city}</span>
+                  <span className="mx-1">•</span>
+                  <span>{address.address.substring(0, 25)}...</span>
+                </div>
+              ) : (
+                'آدرس ثبت نشده'
+              )}
+            </div>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 px-2"
+              onClick={() =>
+                setAddressDialogState({
+                  open: true,
+                  address: address,
+                })
+              }
+            >
+              <EyeIcon className="h-4 w-4" />
+              <span className="mr-1">نمایش</span>
+            </Button>
+          </div>
+        )
+      },
+      enableSorting: false,
+    },
     {
       accessorKey: 'status',
       header: 'وضعیت سفارش',
@@ -440,10 +488,18 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
         description={`برای تغییر وضعیت سفارش به "${ORDER_STATUS_CONSTANTS[OrderStatus.SHIPPED]}"، کد رهگیری را وارد کنید`}
       />
 
+      {/* دیالوگ محصولات */}
       <OrderItemsDialog
         open={itemsDialogState.open}
         onOpenChange={(open) => setItemsDialogState((prev) => ({ ...prev, open }))}
         items={itemsDialogState.items}
+      />
+
+      {/* دیالوگ آدرس */}
+      <AddressDialog
+        open={addressDialogState.open}
+        onOpenChange={(open) => setAddressDialogState((prev) => ({ ...prev, open }))}
+        address={addressDialogState.address}
       />
     </>
   )

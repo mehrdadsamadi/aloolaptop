@@ -36,7 +36,6 @@ export default function OrderItemsDialog({
 
   return (
     <Dialog
-      trigger={<div />}
       title={title}
       description={description}
       open={open}
