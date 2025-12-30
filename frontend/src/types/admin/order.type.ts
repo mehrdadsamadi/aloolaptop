@@ -75,12 +75,25 @@ export interface Location {
 
 export interface Meta {
   payment: Payment
+  history: History[]
 }
 
 export interface Payment {
   refId: number
   fee: number
   code: number
+}
+
+export interface History {
+  from: OrderStatus
+  to: OrderStatus
+  at: string
+  meta: HistoryMeta
+}
+
+export interface HistoryMeta {
+  trackingCode?: string
+  reason?: string
 }
 
 export enum OrderStatus {

@@ -19,11 +19,12 @@ import { toast } from 'sonner'
 import LoadingSection from '@/components/common/loadingSection'
 import { useConfirm } from '@/hooks/useConfirm'
 import NoData from '@/components/common/noData'
-import { IOrder, OrderStatus } from '@/types/admin/order.type'
+import { HistoryMeta, IOrder, OrderStatus } from '@/types/admin/order.type'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { ORDER_STATUS_CONSTANTS, PAYMENT_STATUS_CONSTANTS } from '@/lib/constants/order.constant'
-import { changeOrderStatus, getOrdersList, IOrderMeta } from '@/actions/order.action'
+import { changeOrderStatus, getOrdersList } from '@/actions/order.action'
+import ReasonDialog from '@/app/admin/orders/_components/ReasonDialog'
 
 // اضافه کردن transitions
 const ORDER_STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
@@ -41,12 +42,52 @@ const getAllowedStatuses = (currentStatus: OrderStatus): OrderStatus[] => {
   return ORDER_STATUS_TRANSITIONS[currentStatus] || []
 }
 
+// تابع کمکی برای بررسی نیاز به دلیل
+const requiresReason = (newStatus: OrderStatus): boolean => {
+  return newStatus === OrderStatus.CANCELED || newStatus === OrderStatus.REFUNDED
+}
+
+// تابع کمکی برای گرفتن متن مناسب برای دیالوگ
+const getReasonDialogConfig = (status: OrderStatus) => {
+  switch (status) {
+    case OrderStatus.CANCELED:
+      return {
+        title: 'لغو سفارش',
+        label: 'دلیل لغو *',
+        placeholder: 'لطفاً دلیل لغو سفارش را وارد کنید...',
+        confirmText: 'تأیید لغو',
+      }
+    case OrderStatus.REFUNDED:
+      return {
+        title: 'بازپرداخت وجه',
+        label: 'دلیل بازپرداخت *',
+        placeholder: 'لطفاً دلیل بازپرداخت وجه را وارد کنید...',
+        confirmText: 'تأیید بازپرداخت',
+      }
+    default:
+      return {
+        title: 'دلیل',
+        label: 'دلیل *',
+        placeholder: 'لطفاً دلیل را وارد کنید...',
+        confirmText: 'تایید',
+      }
+  }
+}
+
 interface AdminOrdersProps {
   status: OrderStatus
 }
 
 export default function AdminOrders({ status }: AdminOrdersProps) {
   const { confirm } = useConfirm()
+
+  // State برای مدیریت دیالوگ
+  const [reasonDialogState, setReasonDialogState] = useState({
+    open: false,
+    orderId: '',
+    newStatus: '' as OrderStatus,
+    config: getReasonDialogConfig(OrderStatus.CANCELED),
+  })
 
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const [orders, setOrders] = useState<IOrder[] | null>(null)
@@ -72,12 +113,6 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
       ),
       enableSorting: true,
     },
-    // {
-    //   accessorKey: 'items',
-    //   header: 'محصولات',
-    //   cell: ({ row }) => row.original.profile?.lastName,
-    //   enableSorting: true,
-    // },
     {
       accessorKey: 'totalPrice',
       header: 'قیمت نهایی',
@@ -102,12 +137,6 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
       ),
       enableSorting: true,
     },
-    // {
-    //   accessorKey: 'addressId',
-    //   header: 'آدرس',
-    //   cell: ({ row }) => row.original.addressId,
-    //   enableSorting: true,
-    // },
     {
       accessorKey: 'status',
       header: 'وضعیت سفارش',
@@ -148,13 +177,7 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
               <DropdownMenuRadioGroup
                 value={currentStatus}
                 onValueChange={(value: string) => {
-                  confirm({
-                    title: 'تغییر وضعیت سفارش',
-                    description: `آیا از تغییر وضعیت این سفارش به "${ORDER_STATUS_CONSTANTS[value as OrderStatus]}" مطمئن هستید؟`,
-                    confirmText: 'بله، تغییر بده',
-                    cancelText: 'لغو',
-                    onConfirm: () => changeStatus(row.original._id, value as OrderStatus),
-                  })
+                  handleStatusChange(row.original._id, value as OrderStatus)
                 }}
                 className={'space-y-2'}
                 dir={'rtl'}
@@ -175,53 +198,6 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
         )
       },
     },
-    // {
-    //   accessorKey: 'paymentStatus',
-    //   header: 'وضعیت پرداخت',
-    //   cell: ({ row }) => (
-    //     <DropdownMenu>
-    //       <DropdownMenuTrigger asChild>
-    //         <Button
-    //           size={'sm'}
-    //           variant="outline"
-    //           className={'text-xs'}
-    //           loading={loadingId === row.original._id}
-    //         >
-    //           {PAYMENT_STATUS_CONSTANTS[row.original?.paymentStatus ?? PaymentStatus.PENDING]}
-    //           <ChevronDown className="size-4" />
-    //         </Button>
-    //       </DropdownMenuTrigger>
-    //       <DropdownMenuContent>
-    //         <DropdownMenuLabel dir={'rtl'}>وضعیت های پرداخت</DropdownMenuLabel>
-    //         <DropdownMenuSeparator />
-    //         <DropdownMenuRadioGroup
-    //           value={row.original?.paymentStatus}
-    //           onValueChange={(value: string) => {
-    //             confirm({
-    //               title: 'تغییر وضعیت پرداخت',
-    //               description: `آیا از تغییر وضعیت این پرداخت به "${PAYMENT_STATUS_CONSTANTS[value as PaymentStatus]}" مطمئن هستید؟`,
-    //               confirmText: 'بله، تغییر بده',
-    //               cancelText: 'لغو',
-    //               onConfirm: () => changeRole(row.original._id, value as Roles),
-    //             })
-    //           }}
-    //           className={'space-y-2'}
-    //           dir={'rtl'}
-    //         >
-    //           {Object.entries(PAYMENT_STATUS_CONSTANTS).map(([key, value]) => (
-    //             <DropdownMenuRadioItem
-    //               value={key}
-    //               key={key}
-    //               className={'cursor-pointer'}
-    //             >
-    //               {value}
-    //             </DropdownMenuRadioItem>
-    //           ))}
-    //         </DropdownMenuRadioGroup>
-    //       </DropdownMenuContent>
-    //     </DropdownMenu>
-    //   ),
-    // },
     {
       accessorKey: 'paymentStatus',
       header: 'وضعیت پرداخت',
@@ -234,12 +210,6 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
       cell: ({ row }) => row.original?.trackingCode,
       enableSorting: true,
     },
-    // {
-    //   accessorKey: 'meta',
-    //   header: 'اطلاعات پرداخت',
-    //   cell: ({ row }) => row.original?.meta,
-    //   enableSorting: true,
-    // },
     {
       accessorKey: 'createdAt',
       header: 'تاریخ سفارش',
@@ -258,7 +228,6 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
     })
 
     setOrders(res.orders)
-
     setPagesCount(res?.pagination?.pagesCount)
   }
 
@@ -266,20 +235,65 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
     ordersList()
   }, [page, limit])
 
-  const changeStatus = async (orderId: string, orderStats: OrderStatus, meta?: IOrderMeta) => {
+  // تابع اصلی تغییر وضعیت
+  const changeStatus = async (orderId: string, newStatus: OrderStatus, meta?: HistoryMeta) => {
     setLoadingId(orderId)
 
-    const response = await changeOrderStatus(orderId, orderStats, meta)
+    try {
+      const response = await changeOrderStatus(orderId, newStatus, meta)
 
-    setOrders((prvOrder) => {
-      if (!prvOrder || !response?.order) return prvOrder
+      setOrders((prevOrders) => {
+        if (!prevOrders || !response?.order) return prevOrders
 
-      return prvOrder.filter((order) => order._id !== response?.order?._id)
-    })
+        // به‌روزرسانی سفارش در لیست
+        return prevOrders.map((order) => (order._id === response.order?._id ? response.order : order))
+      })
 
-    toast.success(response.message)
+      toast.success(response.message)
+    } catch (error) {
+      toast.error('خطا در تغییر وضعیت سفارش')
+      console.error(error)
+    } finally {
+      setLoadingId(null)
+    }
+  }
 
-    setLoadingId(null)
+  // هندلر تغییر وضعیت (ممکن است نیاز به دیالوگ داشته باشد)
+  const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
+    // اگر وضعیت جدید نیاز به دلیل دارد
+    if (requiresReason(newStatus)) {
+      setReasonDialogState({
+        open: true,
+        orderId,
+        newStatus,
+        config: getReasonDialogConfig(newStatus),
+      })
+    } else {
+      // برای سایر وضعیت‌ها، مستقیماً تغییر را اعمال کن
+      confirm({
+        title: 'تغییر وضعیت سفارش',
+        description: `آیا از تغییر وضعیت این سفارش به "${ORDER_STATUS_CONSTANTS[newStatus]}" مطمئن هستید؟`,
+        confirmText: 'بله، تغییر بده',
+        cancelText: 'لغو',
+        onConfirm: () => changeStatus(orderId, newStatus),
+      })
+    }
+  }
+
+  // هندلر تایید دیالوگ دلیل
+  const handleReasonSubmit = (reason: string) => {
+    const { orderId, newStatus } = reasonDialogState
+
+    // ایجاد meta با دلیل
+    const meta: HistoryMeta = {
+      reason: reason.trim(),
+    }
+
+    // فراخوانی تابع تغییر وضعیت با meta
+    changeStatus(orderId, newStatus, meta)
+
+    // بستن دیالوگ
+    setReasonDialogState((prev) => ({ ...prev, open: false }))
   }
 
   return (
@@ -298,6 +312,16 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
           onPageChange={(page: number) => setPage(page)}
         />
       )}
+
+      <ReasonDialog
+        open={reasonDialogState.open}
+        onOpenChange={(open) => setReasonDialogState((prev) => ({ ...prev, open }))}
+        onConfirm={handleReasonSubmit}
+        title={reasonDialogState.config.title}
+        label={reasonDialogState.config.label}
+        placeholder={reasonDialogState.config.placeholder}
+        confirmText={reasonDialogState.config.confirmText}
+      />
     </>
   )
 }

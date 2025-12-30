@@ -5,12 +5,12 @@ export const ORDER_STATUS_CONSTANTS = {
   shipped: 'ارسال شده',
   delivered: 'تحویل داده شده',
   canceled: 'لغو شده',
-  refunded: 'برگشت خورده',
+  refunded: 'باز پرداخت',
 }
 
 export const PAYMENT_STATUS_CONSTANTS = {
   pending: 'درانتظار پرداخت',
   paid: 'پرداخت شده',
   failed: 'لغو شده',
-  refunded: 'برگشت خورده',
+  refunded: 'باز پرداخت',
 }
