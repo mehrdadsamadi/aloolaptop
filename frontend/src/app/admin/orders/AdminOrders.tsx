@@ -14,18 +14,20 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, EyeIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import LoadingSection from '@/components/common/loadingSection'
 import { useConfirm } from '@/hooks/useConfirm'
 import NoData from '@/components/common/noData'
-import { HistoryMeta, IOrder, OrderStatus } from '@/types/admin/order.type'
+import { HistoryMeta, IOrder, Item, OrderStatus } from '@/types/admin/order.type'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { ORDER_STATUS_CONSTANTS, PAYMENT_STATUS_CONSTANTS } from '@/lib/constants/order.constant'
 import { changeOrderStatus, getOrdersList } from '@/actions/order.action'
 import ReasonDialog from '@/app/admin/orders/_components/ReasonDialog'
 import TrackingCodeDialog from '@/app/admin/orders/_components/TrackingCodeDialog'
+import { Badge } from '@/components/ui/badge'
+import OrderItemsDialog from '@/app/admin/orders/_components/OrderItemsDialog'
 
 // اضافه کردن transitions
 const ORDER_STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
@@ -102,6 +104,14 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
     newStatus: '' as OrderStatus,
   })
 
+  const [itemsDialogState, setItemsDialogState] = useState<{
+    open: boolean
+    items: Item[]
+  }>({
+    open: false,
+    items: [],
+  })
+
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const [orders, setOrders] = useState<IOrder[] | null>(null)
   const [page, setPage] = useState(1)
@@ -118,13 +128,61 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
             <AvatarImage src={getImageUrl(row.original?.userId?.profile?.avatar?.url)} />
             <AvatarFallback>AV</AvatarFallback>
           </Avatar>
-          <div className={'flex flex-col gap-2'}>
+          <div className={'flex flex-col'}>
             <p>{getFullName(row.original?.userId?.profile)}</p>
-            <p>{row.original?.userId?.mobile}</p>
+            <p className={'text-xs'}>{row.original?.userId?.mobile}</p>
           </div>
         </div>
       ),
       enableSorting: true,
+    },
+    {
+      accessorKey: 'items',
+      header: 'محصولات',
+      cell: ({ row }) => {
+        const items: Item[] = row.original.items || []
+        const totalItems = items.length
+        const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0)
+
+        return (
+          <div className="flex items-center gap-3">
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <Badge
+                  variant="outline"
+                  className="text-xs"
+                >
+                  {totalItems} محصول
+                </Badge>
+                <Badge
+                  variant="secondary"
+                  className="text-xs"
+                >
+                  {totalQuantity} عدد
+                </Badge>
+              </div>
+            </div>
+
+            {items.length > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 px-2"
+                onClick={() =>
+                  setItemsDialogState({
+                    open: true,
+                    items: items,
+                  })
+                }
+              >
+                <EyeIcon className="h-4 w-4" />
+                <span className="mr-1">نمایش</span>
+              </Button>
+            )}
+          </div>
+        )
+      },
+      enableSorting: false,
     },
     {
       accessorKey: 'totalPrice',
@@ -150,6 +208,12 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
       ),
       enableSorting: true,
     },
+    // {
+    //   accessorKey: 'addressId',
+    //   header: 'آدرس',
+    //   cell: ({ row }) => row.original.addressId,
+    //   enableSorting: true,
+    // },
     {
       accessorKey: 'status',
       header: 'وضعیت سفارش',
@@ -219,10 +283,16 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
     },
     {
       accessorKey: 'trackingCode',
-      header: 'کد رهگیری',
+      header: 'کد رهگیری سفارش',
       cell: ({ row }) => row.original?.trackingCode,
       enableSorting: true,
     },
+    // {
+    //   accessorKey: 'meta',
+    //   header: 'اطلاعات پرداخت',
+    //   cell: ({ row }) => row.original?.meta,
+    //   enableSorting: true,
+    // },
     {
       accessorKey: 'createdAt',
       header: 'تاریخ سفارش',
@@ -368,6 +438,12 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
         onConfirm={handleTrackingCodeSubmit}
         title="ثبت کد رهگیری پستی"
         description={`برای تغییر وضعیت سفارش به "${ORDER_STATUS_CONSTANTS[OrderStatus.SHIPPED]}"، کد رهگیری را وارد کنید`}
+      />
+
+      <OrderItemsDialog
+        open={itemsDialogState.open}
+        onOpenChange={(open) => setItemsDialogState((prev) => ({ ...prev, open }))}
+        items={itemsDialogState.items}
       />
     </>
   )
