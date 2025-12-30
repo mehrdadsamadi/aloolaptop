@@ -74,8 +74,8 @@ export interface Location {
 }
 
 export interface Meta {
-  payment: Payment
-  history: History[]
+  payment?: Payment
+  history?: History[]
 }
 
 export interface Payment {

@@ -14,12 +14,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
-import { ChevronDown, EyeIcon, MapPinIcon } from 'lucide-react'
+import { ChevronDown, ChevronLeftIcon, CreditCardIcon, HistoryIcon, MapPinIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import LoadingSection from '@/components/common/loadingSection'
 import { useConfirm } from '@/hooks/useConfirm'
 import NoData from '@/components/common/noData'
-import { AddressId, HistoryMeta, IOrder, Item, OrderStatus } from '@/types/admin/order.type'
+import { AddressId, HistoryMeta, IOrder, Item, Meta, OrderStatus } from '@/types/admin/order.type'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { ORDER_STATUS_CONSTANTS, PAYMENT_STATUS_CONSTANTS } from '@/lib/constants/order.constant'
@@ -29,6 +29,7 @@ import TrackingCodeDialog from '@/app/admin/orders/_components/TrackingCodeDialo
 import { Badge } from '@/components/ui/badge'
 import OrderItemsDialog from '@/app/admin/orders/_components/OrderItemsDialog'
 import AddressDialog from '@/app/admin/orders/_components/AddressDialog'
+import MetaInfoDialog from '@/app/admin/orders/_components/MetaInfoDialog'
 
 // اضافه کردن transitions
 const ORDER_STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
@@ -121,6 +122,14 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
     address: null,
   })
 
+  const [metaDialogState, setMetaDialogState] = useState<{
+    open: boolean
+    meta: Meta | null
+  }>({
+    open: false,
+    meta: null,
+  })
+
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const [orders, setOrders] = useState<IOrder[] | null>(null)
   const [page, setPage] = useState(1)
@@ -154,40 +163,35 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
         const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0)
 
         return (
-          <div className="flex items-center gap-3">
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-2">
-                <Badge
-                  variant="outline"
-                  className="text-xs"
-                >
-                  {totalItems} محصول
-                </Badge>
-                <Badge
-                  variant="secondary"
-                  className="text-xs"
-                >
-                  {totalQuantity} عدد
-                </Badge>
+          <div
+            className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/30 cursor-pointer transition-colors group"
+            onClick={() =>
+              setItemsDialogState({
+                open: true,
+                items: items,
+              })
+            }
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <Badge
+                    variant="outline"
+                    className="text-xs"
+                  >
+                    {totalItems} محصول
+                  </Badge>
+                  <Badge
+                    variant="secondary"
+                    className="text-xs"
+                  >
+                    {totalQuantity} عدد
+                  </Badge>
+                </div>
               </div>
-            </div>
 
-            {items.length > 0 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 px-2"
-                onClick={() =>
-                  setItemsDialogState({
-                    open: true,
-                    items: items,
-                  })
-                }
-              >
-                <EyeIcon className="h-4 w-4" />
-                <span className="mr-1">نمایش</span>
-              </Button>
-            )}
+              <ChevronLeftIcon className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
           </div>
         )
       },
@@ -224,39 +228,36 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
         const address = row.original.addressId
 
         return (
-          <div className="flex items-center justify-between">
-            <div className={'flex items-center gap-1'}>
-              <MapPinIcon className="size-5" />
+          <div
+            className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/30 cursor-pointer transition-colors group"
+            onClick={() =>
+              setAddressDialogState({
+                open: true,
+                address: address,
+              })
+            }
+          >
+            <div className="flex items-center justify-between">
+              <div className={'flex items-center gap-1'}>
+                <MapPinIcon className="size-5" />
 
-              <span className="font-semibold truncate">{address?.title || ''}</span>
+                <span className="font-semibold truncate">{address?.title || ''}</span>
+              </div>
+
+              <div className="text-sm text-muted-foreground truncate mx-2">
+                {address ? (
+                  <div className={'flex items-center'}>
+                    <span className="font-medium">{address.city}</span>
+                    <span className="mx-1">•</span>
+                    <span>{address.address.substring(0, 25)}...</span>
+                  </div>
+                ) : (
+                  'آدرس ثبت نشده'
+                )}
+              </div>
+
+              <ChevronLeftIcon className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-
-            <div className="text-sm text-muted-foreground truncate">
-              {address ? (
-                <div className={'flex items-center'}>
-                  <span className="font-medium">{address.city}</span>
-                  <span className="mx-1">•</span>
-                  <span>{address.address.substring(0, 25)}...</span>
-                </div>
-              ) : (
-                'آدرس ثبت نشده'
-              )}
-            </div>
-
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 px-2"
-              onClick={() =>
-                setAddressDialogState({
-                  open: true,
-                  address: address,
-                })
-              }
-            >
-              <EyeIcon className="h-4 w-4" />
-              <span className="mr-1">نمایش</span>
-            </Button>
           </div>
         )
       },
@@ -335,12 +336,60 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
       cell: ({ row }) => row.original?.trackingCode,
       enableSorting: true,
     },
-    // {
-    //   accessorKey: 'meta',
-    //   header: 'اطلاعات پرداخت',
-    //   cell: ({ row }) => row.original?.meta,
-    //   enableSorting: true,
-    // },
+    {
+      accessorKey: 'meta',
+      header: 'اطلاعات متا',
+      cell: ({ row }) => {
+        const meta = row.original?.meta
+        const hasPayment = meta?.payment && Object.keys(meta.payment).length > 0
+        const hasHistory = meta?.history && meta.history.length > 0
+        const historyCount = meta?.history?.length || 0
+
+        return (
+          <div
+            className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/30 cursor-pointer transition-colors group"
+            onClick={() =>
+              setMetaDialogState({
+                open: true,
+                meta: meta,
+              })
+            }
+          >
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <CreditCardIcon className="size-5" />
+
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                  {hasPayment && (
+                    <div className="flex items-center gap-1">
+                      <Badge
+                        variant="outline"
+                        className="text-xs"
+                      >
+                        پرداخت
+                      </Badge>
+                      {meta?.payment?.refId && <span className="font-mono text-xs">#{meta?.payment?.refId.toString()}</span>}
+                    </div>
+                  )}
+
+                  {hasHistory && (
+                    <div className="flex items-center gap-1">
+                      <HistoryIcon className="h-3 w-3" />
+                      <span>{historyCount} تغییر وضعیت</span>
+                    </div>
+                  )}
+
+                  {!hasPayment && !hasHistory && <span className="text-muted-foreground">بدون اطلاعات</span>}
+                </div>
+              </div>
+            </div>
+
+            <ChevronLeftIcon className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+          </div>
+        )
+      },
+      enableSorting: false,
+    },
     {
       accessorKey: 'createdAt',
       header: 'تاریخ سفارش',
@@ -500,6 +549,13 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
         open={addressDialogState.open}
         onOpenChange={(open) => setAddressDialogState((prev) => ({ ...prev, open }))}
         address={addressDialogState.address}
+      />
+
+      {/* دیالوگ اطلاعات متا */}
+      <MetaInfoDialog
+        open={metaDialogState.open}
+        onOpenChange={(open) => setMetaDialogState((prev) => ({ ...prev, open }))}
+        meta={metaDialogState.meta}
       />
     </>
   )
