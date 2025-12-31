@@ -35,12 +35,6 @@ const data = {
       isActive: true,
     },
     {
-      title: 'کاربران',
-      url: '/admin/users',
-      icon: UsersIcon,
-      isActive: false,
-    },
-    {
       title: 'دسته بندی ها',
       url: '/admin/categories',
       icon: ListIcon,
@@ -57,6 +51,21 @@ const data = {
       url: '/admin/coupons',
       icon: TicketPercentIcon,
       isActive: false,
+    },
+    {
+      title: 'کاربران',
+      url: '/admin/users',
+      icon: UsersIcon,
+      items: [
+        {
+          title: 'لیست کاربران',
+          url: '/admin/users',
+        },
+        {
+          title: 'دیدگاه ها و امتیاز ها',
+          url: '/admin/reviews',
+        },
+      ],
     },
     {
       title: 'سفارشات',

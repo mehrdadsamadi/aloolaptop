@@ -37,4 +37,8 @@ export const ENDPOINTS = {
       `/api/orders?status=${status}&page=${page}&limit=${limit}`,
     CHANGE_STATUS: (orderId: string, status: OrderStatus) => `/api/orders/${orderId}/${status}`,
   },
+  REVIEWS: {
+    LIST: ({ page = 1, limit = 20 }: { page?: number; limit?: number }) => `/api/reviews?page=${page}&limit=${limit}`,
+    CHANGE_VISIBILITY: (reviewId: string) => `/api/reviews/${reviewId}/change-visibility`,
+  },
 }

@@ -52,44 +52,57 @@ export class ReviewService {
     const count = await this.reviewModel.countDocuments();
 
     const reviews = await this.reviewModel
-      .aggregate([
-        { $sort: { createdAt: -1 } },
-        { $skip: skip },
-        { $limit: limit },
-
-        // Join product → مشابه populate
+      .find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate([
         {
-          $lookup: {
-            from: 'products',
-            localField: 'productId',
-            foreignField: '_id',
-            as: 'product',
-          },
+          path: 'userId',
+          select: 'profile.firstName profile.lastName profile.avatar mobile',
         },
+        { path: 'productId', select: 'name images rate' },
+      ]);
 
-        // فقط یکی بگیر چون محصول یک دونه است
-        { $unwind: '$product' },
-
-        // فقط اطلاعات لازم محصول را برگردان
-        {
-          $project: {
-            userId: 1,
-            productId: 1,
-            rating: 1,
-            comment: 1,
-            isVisible: 1,
-            createdAt: 1,
-            updatedAt: 1,
-
-            product: {
-              _id: '$product._id',
-              name: '$product.name',
-              image: { $arrayElemAt: ['$product.images', 0] }, // عکس اول
-            },
-          },
-        },
-      ])
-      .exec();
+    // const reviews = await this.reviewModel
+    //   .aggregate([
+    //     { $sort: { createdAt: -1 } },
+    //     { $skip: skip },
+    //     { $limit: limit },
+    //
+    //     // Join product → مشابه populate
+    //     {
+    //       $lookup: {
+    //         from: 'products',
+    //         localField: 'productId',
+    //         foreignField: '_id',
+    //         as: 'product',
+    //       },
+    //     },
+    //
+    //     // فقط یکی بگیر چون محصول یک دونه است
+    //     { $unwind: '$product' },
+    //
+    //     // فقط اطلاعات لازم محصول را برگردان
+    //     {
+    //       $project: {
+    //         userId: 1,
+    //         productId: 1,
+    //         rating: 1,
+    //         comment: 1,
+    //         isVisible: 1,
+    //         createdAt: 1,
+    //         updatedAt: 1,
+    //
+    //         product: {
+    //           _id: '$product._id',
+    //           name: '$product.name',
+    //           image: { $arrayElemAt: ['$product.images', 0] }, // عکس اول
+    //         },
+    //       },
+    //     },
+    //   ])
+    //   .exec();
 
     return {
       reviews,
@@ -97,53 +110,66 @@ export class ReviewService {
     };
   }
 
-  async findAllVisitor(paginationDto: PaginationDto) {
+  async listVisitor(paginationDto: PaginationDto) {
     const userId = this.req.user?._id;
 
     const { page, limit, skip } = paginationSolver(paginationDto);
 
-    const count = await this.reviewModel.countDocuments();
+    const count = await this.reviewModel.countDocuments({ userId });
 
     const reviews = await this.reviewModel
-      .aggregate([
-        { $match: { userId } },
-        { $sort: { createdAt: -1 } },
-        { $skip: skip },
-        { $limit: limit },
-
-        // Join product → مشابه populate
+      .find({ userId })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate([
         {
-          $lookup: {
-            from: 'products',
-            localField: 'productId',
-            foreignField: '_id',
-            as: 'product',
-          },
+          path: 'userId',
+          select: 'profile.firstName profile.lastName profile.avatar mobile',
         },
+        { path: 'productId', select: 'name images rate' },
+      ]);
 
-        // فقط یکی بگیر چون محصول یک دونه است
-        { $unwind: '$product' },
-
-        // فقط اطلاعات لازم محصول را برگردان
-        {
-          $project: {
-            userId: 1,
-            productId: 1,
-            rating: 1,
-            comment: 1,
-            isVisible: 1,
-            createdAt: 1,
-            updatedAt: 1,
-
-            product: {
-              _id: '$product._id',
-              name: '$product.name',
-              image: { $arrayElemAt: ['$product.images', 0] }, // عکس اول
-            },
-          },
-        },
-      ])
-      .exec();
+    // const reviews = await this.reviewModel
+    //   .aggregate([
+    //     { $match: { userId } },
+    //     { $sort: { createdAt: -1 } },
+    //     { $skip: skip },
+    //     { $limit: limit },
+    //
+    //     // Join product → مشابه populate
+    //     {
+    //       $lookup: {
+    //         from: 'products',
+    //         localField: 'productId',
+    //         foreignField: '_id',
+    //         as: 'product',
+    //       },
+    //     },
+    //
+    //     // فقط یکی بگیر چون محصول یک دونه است
+    //     { $unwind: '$product' },
+    //
+    //     // فقط اطلاعات لازم محصول را برگردان
+    //     {
+    //       $project: {
+    //         userId: 1,
+    //         productId: 1,
+    //         rating: 1,
+    //         comment: 1,
+    //         isVisible: 1,
+    //         createdAt: 1,
+    //         updatedAt: 1,
+    //
+    //         product: {
+    //           _id: '$product._id',
+    //           name: '$product.name',
+    //           image: { $arrayElemAt: ['$product.images', 0] }, // عکس اول
+    //         },
+    //       },
+    //     },
+    //   ])
+    //   .exec();
 
     return {
       reviews,

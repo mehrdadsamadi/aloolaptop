@@ -19,8 +19,8 @@ import { CreateReviewDto, UpdateReviewDto } from '../dto/user-review.dto';
 import { CanAccess } from '../../../common/decorators/role.decorator';
 import { Roles } from '../../../common/enums/role.enum';
 
-@Controller('review')
-@ApiTags('Review')
+@Controller('reviews')
+@ApiTags('Reviews')
 @AuthDecorator()
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
@@ -32,7 +32,7 @@ export class ReviewController {
     return this.reviewService.create(createReviewDto);
   }
 
-  @Get('list')
+  @Get()
   @Pagination()
   @CanAccess(Roles.ADMIN)
   findAll(@Query() paginationDto: PaginationDto) {
@@ -45,13 +45,13 @@ export class ReviewController {
     return this.reviewService.findOne(id);
   }
 
-  @Get('find-all/visitors')
+  @Get('visitor')
   @Pagination()
-  findAllVisitor(@Query() paginationDto: PaginationDto) {
-    return this.reviewService.findAllVisitor(paginationDto);
+  listVisitor(@Query() paginationDto: PaginationDto) {
+    return this.reviewService.listVisitor(paginationDto);
   }
 
-  @Get(':id/visitors')
+  @Get(':id/visitor')
   findOneVisitor(@Param('id') id: string) {
     return this.reviewService.findOneVisitor(id);
   }
