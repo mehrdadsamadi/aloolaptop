@@ -1,6 +1,6 @@
 'use client'
 
-import { BadgeCheck, Bell, ChevronsUpDown, LogOut } from 'lucide-react'
+import { Bell, ChevronsUpDown, LogOut, UserIcon } from 'lucide-react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -16,12 +16,16 @@ import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/c
 import { useUser } from '@/hooks/useUser'
 import { getFullName, getImageUrl } from '@/lib/utils'
 import { useConfirm } from '@/hooks/useConfirm'
+import { useState } from 'react'
+import ChangeProfileDialog from '@/components/admin/dialogs/changeProfile'
 
 export function NavUser() {
   const { isMobile } = useSidebar()
   const { confirm } = useConfirm()
   const { logout } = useUser()
   const { user } = useUser()
+
+  const [changeProfileDialog, setChangeProfileDialog] = useState(false)
 
   return (
     <SidebarMenu>
@@ -74,8 +78,11 @@ export function NavUser() {
             <DropdownMenuSeparator />
 
             <DropdownMenuGroup dir={'rtl'}>
-              <DropdownMenuItem className={'cursor-pointer'}>
-                <BadgeCheck />
+              <DropdownMenuItem
+                className={'cursor-pointer'}
+                onClick={() => setChangeProfileDialog(true)}
+              >
+                <UserIcon />
                 حساب کاربری
               </DropdownMenuItem>
               <DropdownMenuItem className={'cursor-pointer'}>
@@ -106,6 +113,11 @@ export function NavUser() {
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
+
+      <ChangeProfileDialog
+        open={changeProfileDialog}
+        onOpenChange={setChangeProfileDialog}
+      />
     </SidebarMenu>
   )
 }

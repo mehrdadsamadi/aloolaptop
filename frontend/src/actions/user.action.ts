@@ -24,3 +24,9 @@ export async function changeUserRole(userId: string, role: Roles) {
 
   return res.json()
 }
+
+export async function changeUserProfile(formData: FormData) {
+  const res = await apiFetch(ENDPOINTS.USER.CHANGE_PROFILE, { method: 'PATCH', body: formData })
+
+  return res.json()
+}
