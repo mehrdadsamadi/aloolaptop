@@ -85,7 +85,10 @@ export function NavUser() {
                 <UserIcon />
                 حساب کاربری
               </DropdownMenuItem>
-              <DropdownMenuItem className={'cursor-pointer'}>
+              <DropdownMenuItem
+                disabled={true}
+                className={'cursor-pointer'}
+              >
                 <Bell />
                 نوتیفیکیشن ها
               </DropdownMenuItem>
