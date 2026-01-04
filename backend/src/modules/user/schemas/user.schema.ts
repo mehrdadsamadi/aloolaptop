@@ -5,6 +5,7 @@ import { Profile, ProfileSchema } from './profile.schema';
 import { OtpDocument } from './otp.schema';
 import { AddressDocument } from './address.schema';
 import { ReviewDocument } from './review.schema';
+import { TimestampedDocument } from '../../statistic/types/statistic.type';
 
 @Schema({ versionKey: false, timestamps: true })
 export class User {
@@ -24,12 +25,13 @@ export class User {
   profile?: Profile;
 }
 
-export type UserDocument = HydratedDocument<User> & {
-  // virtual populate
-  otp?: OtpDocument | null;
-  addresses?: AddressDocument[] | null;
-  reviews?: ReviewDocument[] | null;
-};
+export type UserDocument = HydratedDocument<User> &
+  TimestampedDocument & {
+    // virtual populate
+    otp?: OtpDocument | null;
+    addresses?: AddressDocument[] | null;
+    reviews?: ReviewDocument[] | null;
+  };
 
 export const UserSchema = SchemaFactory.createForClass(User);
 

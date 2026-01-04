@@ -3,6 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { CartItem, CartItemSchema } from '../../cart/schemas/cart-item.schema';
 import { OrderStatus } from '../enums/order-status.enum';
 import { PaymentStatus } from '../../payment/enums/payment-status.enum';
+import { TimestampedDocument } from '../../statistic/types/statistic.type';
 
 @Schema({ timestamps: true, versionKey: false })
 export class Order {
@@ -50,7 +51,7 @@ export class Order {
   meta: Record<string, any>;
 }
 
-export type OrderDocument = HydratedDocument<Order>;
+export type OrderDocument = HydratedDocument<Order> & TimestampedDocument;
 export const OrderSchema = SchemaFactory.createForClass(Order);
 
 OrderSchema.index({ userId: 1 });

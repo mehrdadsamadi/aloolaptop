@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { CouponType } from '../enums/coupon-type.enum';
 import { DiscountMethod } from '../enums/discount-method.enum';
+import { TimestampedDocument } from '../../statistic/types/statistic.type';
 
 @Schema({ timestamps: true, versionKey: false })
 export class Coupon {
@@ -39,7 +40,7 @@ export class Coupon {
   isActive: boolean;
 }
 
-export type CouponDocument = HydratedDocument<Coupon>;
+export type CouponDocument = HydratedDocument<Coupon> & TimestampedDocument;
 export const CouponSchema = SchemaFactory.createForClass(Coupon);
 
 CouponSchema.index({ code: 1 }, { unique: true });

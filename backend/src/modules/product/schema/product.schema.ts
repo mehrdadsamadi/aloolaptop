@@ -4,6 +4,7 @@ import { ProductCondition } from '../enums/product-condition.enum';
 import { ProductGrade } from '../enums/product-grade.enum';
 import { ImageSchema, ImageSubSchema } from '../../common/schemas/image.schema';
 import { ReviewDocument } from '../../user/schemas/review.schema';
+import { TimestampedDocument } from '../../statistic/types/statistic.type';
 
 @Schema({ timestamps: true, versionKey: false })
 export class Product {
@@ -61,11 +62,12 @@ export class Product {
   discountExpiresAt?: Date;
 }
 
-export type ProductDocument = HydratedDocument<Product> & {
-  // virtual populate
-  finalPrice: number;
-  reviews?: ReviewDocument[] | null;
-};
+export type ProductDocument = HydratedDocument<Product> &
+  TimestampedDocument & {
+    // virtual populate
+    finalPrice: number;
+    reviews?: ReviewDocument[] | null;
+  };
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
 

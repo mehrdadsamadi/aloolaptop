@@ -2,6 +2,7 @@ import { HydratedDocument, Schema as MongooseSchema, Types } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { AttributeType } from '../enums/attribute-type.enum';
 import { ImageSchema, ImageSubSchema } from '../../common/schemas/image.schema';
+import { TimestampedDocument } from '../../statistic/types/statistic.type';
 
 export class CategoryAttribute {
   @Prop({ required: true }) key: string;
@@ -50,10 +51,11 @@ export class Category {
   meta?: { title?: string; description?: string; keywords?: string[] };
 }
 
-export type CategoryDocument = HydratedDocument<Category> & {
-  // virtual populate
-  parent?: CategoryDocument | null;
-};
+export type CategoryDocument = HydratedDocument<Category> &
+  TimestampedDocument & {
+    // virtual populate
+    parent?: CategoryDocument | null;
+  };
 
 export const CategorySchema = SchemaFactory.createForClass(Category);
 

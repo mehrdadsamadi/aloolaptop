@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Schema as MSchema, Types } from 'mongoose';
+import { TimestampedDocument } from '../../statistic/types/statistic.type';
 
 const GeoSchema = new MSchema(
   {
@@ -36,7 +37,7 @@ export class Address {
   isDefault: boolean;
 }
 
-export type AddressDocument = HydratedDocument<Address>;
+export type AddressDocument = HydratedDocument<Address> & TimestampedDocument;
 export const AddressSchema = SchemaFactory.createForClass(Address);
 
 // ایندکس برای سرعت جستجو بر اساس user

@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { PaymentStatus } from '../enums/payment-status.enum';
 import { PaymentGateway } from '../enums/payment-gateway.enum';
+import { TimestampedDocument } from '../../statistic/types/statistic.type';
 
 @Schema({ timestamps: true, versionKey: false })
 export class Payment {
@@ -37,7 +38,7 @@ export class Payment {
   meta: Record<string, any>;
 }
 
-export type PaymentDocument = HydratedDocument<Payment>;
+export type PaymentDocument = HydratedDocument<Payment> & TimestampedDocument;
 export const PaymentSchema = SchemaFactory.createForClass(Payment);
 
 PaymentSchema.index({ orderId: 1 });

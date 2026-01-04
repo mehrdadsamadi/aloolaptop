@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { CartItem, CartItemSchema } from './cart-item.schema';
+import { TimestampedDocument } from '../../statistic/types/statistic.type';
 
 @Schema({ timestamps: true, versionKey: false })
 export class Cart {
@@ -34,7 +35,7 @@ export class Cart {
   totalPrice: number;
 }
 
-export type CartDocument = HydratedDocument<Cart>;
+export type CartDocument = HydratedDocument<Cart> & TimestampedDocument;
 export const CartSchema = SchemaFactory.createForClass(Cart);
 
 CartSchema.index({ userId: 1 }, { unique: true });

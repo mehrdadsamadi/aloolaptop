@@ -10,6 +10,7 @@ import { CouponModule } from '../coupon/coupon.module';
 import { CartModule } from '../cart/cart.module';
 import { CheckoutModule } from '../checkout/checkout.module';
 import { OrderModule } from '../order/order.module';
+import { StatisticsModule } from '../statistic/statistics.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { OrderModule } from '../order/order.module';
     CartModule,
     OrderModule,
     CheckoutModule,
+    StatisticsModule,
   ],
   controllers: [],
   providers: [

@@ -42,4 +42,7 @@ export const ENDPOINTS = {
     LIST: ({ page = 1, limit = 20 }: { page?: number; limit?: number }) => `/api/reviews?page=${page}&limit=${limit}`,
     CHANGE_VISIBILITY: (reviewId: string) => `/api/reviews/${reviewId}/change-visibility`,
   },
+  STATISTICS: {
+    USER: '/api/statistics/users',
+  },
 }

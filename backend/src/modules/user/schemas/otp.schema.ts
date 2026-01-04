@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
+import { TimestampedDocument } from '../../statistic/types/statistic.type';
 
 @Schema({ versionKey: false, timestamps: true })
 export class Otp {
@@ -13,7 +14,7 @@ export class Otp {
   userId: Types.ObjectId;
 }
 
-export type OtpDocument = HydratedDocument<Otp>;
+export type OtpDocument = HydratedDocument<Otp> & TimestampedDocument;
 
 export const OtpSchema = SchemaFactory.createForClass(Otp);
 

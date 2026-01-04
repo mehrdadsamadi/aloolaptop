@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
+import { TimestampedDocument } from '../../statistic/types/statistic.type';
 
 @Schema({ timestamps: true, versionKey: false })
 export class Review {
@@ -19,5 +20,5 @@ export class Review {
   isVisible: boolean; // تعیین اینکه کامنت قابل نمایش هست یا نه
 }
 
-export type ReviewDocument = HydratedDocument<Review>;
+export type ReviewDocument = HydratedDocument<Review> & TimestampedDocument;
 export const ReviewSchema = SchemaFactory.createForClass(Review);
