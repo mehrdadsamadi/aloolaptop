@@ -45,5 +45,6 @@ export const ENDPOINTS = {
   STATISTICS: {
     USERS: '/api/statistics/users',
     PRODUCTS: '/api/statistics/products',
+    ORDERS: '/api/statistics/orders',
   },
 }

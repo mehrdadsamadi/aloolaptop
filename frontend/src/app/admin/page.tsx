@@ -9,10 +9,13 @@ import { Badge } from '@/components/ui/badge'
 import { SalesChart } from '@/components/admin/dashboard/salesChart'
 import { GrowthChart } from '@/components/admin/dashboard/growthChart'
 import { useEffect, useState } from 'react'
-import { getProductStats, getUserStats } from '@/actions/statistic.action'
+import { getOrderStats, getProductStats, getUserStats } from '@/actions/statistic.action'
 import { IChartStats, IStats } from '@/types/admin/statistic.type'
+import { useLoading } from '@/hooks/useLoading'
 
 export default function AdminPage() {
+  const { showLoading, hideLoading } = useLoading()
+
   const [stats, setStats] = useState<IStats[]>([
     {
       key: 'users',
@@ -32,9 +35,9 @@ export default function AdminPage() {
     },
     {
       key: 'orders',
-      title: 'سفارشات جدید',
-      value: '۴۵۶',
-      change: '+5.3%',
+      title: 'کل سفارشات',
+      value: '0',
+      change: '0',
       icon: ShoppingCart,
       trend: 'up',
     },
@@ -57,49 +60,93 @@ export default function AdminPage() {
   ])
   const [userStats, setUserStats] = useState<IChartStats | null>(null)
   const [productStats, setProductStats] = useState<IChartStats | null>(null)
+  const [orderStats, setOrderStats] = useState<IChartStats | null>(null)
 
   const getUserStatistics = async () => {
-    const res = await getUserStats()
+    try {
+      showLoading()
 
-    setUserStats(res?.users)
+      const res = await getUserStats()
 
-    setStats((prvStats) => {
-      return prvStats.map((item) =>
-        item.key === 'users'
-          ? {
-              ...item,
-              value: res?.users?.total?.toLocaleString(),
-              change: `${res?.users?.growth} %`,
-              trend: res?.users?.growth > 0 ? 'up' : 'down',
-            }
-          : item
-      )
-    })
+      setUserStats(res?.users)
+
+      setStats((prvStats) => {
+        return prvStats.map((item) =>
+          item.key === 'users'
+            ? {
+                ...item,
+                value: res?.users?.total?.toLocaleString(),
+                change: `${res?.users?.growth} %`,
+                trend: res?.users?.growth > 0 ? 'up' : 'down',
+              }
+            : item
+        )
+      })
+    } catch (error) {
+      console.log(error)
+    } finally {
+      hideLoading()
+    }
   }
 
   const getProductStatistics = async () => {
-    const res = await getProductStats()
+    try {
+      showLoading()
 
-    console.log('product', res)
-    setProductStats(res?.products)
+      const res = await getProductStats()
 
-    setStats((prvStats) => {
-      return prvStats.map((item) =>
-        item.key === 'products'
-          ? {
-              ...item,
-              value: res?.products?.total?.toLocaleString(),
-              change: `${res?.products?.growth} %`,
-              trend: res?.products?.growth > 0 ? 'up' : 'down',
-            }
-          : item
-      )
-    })
+      setProductStats(res?.products)
+
+      setStats((prvStats) => {
+        return prvStats.map((item) =>
+          item.key === 'products'
+            ? {
+                ...item,
+                value: res?.products?.total?.toLocaleString(),
+                change: `${res?.products?.growth} %`,
+                trend: res?.products?.growth > 0 ? 'up' : 'down',
+              }
+            : item
+        )
+      })
+    } catch (error) {
+      console.log(error)
+    } finally {
+      hideLoading()
+    }
+  }
+
+  const getOrderStatistics = async () => {
+    try {
+      showLoading()
+
+      const res = await getOrderStats()
+
+      setOrderStats(res?.orders)
+
+      setStats((prvStats) => {
+        return prvStats.map((item) =>
+          item.key === 'orders'
+            ? {
+                ...item,
+                value: res?.orders?.total?.toLocaleString(),
+                change: `${res?.orders?.growth} %`,
+                trend: res?.orders?.growth > 0 ? 'up' : 'down',
+              }
+            : item
+        )
+      })
+    } catch (error) {
+      console.log(error)
+    } finally {
+      hideLoading()
+    }
   }
 
   useEffect(() => {
     getUserStatistics()
     getProductStatistics()
+    getOrderStatistics()
   }, [])
 
   return (
@@ -191,10 +238,16 @@ export default function AdminPage() {
 
         <Card className="col-span-4">
           <CardHeader>
-            <CardTitle>آخرین سفارشات</CardTitle>
-            <CardDescription>۱۰ سفارش اخیر</CardDescription>
+            <CardTitle>رشد سفارشات</CardTitle>
+            <CardDescription>تعداد ماهانه سفارشات</CardDescription>
           </CardHeader>
-          <CardContent>{/*<RecentOrders />*/}</CardContent>
+          <CardContent>
+            <GrowthChart
+              data={orderStats}
+              title={'سفارشات'}
+              icon={<ShoppingCart className="h-5 w-5 text-blue-500" />}
+            />
+          </CardContent>
         </Card>
       </div>
 

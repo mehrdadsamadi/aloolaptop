@@ -14,3 +14,9 @@ export async function getProductStats() {
 
   return res.json()
 }
+
+export async function getOrderStats() {
+  const res = await apiFetch(ENDPOINTS.STATISTICS.ORDERS, { method: 'GET' })
+
+  return res.json()
+}

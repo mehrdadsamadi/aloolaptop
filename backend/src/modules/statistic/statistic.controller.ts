@@ -18,9 +18,13 @@ export class StatisticsController {
     return this.statisticsService.getUserStatistics();
   }
 
-  // برای آینده - ایجاد آمار محصولات
   @Get('products')
   async getProductStats() {
     return this.statisticsService.getProductStatistics();
+  }
+
+  @Get('orders')
+  async getOrderStats() {
+    return this.statisticsService.getOrderStatistics();
   }
 }

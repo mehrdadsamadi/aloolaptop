@@ -10,6 +10,8 @@ import {
   TimestampedDocument,
 } from './types/statistic.type';
 import { Product, ProductDocument } from '../product/schema/product.schema';
+import { Order, OrderDocument } from '../order/schema/order.schema';
+import { PaymentStatus } from '../payment/enums/payment-status.enum';
 
 @Injectable()
 export class StatisticsService {
@@ -19,6 +21,9 @@ export class StatisticsService {
 
     @InjectModel(Product.name)
     private readonly productModel: Model<ProductDocument>,
+
+    @InjectModel(Order.name)
+    private readonly orderModel: Model<OrderDocument>,
   ) {}
 
   /**
@@ -35,7 +40,20 @@ export class StatisticsService {
    */
   async getProductStatistics() {
     return {
-      products: await this.getStatistics(this.productModel),
+      products: await this.getStatistics(this.productModel, {
+        isActive: true,
+      }),
+    };
+  }
+
+  /**
+   * Statistics مخصوص سفارشات
+   */
+  async getOrderStatistics() {
+    return {
+      orders: await this.getStatistics(this.orderModel, {
+        paymentStatus: PaymentStatus.PAID,
+      }),
     };
   }
 
@@ -44,16 +62,18 @@ export class StatisticsService {
    */
   async getStatistics<T extends TimestampedDocument>(
     model: Model<T>,
+    filter: Record<string, any> = {},
   ): Promise<StatisticsResult> {
     // بازه ۶ ماه اخیر شمسی
     const end = moment().clone().endOf('jMonth');
     const start = moment().clone().subtract(5, 'jMonth').startOf('jMonth');
 
     const [total, aggregated] = await Promise.all([
-      model.countDocuments(),
+      model.countDocuments(filter),
       model.aggregate([
         {
           $match: {
+            ...filter,
             createdAt: {
               $gte: start.toDate(),
               $lte: end.toDate(),
