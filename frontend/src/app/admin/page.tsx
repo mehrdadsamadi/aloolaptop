@@ -1,7 +1,7 @@
 'use client'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { DollarSign, Package, ShoppingCart, UserPlus, Users } from 'lucide-react'
+import { DollarSign, Package, ShoppingCart, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 
@@ -182,24 +182,15 @@ export default function AdminPage() {
           <h1 className="text-xl font-bold tracking-tight">داشبورد مدیریت</h1>
           <p className="text-muted-foreground text-sm">خوش آمدید! اینجا می‌توانید عملکرد کلی سیستم را مشاهده کنید.</p>
         </div>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            disabled
-          >
-            <UserPlus className="ml-2 h-4 w-4" />
-            خروجی گزارش
-          </Button>
-          <Button
-            onClick={() => {
-              refreshStats()
+        <Button
+          onClick={() => {
+            refreshStats()
 
-              toast.success('داده ها بروزرسانی شد')
-            }}
-          >
-            بروزرسانی داده‌ها
-          </Button>
-        </div>
+            toast.success('داده ها بروزرسانی شد')
+          }}
+        >
+          بروزرسانی داده‌ها
+        </Button>
       </div>
 
       {/* آمار اصلی */}

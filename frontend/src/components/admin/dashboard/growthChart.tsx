@@ -154,7 +154,7 @@ export function GrowthChart({ data, title, icon, totalPostfix = '' }: Props) {
   )
 
   return (
-    <div className="bg-white rounded-lg border p-6 shadow-sm">
+    <div className="p-4">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
         <div className="flex items-center gap-3 mb-4 md:mb-0">
