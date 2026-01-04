@@ -13,6 +13,7 @@ export interface IChartStats {
 }
 
 export interface IStats {
+  key: string
   title: string
   value: string
   change: string

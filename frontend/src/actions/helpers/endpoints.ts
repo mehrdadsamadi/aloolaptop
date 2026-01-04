@@ -43,6 +43,7 @@ export const ENDPOINTS = {
     CHANGE_VISIBILITY: (reviewId: string) => `/api/reviews/${reviewId}/change-visibility`,
   },
   STATISTICS: {
-    USER: '/api/statistics/users',
+    USERS: '/api/statistics/users',
+    PRODUCTS: '/api/statistics/products',
   },
 }

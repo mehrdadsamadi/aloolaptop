@@ -1,21 +1,21 @@
 // app/admin/components/user-growth-chart.tsx
 'use client'
 
-import { TrendingDown, TrendingUp, Users } from 'lucide-react'
+import { TrendingDown, TrendingUp } from 'lucide-react'
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { useEffect, useState } from 'react'
 import { IChartStats } from '@/types/admin/statistic.type'
 
 interface Props {
   data: IChartStats | null
-  title?: string
-  icon?: React.ReactNode
+  title: string
+  icon: React.ReactNode
 }
 
 const LINE_COLOR = '#3B82F6'
 const GRID_COLOR = '#E5E7EB'
 
-export function UserGrowthChart({ data, title = 'رشد کاربران', icon = <Users className="h-5 w-5 text-blue-500" /> }: Props) {
+export function GrowthChart({ data, title, icon }: Props) {
   const [formattedData, setFormattedData] = useState<
     Array<{
       month: string
@@ -107,8 +107,8 @@ export function UserGrowthChart({ data, title = 'رشد کاربران', icon = 
         <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200 min-w-[200px]">
           <p className="font-semibold text-gray-800 mb-2 text-right">{label}</p>
           <div className="space-y-1 text-right">
-            <div className="flex items-center justify-between">
-              <span className="text-blue-600 font-medium">کاربران:</span>
+            <div className="flex items-center justify-between flex-row-reverse">
+              <span className="text-blue-600 font-medium">:{title}</span>
               <span className="font-bold text-gray-800">{payload[0].value.toLocaleString()}</span>
             </div>
             {payload[1] && (
@@ -154,7 +154,7 @@ export function UserGrowthChart({ data, title = 'رشد کاربران', icon = 
           <div>
             <h3 className="font-semibold text-lg">{title}</h3>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-sm text-gray-500">کل کاربران:</span>
+              <span className="text-sm text-gray-500">کل {title}:</span>
               <span className="text-2xl font-bold text-gray-800">{data.total.toLocaleString()}</span>
             </div>
           </div>

@@ -7,21 +7,23 @@ import { Badge } from '@/components/ui/badge'
 
 // کامپوننت‌های فرضی - باید جداگانه بسازید یا از shadcn نصب کنید
 import { SalesChart } from '@/components/admin/dashboard/salesChart'
-import { UserGrowthChart } from '@/components/admin/dashboard/userGrowthChart'
+import { GrowthChart } from '@/components/admin/dashboard/growthChart'
 import { useEffect, useState } from 'react'
-import { getUserStats } from '@/actions/statistic.action'
+import { getProductStats, getUserStats } from '@/actions/statistic.action'
 import { IChartStats, IStats } from '@/types/admin/statistic.type'
 
 export default function AdminPage() {
   const [stats, setStats] = useState<IStats[]>([
     {
+      key: 'users',
       title: 'کل کاربران',
-      value: '12,584',
-      change: '+12.5%',
+      value: '0',
+      change: '0',
       icon: Users,
       trend: 'up',
     },
     {
+      key: 'sales',
       title: 'فروش امروز',
       value: '۱۲,۴۵۰,۰۰۰ تومان',
       change: '+8.2%',
@@ -29,6 +31,7 @@ export default function AdminPage() {
       trend: 'up',
     },
     {
+      key: 'orders',
       title: 'سفارشات جدید',
       value: '۴۵۶',
       change: '+5.3%',
@@ -36,13 +39,15 @@ export default function AdminPage() {
       trend: 'up',
     },
     {
+      key: 'products',
       title: 'محصولات موجود',
-      value: '۱,۲۳۴',
-      change: '-3.4%',
+      value: '0',
+      change: '0',
       icon: Package,
-      trend: 'down',
+      trend: 'up',
     },
     {
+      key: 'carts',
       title: 'میانگین سبد خرید',
       value: '۲۷۵,۰۰۰ تومان',
       change: '+4.7%',
@@ -51,16 +56,50 @@ export default function AdminPage() {
     },
   ])
   const [userStats, setUserStats] = useState<IChartStats | null>(null)
+  const [productStats, setProductStats] = useState<IChartStats | null>(null)
 
   const getUserStatistics = async () => {
     const res = await getUserStats()
 
-    console.log('res', res)
     setUserStats(res?.users)
+
+    setStats((prvStats) => {
+      return prvStats.map((item) =>
+        item.key === 'users'
+          ? {
+              ...item,
+              value: res?.users?.total?.toLocaleString(),
+              change: `${res?.users?.growth} %`,
+              trend: res?.users?.growth > 0 ? 'up' : 'down',
+            }
+          : item
+      )
+    })
+  }
+
+  const getProductStatistics = async () => {
+    const res = await getProductStats()
+
+    console.log('product', res)
+    setProductStats(res?.products)
+
+    setStats((prvStats) => {
+      return prvStats.map((item) =>
+        item.key === 'products'
+          ? {
+              ...item,
+              value: res?.products?.total?.toLocaleString(),
+              change: `${res?.products?.growth} %`,
+              trend: res?.products?.growth > 0 ? 'up' : 'down',
+            }
+          : item
+      )
+    })
   }
 
   useEffect(() => {
     getUserStatistics()
+    getProductStatistics()
   }, [])
 
   return (
@@ -97,6 +136,7 @@ export default function AdminPage() {
                 <Badge
                   variant={stat.trend === 'up' ? 'default' : 'destructive'}
                   className="ml-2"
+                  dir={'ltr'}
                 >
                   {stat.change}
                 </Badge>
@@ -125,39 +165,27 @@ export default function AdminPage() {
             <CardDescription>ثبت‌نام ماهانه کاربران جدید</CardDescription>
           </CardHeader>
           <CardContent>
-            <UserGrowthChart data={userStats} />
+            <GrowthChart
+              data={userStats}
+              title={'کاربران'}
+              icon={<Users className="h-5 w-5 text-blue-500" />}
+            />
           </CardContent>
         </Card>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        {/* خلاصه فعالیت‌ها */}
         <Card className="col-span-3">
           <CardHeader>
-            <CardTitle>فعالیت‌های اخیر</CardTitle>
-            <CardDescription>آخرین رویدادهای سیستم</CardDescription>
+            <CardTitle>رشد محصولات</CardTitle>
+            <CardDescription>تعداد ماهانه محصولات</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {[
-                { user: 'علی محمدی', action: 'سفارش جدید ثبت کرد' },
-                { user: 'سارا احمدی', action: 'حساب کاربری ایجاد کرد' },
-                { user: 'رضا کریمی', action: 'محصول جدید افزود' },
-                { user: 'فروشگاه مرکزی', action: 'موجودی به‌روزرسانی شد' },
-                { user: 'مدیر سیستم', action: 'پشتیبان‌گیری انجام داد' },
-              ].map((activity, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between border-b pb-3 last:border-0"
-                >
-                  <div>
-                    <p className="text-sm font-medium">{activity.user}</p>
-                    <p className="text-xs text-muted-foreground">{activity.action}</p>
-                  </div>
-                  <span className="text-xs text-muted-foreground">۵ دقیقه پیش</span>
-                </div>
-              ))}
-            </div>
+            <GrowthChart
+              data={productStats}
+              title={'محصولات'}
+              icon={<Package className="h-5 w-5 text-blue-500" />}
+            />
           </CardContent>
         </Card>
 

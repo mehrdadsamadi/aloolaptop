@@ -21,6 +21,6 @@ export class StatisticsController {
   // برای آینده - ایجاد آمار محصولات
   @Get('products')
   async getProductStats() {
-    // پیاده سازی مشابه برای محصولات
+    return this.statisticsService.getProductStatistics();
   }
 }

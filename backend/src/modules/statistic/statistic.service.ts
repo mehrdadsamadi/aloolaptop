@@ -9,12 +9,16 @@ import {
   StatisticsResult,
   TimestampedDocument,
 } from './types/statistic.type';
+import { Product, ProductDocument } from '../product/schema/product.schema';
 
 @Injectable()
 export class StatisticsService {
   constructor(
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
+
+    @InjectModel(Product.name)
+    private readonly productModel: Model<ProductDocument>,
   ) {}
 
   /**
@@ -23,6 +27,15 @@ export class StatisticsService {
   async getUserStatistics() {
     return {
       users: await this.getStatistics(this.userModel),
+    };
+  }
+
+  /**
+   * Statistics مخصوص محصولات
+   */
+  async getProductStatistics() {
+    return {
+      products: await this.getStatistics(this.productModel),
     };
   }
 
@@ -89,22 +102,38 @@ export class StatisticsService {
       return {
         month: m.label,
         year: m.jYear,
-        count: match?.count ?? 0,
+        count: match?.count ?? 0, // ثبت‌نام همان ماه
       };
     });
 
     /**
-     * محاسبه رشد
+     * محاسبه رشد بر اساس کل کاربران (CUMULATIVE)
      */
-    const current = chartData[chartData.length - 1]?.count ?? 0;
-    const previous = chartData[chartData.length - 2]?.count ?? 0;
+    const totalLast6Months = chartData.reduce(
+      (sum, item) => sum + item.count,
+      0,
+    );
+
+    const baseTotalBeforeRange = total - totalLast6Months;
+
+    let cumulativePrev = baseTotalBeforeRange;
+    let cumulativeCurrent = baseTotalBeforeRange;
+
+    chartData.forEach((item, index) => {
+      cumulativeCurrent += item.count;
+      if (index === chartData.length - 2) {
+        cumulativePrev = cumulativeCurrent;
+      }
+    });
 
     let growth: number | null = null;
 
-    if (previous > 0) {
-      growth = Number((((current - previous) / previous) * 100).toFixed(2));
-    } else if (previous === 0 && current > 0) {
-      growth = 100;
+    if (cumulativePrev > 0) {
+      growth = Number(
+        (((cumulativeCurrent - cumulativePrev) / cumulativePrev) * 100).toFixed(
+          2,
+        ),
+      );
     }
 
     return {
