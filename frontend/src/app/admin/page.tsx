@@ -6,10 +6,9 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 
 // کامپوننت‌های فرضی - باید جداگانه بسازید یا از shadcn نصب کنید
-import { SalesChart } from '@/components/admin/dashboard/salesChart'
 import { GrowthChart } from '@/components/admin/dashboard/growthChart'
 import { useEffect, useState } from 'react'
-import { getOrderStats, getProductStats, getUserStats } from '@/actions/statistic.action'
+import { getOrderStats, getPaymentStats, getProductStats, getUserStats } from '@/actions/statistic.action'
 import { IChartStats, IStats } from '@/types/admin/statistic.type'
 import { useLoading } from '@/hooks/useLoading'
 
@@ -26,10 +25,10 @@ export default function AdminPage() {
       trend: 'up',
     },
     {
-      key: 'sales',
-      title: 'فروش امروز',
-      value: '۱۲,۴۵۰,۰۰۰ تومان',
-      change: '+8.2%',
+      key: 'payments',
+      title: 'فروش ماهانه',
+      value: '0',
+      change: '0',
       icon: DollarSign,
       trend: 'up',
     },
@@ -61,6 +60,7 @@ export default function AdminPage() {
   const [userStats, setUserStats] = useState<IChartStats | null>(null)
   const [productStats, setProductStats] = useState<IChartStats | null>(null)
   const [orderStats, setOrderStats] = useState<IChartStats | null>(null)
+  const [paymentStats, setPaymentStats] = useState<IChartStats | null>(null)
 
   const getUserStatistics = async () => {
     try {
@@ -143,10 +143,38 @@ export default function AdminPage() {
     }
   }
 
+  const getPaymentStatistics = async () => {
+    try {
+      showLoading()
+
+      const res = await getPaymentStats()
+
+      setPaymentStats(res?.payments)
+
+      setStats((prvStats) => {
+        return prvStats.map((item) =>
+          item.key === 'payments'
+            ? {
+                ...item,
+                value: `${res?.payments?.total?.toLocaleString()} تومان`,
+                change: `${res?.payments?.growth} %`,
+                trend: res?.payments?.growth > 0 ? 'up' : 'down',
+              }
+            : item
+        )
+      })
+    } catch (error) {
+      console.log(error)
+    } finally {
+      hideLoading()
+    }
+  }
+
   useEffect(() => {
     getUserStatistics()
     getProductStatistics()
     getOrderStatistics()
+    getPaymentStatistics()
   }, [])
 
   return (
@@ -202,7 +230,12 @@ export default function AdminPage() {
             <CardDescription>عملکرد فروش در ۶ ماه گذشته</CardDescription>
           </CardHeader>
           <CardContent className="pl-2">
-            <SalesChart />
+            <GrowthChart
+              data={paymentStats}
+              title={'فروش'}
+              icon={<DollarSign className="h-5 w-5 text-blue-500" />}
+              totalPostfix={'تومان'}
+            />
           </CardContent>
         </Card>
 

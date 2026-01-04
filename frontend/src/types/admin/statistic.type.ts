@@ -3,12 +3,12 @@ import { LucideIcon } from 'lucide-react'
 interface IChartData {
   month: string
   year: number
-  count: number
+  value: number
 }
 
 export interface IChartStats {
   total: number
-  growth: number
+  growth: number | null
   chartData: IChartData[]
 }
 

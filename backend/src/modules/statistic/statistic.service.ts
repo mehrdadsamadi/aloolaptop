@@ -6,12 +6,14 @@ import * as moment from 'moment-jalaali';
 import { User, UserDocument } from '../user/schemas/user.schema';
 import {
   MonthlyStat,
+  StatisticsOptions,
   StatisticsResult,
   TimestampedDocument,
 } from './types/statistic.type';
 import { Product, ProductDocument } from '../product/schema/product.schema';
 import { Order, OrderDocument } from '../order/schema/order.schema';
 import { PaymentStatus } from '../payment/enums/payment-status.enum';
+import { Payment, PaymentDocument } from '../payment/schema/payment.schema';
 
 @Injectable()
 export class StatisticsService {
@@ -24,6 +26,9 @@ export class StatisticsService {
 
     @InjectModel(Order.name)
     private readonly orderModel: Model<OrderDocument>,
+
+    @InjectModel(Payment.name)
+    private readonly paymentModel: Model<PaymentDocument>,
   ) {}
 
   /**
@@ -58,18 +63,91 @@ export class StatisticsService {
   }
 
   /**
-   * متد عمومی و بهینه برای تمام مدل‌هایی که createdAt دارند
+   * Statistics مخصوص فروش
+   */
+  async getPaymentStatistics() {
+    return {
+      payments: await this.getStatistics(
+        this.paymentModel,
+        {
+          status: PaymentStatus.PAID,
+        },
+        {
+          valueField: 'amount', // فیلدی که می‌خواهیم جمع آن را محاسبه کنیم
+          operation: 'sum', // عملیات aggregation (sum, count, avg)
+        },
+      ),
+    };
+  }
+
+  /**
+   * متد عمومی و بهینه برای تمام مدل‌ها
+   * @param model مدل مورد نظر
+   * @param filter فیلترهای اضافی
+   * @param options تنظیمات اختیاری برای نوع آمارگیری
    */
   async getStatistics<T extends TimestampedDocument>(
     model: Model<T>,
     filter: Record<string, any> = {},
+    options: StatisticsOptions = {},
   ): Promise<StatisticsResult> {
-    // بازه ۶ ماه اخیر شمسی
-    const end = moment().clone().endOf('jMonth');
-    const start = moment().clone().subtract(5, 'jMonth').startOf('jMonth');
+    const {
+      valueField = null, // فیلد مورد نظر برای جمع‌بندی (مثلاً 'amount')
+      operation = 'count', // 'count', 'sum', 'avg'
+      monthsCount = 6, // تعداد ماه‌های مورد نظر
+    } = options;
 
-    const [total, aggregated] = await Promise.all([
-      model.countDocuments(filter),
+    // بازه ماه‌های اخیر شمسی
+    const end = moment().clone().endOf('jMonth');
+    const start = moment()
+      .clone()
+      .subtract(monthsCount - 1, 'jMonth')
+      .startOf('jMonth');
+
+    // ایجاد pipeline بر اساس options
+    const groupStage: any = {
+      _id: {
+        year: { $year: '$createdAt' },
+        month: { $month: '$createdAt' },
+      },
+      count: { $sum: 1 },
+    };
+
+    // اگر valueField مشخص شده باشد، عملیات مربوطه را اضافه می‌کنیم
+    if (valueField && operation !== 'count') {
+      if (operation === 'sum') {
+        groupStage.value = { $sum: `$${valueField}` };
+      } else if (operation === 'avg') {
+        groupStage.value = { $avg: `$${valueField}` };
+      }
+    } else {
+      // اگر operation = 'count' یا valueField مشخص نشده باشد
+      groupStage.value = { $sum: 1 };
+    }
+
+    const [totalResult, aggregated] = await Promise.all([
+      // محاسبه کل بر اساس نوع عملیات
+      model.aggregate([
+        {
+          $match: filter,
+        },
+        {
+          $group: {
+            _id: null,
+            totalCount: { $sum: 1 },
+            ...(valueField && {
+              totalValue:
+                operation === 'sum'
+                  ? { $sum: `$${valueField}` }
+                  : operation === 'avg'
+                    ? { $avg: `$${valueField}` }
+                    : undefined,
+            }),
+          },
+        },
+      ]),
+
+      // aggregate برای محاسبه بر اساس ماه‌ها
       model.aggregate([
         {
           $match: {
@@ -81,13 +159,7 @@ export class StatisticsService {
           },
         },
         {
-          $group: {
-            _id: {
-              year: { $year: '$createdAt' },
-              month: { $month: '$createdAt' },
-            },
-            count: { $sum: 1 },
-          },
+          $group: groupStage,
         },
         {
           $sort: {
@@ -98,13 +170,19 @@ export class StatisticsService {
       ]),
     ]);
 
+    // استخراج نتایج total
+    const totalData = totalResult[0] || {};
+    const total = valueField
+      ? totalData.totalValue || 0
+      : totalData.totalCount || 0;
+
     /**
-     * تولید لیست ۶ ماه شمسی (حتی اگر دیتایی وجود نداشته باشد)
+     * تولید لیست ماه‌های شمسی (حتی اگر دیتایی وجود نداشته باشد)
      */
-    const months = Array.from({ length: 6 }).map((_, index) => {
+    const months = Array.from({ length: monthsCount }).map((_, index) => {
       const m = moment()
         .clone()
-        .subtract(5 - index, 'jMonth');
+        .subtract(monthsCount - 1 - index, 'jMonth');
       return {
         jYear: m.jYear(),
         jMonth: m.jMonth(),
@@ -114,6 +192,7 @@ export class StatisticsService {
       };
     });
 
+    // ایجاد chartData
     const chartData: MonthlyStat[] = months.map((m) => {
       const match = aggregated.find(
         (a) => a._id.year === m.gYear && a._id.month === m.gMonth,
@@ -122,25 +201,25 @@ export class StatisticsService {
       return {
         month: m.label,
         year: m.jYear,
-        count: match?.count ?? 0, // ثبت‌نام همان ماه
+        value: match?.value ?? 0, // مقدار (count یا sum amount)
       };
     });
 
     /**
-     * محاسبه رشد بر اساس کل کاربران (CUMULATIVE)
+     * محاسبه رشد (growth)
      */
-    const totalLast6Months = chartData.reduce(
-      (sum, item) => sum + item.count,
+    const totalLastMonths = chartData.reduce(
+      (sum, item) => sum + item.value,
       0,
     );
 
-    const baseTotalBeforeRange = total - totalLast6Months;
+    const baseTotalBeforeRange = total - totalLastMonths;
 
     let cumulativePrev = baseTotalBeforeRange;
     let cumulativeCurrent = baseTotalBeforeRange;
 
     chartData.forEach((item, index) => {
-      cumulativeCurrent += item.count;
+      cumulativeCurrent += item.value;
       if (index === chartData.length - 2) {
         cumulativePrev = cumulativeCurrent;
       }
@@ -149,11 +228,9 @@ export class StatisticsService {
     let growth: number | null = null;
 
     if (cumulativePrev > 0) {
-      growth = Number(
-        (((cumulativeCurrent - cumulativePrev) / cumulativePrev) * 100).toFixed(
-          2,
-        ),
-      );
+      const growthValue =
+        ((cumulativeCurrent - cumulativePrev) / cumulativePrev) * 100;
+      growth = Number(growthValue.toFixed(2));
     }
 
     return {
@@ -161,5 +238,26 @@ export class StatisticsService {
       growth,
       chartData,
     };
+  }
+
+  /**
+   * متد کمکی برای دریافت آمار بر اساس بازه زمانی دلخواه
+   */
+  async getStatisticsByDateRange<T extends TimestampedDocument>(
+    model: Model<T>,
+    startDate: Date,
+    endDate: Date,
+    filter: Record<string, any> = {},
+    options: StatisticsOptions = {},
+  ): Promise<StatisticsResult> {
+    const fullFilter = {
+      ...filter,
+      createdAt: {
+        $gte: startDate,
+        $lte: endDate,
+      },
+    };
+
+    return this.getStatistics(model, fullFilter, options);
   }
 }

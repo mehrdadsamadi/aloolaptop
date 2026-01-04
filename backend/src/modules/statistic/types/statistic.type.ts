@@ -9,10 +9,16 @@ export interface StatisticsResult {
 export interface MonthlyStat {
   month: string;
   year: number;
-  count: number;
+  value: number;
 }
 
 export type TimestampedDocument = Document & {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export interface StatisticsOptions {
+  valueField?: string; // فیلدی که می‌خواهیم روی آن عملیات انجام دهیم (مثلاً 'amount')
+  operation?: 'count' | 'sum' | 'avg'; // نوع عملیات
+  monthsCount?: number; // تعداد ماه‌های مورد نظر
+}

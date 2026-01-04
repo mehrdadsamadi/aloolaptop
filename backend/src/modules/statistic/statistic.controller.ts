@@ -27,4 +27,9 @@ export class StatisticsController {
   async getOrderStats() {
     return this.statisticsService.getOrderStatistics();
   }
+
+  @Get('payments')
+  async getPaymentStats() {
+    return this.statisticsService.getPaymentStatistics();
+  }
 }

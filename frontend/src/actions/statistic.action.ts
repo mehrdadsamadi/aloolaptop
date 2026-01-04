@@ -20,3 +20,9 @@ export async function getOrderStats() {
 
   return res.json()
 }
+
+export async function getPaymentStats() {
+  const res = await apiFetch(ENDPOINTS.STATISTICS.PAYMENTS, { method: 'GET' })
+
+  return res.json()
+}

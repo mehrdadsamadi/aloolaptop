@@ -10,16 +10,17 @@ interface Props {
   data: IChartStats | null
   title: string
   icon: React.ReactNode
+  totalPostfix?: string
 }
 
 const LINE_COLOR = '#3B82F6'
 const GRID_COLOR = '#E5E7EB'
 
-export function GrowthChart({ data, title, icon }: Props) {
+export function GrowthChart({ data, title, icon, totalPostfix = '' }: Props) {
   const [formattedData, setFormattedData] = useState<
     Array<{
       month: string
-      users: number
+      value: number
       growth: number
       displayMonth: string
       shortMonth: string
@@ -36,10 +37,10 @@ export function GrowthChart({ data, title, icon }: Props) {
         // محاسبه رشد ماهانه
         let monthlyGrowth = 0
         if (index > 0) {
-          const prevCount = data.chartData[index - 1].count
+          const prevCount = data.chartData[index - 1].value
           if (prevCount > 0) {
-            monthlyGrowth = ((item.count - prevCount) / prevCount) * 100
-          } else if (item.count > 0) {
+            monthlyGrowth = ((item.value - prevCount) / prevCount) * 100
+          } else if (item.value > 0) {
             monthlyGrowth = 100
           }
         }
@@ -69,7 +70,7 @@ export function GrowthChart({ data, title, icon }: Props) {
           month: item.month,
           displayMonth: `${displayMonth} ${item.year}`,
           shortMonth: displayMonth,
-          users: item.count,
+          value: item.value,
           growth: parseFloat(monthlyGrowth.toFixed(1)),
         }
       })
@@ -77,7 +78,7 @@ export function GrowthChart({ data, title, icon }: Props) {
       setFormattedData(formatted)
 
       // پیدا کردن بیشترین مقدار برای تنظیم YAxis
-      const max = Math.max(...formatted.map((item) => item.users))
+      const max = Math.max(...formatted.map((item) => item.value))
       setMaxValue(max)
 
       // محاسبه میانگین رشد ماهانه (به جز ماه اول)
@@ -109,7 +110,12 @@ export function GrowthChart({ data, title, icon }: Props) {
           <div className="space-y-1 text-right">
             <div className="flex items-center justify-between flex-row-reverse">
               <span className="text-blue-600 font-medium">:{title}</span>
-              <span className="font-bold text-gray-800">{payload[0].value.toLocaleString()}</span>
+              <span
+                className="font-bold text-gray-800"
+                dir={'rtl'}
+              >
+                {payload[0].value.toLocaleString()} {totalPostfix}
+              </span>
             </div>
             {payload[1] && (
               <div className="flex items-center justify-between">
@@ -138,7 +144,9 @@ export function GrowthChart({ data, title, icon }: Props) {
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-blue-500"></div>
             <span className="text-sm text-gray-700 font-medium">{item.shortMonth}:</span>
-            <span className="text-sm text-gray-600">{item.users.toLocaleString()}</span>
+            <span className="text-sm text-gray-600">
+              {item.value.toLocaleString()} {totalPostfix}
+            </span>
           </div>
         </div>
       ))}
@@ -155,24 +163,28 @@ export function GrowthChart({ data, title, icon }: Props) {
             <h3 className="font-semibold text-lg">{title}</h3>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-sm text-gray-500">کل {title}:</span>
-              <span className="text-2xl font-bold text-gray-800">{data.total.toLocaleString()}</span>
+              <span className="text-2xl font-bold text-gray-800">
+                {data.total.toLocaleString()} {totalPostfix}
+              </span>
             </div>
           </div>
         </div>
 
         <div className="flex flex-wrap gap-4">
-          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-            <div className="flex items-center gap-2">
-              {data.growth >= 0 ? <TrendingUp className="h-5 w-5 text-green-500" /> : <TrendingDown className="h-5 w-5 text-red-500" />}
-              <div>
-                <div className="text-sm text-gray-500">رشد ماهانه</div>
-                <div className={`text-lg font-bold ${data.growth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {data.growth >= 0 ? '+' : ''}
-                  {data.growth}%
+          {data?.growth !== null && (
+            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center gap-2">
+                {data?.growth >= 0 ? <TrendingUp className="h-5 w-5 text-green-500" /> : <TrendingDown className="h-5 w-5 text-red-500" />}
+                <div>
+                  <div className="text-sm text-gray-500">رشد ماهانه</div>
+                  <div className={`text-lg font-bold ${data?.growth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {data?.growth >= 0 ? '+' : ''}
+                    {data?.growth}%
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
           <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
             <div className="flex items-center gap-2">
@@ -226,7 +238,7 @@ export function GrowthChart({ data, title, icon }: Props) {
             <Tooltip content={<CustomTooltip />} />
             <Line
               type="monotone"
-              dataKey="users"
+              dataKey="value"
               stroke={LINE_COLOR}
               strokeWidth={3}
               dot={{
