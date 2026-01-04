@@ -1,7 +1,7 @@
 'use client'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { CreditCard, DollarSign, Package, ShoppingCart, UserPlus, Users } from 'lucide-react'
+import { DollarSign, Package, ShoppingCart, UserPlus, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 
@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react'
 import { getOrderStats, getPaymentStats, getProductStats, getUserStats } from '@/actions/statistic.action'
 import { IChartStats, IStats } from '@/types/admin/statistic.type'
 import { useLoading } from '@/hooks/useLoading'
+import { toast } from 'sonner'
 
 export default function AdminPage() {
   const { showLoading, hideLoading } = useLoading()
@@ -46,14 +47,6 @@ export default function AdminPage() {
       value: '0',
       change: '0',
       icon: Package,
-      trend: 'up',
-    },
-    {
-      key: 'carts',
-      title: 'میانگین سبد خرید',
-      value: '۲۷۵,۰۰۰ تومان',
-      change: '+4.7%',
-      icon: CreditCard,
       trend: 'up',
     },
   ])
@@ -170,11 +163,15 @@ export default function AdminPage() {
     }
   }
 
-  useEffect(() => {
+  const refreshStats = () => {
     getUserStatistics()
     getProductStatistics()
     getOrderStatistics()
     getPaymentStatistics()
+  }
+
+  useEffect(() => {
+    refreshStats()
   }, [])
 
   return (
@@ -193,12 +190,20 @@ export default function AdminPage() {
             <UserPlus className="ml-2 h-4 w-4" />
             خروجی گزارش
           </Button>
-          <Button>بروزرسانی داده‌ها</Button>
+          <Button
+            onClick={() => {
+              refreshStats()
+
+              toast.success('داده ها بروزرسانی شد')
+            }}
+          >
+            بروزرسانی داده‌ها
+          </Button>
         </div>
       </div>
 
       {/* آمار اصلی */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {stats.map((stat, index) => (
           <Card key={index}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
