@@ -8,10 +8,12 @@ import { Badge } from '@/components/ui/badge'
 // کامپوننت‌های فرضی - باید جداگانه بسازید یا از shadcn نصب کنید
 import { GrowthChart } from '@/components/admin/dashboard/growthChart'
 import { useEffect, useState } from 'react'
-import { getOrderStats, getPaymentStats, getProductStats, getUserStats } from '@/actions/statistic.action'
-import { IChartStats, IStats } from '@/types/admin/statistic.type'
+import { getOrderStats, getPaymentStats, getProductStats, getTopSellingProducts, getUserStats } from '@/actions/statistic.action'
+import { IChartStats, IStats, TopSellingProduct } from '@/types/admin/statistic.type'
 import { useLoading } from '@/hooks/useLoading'
 import { toast } from 'sonner'
+import { Switch } from '@/components/ui/switch'
+import { TopSellingProductsSortBy } from '@/lib/enums/topSellingProductsSortBy.enum'
 
 export default function AdminPage() {
   const { showLoading, hideLoading } = useLoading()
@@ -54,6 +56,8 @@ export default function AdminPage() {
   const [productStats, setProductStats] = useState<IChartStats | null>(null)
   const [orderStats, setOrderStats] = useState<IChartStats | null>(null)
   const [paymentStats, setPaymentStats] = useState<IChartStats | null>(null)
+  const [topSellingProducts, setTopSellingProducts] = useState<TopSellingProduct[] | null>(null)
+  const [topSellingSortByRevenue, setTopSellingSortByRevenue] = useState(true)
 
   const getUserStatistics = async () => {
     try {
@@ -163,6 +167,22 @@ export default function AdminPage() {
     }
   }
 
+  const getTopSellingProductsInOrder = async () => {
+    try {
+      showLoading()
+
+      const res = await getTopSellingProducts({
+        sortBy: topSellingSortByRevenue ? TopSellingProductsSortBy.REVENUE : TopSellingProductsSortBy.QUANTITY,
+      })
+
+      setTopSellingProducts(res?.products)
+    } catch (error) {
+      console.log(error)
+    } finally {
+      hideLoading()
+    }
+  }
+
   const refreshStats = () => {
     getUserStatistics()
     getProductStatistics()
@@ -173,6 +193,10 @@ export default function AdminPage() {
   useEffect(() => {
     refreshStats()
   }, [])
+
+  useEffect(() => {
+    getTopSellingProductsInOrder()
+  }, [topSellingSortByRevenue])
 
   return (
     <div className="p-6 space-y-6">
@@ -281,38 +305,94 @@ export default function AdminPage() {
       </div>
 
       {/* محصولات پرطرفدار */}
-      <Card>
-        <CardHeader>
-          <CardTitle>محصولات پرفروش</CardTitle>
-          <CardDescription>۱۰ محصول برتر این ماه</CardDescription>
+      <Card className="">
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-lg">محصولات پرفروش</CardTitle>
+
+              <div className="flex items-center gap-2">
+                <CardDescription className={`mx-0 ${topSellingSortByRevenue ? 'text-foreground' : 'text-muted-foreground'}`}>
+                  رتبه‌بندی بر اساس بیشترین <b>قیمت</b> فروش
+                </CardDescription>
+                <Switch
+                  checked={topSellingSortByRevenue}
+                  onCheckedChange={setTopSellingSortByRevenue}
+                  dir={'ltr'}
+                  id="airplane-mode"
+                  className={'cursor-pointer'}
+                />
+                <CardDescription className={`mx-0 ${!topSellingSortByRevenue ? 'text-foreground' : 'text-muted-foreground'}`}>
+                  رتبه‌بندی بر اساس بیشترین <b>تعداد</b> فروش
+                </CardDescription>
+              </div>
+            </div>
+            <div className="text-xs text-muted-foreground">{topSellingProducts?.length} محصول</div>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {[
-              { name: 'گوشی موبایل X10', sales: 245, revenue: '۱۲۵۰ میلیون' },
-              { name: 'لپ‌تاپ پرو مکس', sales: 189, revenue: '۹۸۰ میلیون' },
-              { name: 'هدفون بی‌سیم', sales: 156, revenue: '۳۲۰ میلیون' },
-              { name: 'ماوس گیمینگ', sales: 142, revenue: '۱۸۰ میلیون' },
-              { name: 'کیبورد مکانیکی', sales: 128, revenue: '۲۱۰ میلیون' },
-            ].map((product, index) => (
+          <div className="space-y-2">
+            {topSellingProducts?.map((product, index) => (
               <div
-                key={index}
-                className="flex items-center justify-between"
+                key={product?.productId}
+                className="group flex items-center justify-between p-2 rounded-md hover:bg-primary/5 transition-colors"
               >
-                <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 bg-muted rounded-md flex items-center justify-center">{index + 1}</div>
-                  <div>
-                    <p className="font-medium">{product.name}</p>
-                    <p className="text-sm text-muted-foreground">{product.sales} فروش</p>
+                <div className="flex items-center gap-3 flex-1">
+                  <div className="text-center">
+                    <div
+                      className={`w-8 h-8 rounded-md flex items-center justify-center text-sm font-bold
+                ${
+                  index === 0
+                    ? 'bg-amber-100 text-amber-800'
+                    : index === 1
+                      ? 'bg-gray-100 text-gray-800'
+                      : index === 2
+                        ? 'bg-orange-100 text-orange-800'
+                        : 'bg-muted text-muted-foreground'
+                }`}
+                    >
+                      #{index + 1}
+                    </div>
                   </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold">{product.revenue}</p>
-                  <p className="text-sm text-muted-foreground">درآمد</p>
+
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <p className="font-medium text-sm">{product.productName}</p>
+                      <span className="font-bold text-primary text-sm">{product.totalRevenue?.toLocaleString()} تومان</span>
+                    </div>
+                    <div className="flex items-center justify-between mt-1">
+                      <span className="text-xs text-muted-foreground">{product.totalSoldQuantity} فروش</span>
+                      <span className="text-xs text-muted-foreground">
+                        {((product.totalSoldQuantity * 100) / topSellingProducts.reduce((sum, p) => sum + p.totalSoldQuantity, 0)).toFixed(
+                          1
+                        )}
+                        % از کل
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
+
+          {topSellingProducts?.length === 0 && (
+            <div className="text-center py-8 text-muted-foreground">
+              <svg
+                className="w-12 h-12 mx-auto mb-3 opacity-50"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                />
+              </svg>
+              <p>محصولی یافت نشد</p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

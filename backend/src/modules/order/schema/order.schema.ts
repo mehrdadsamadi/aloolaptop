@@ -56,3 +56,5 @@ export const OrderSchema = SchemaFactory.createForClass(Order);
 
 OrderSchema.index({ userId: 1 });
 OrderSchema.index({ trackingCode: 1 }, { unique: true });
+OrderSchema.index({ paymentStatus: 1, status: 1 });
+OrderSchema.index({ 'items.productId': 1 });

@@ -20,3 +20,10 @@ export interface IStats {
   icon: LucideIcon
   trend: 'up' | 'down'
 }
+
+export interface TopSellingProduct {
+  productName: string
+  totalSoldQuantity: number
+  totalRevenue: number
+  productId: string
+}

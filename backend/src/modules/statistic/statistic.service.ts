@@ -14,6 +14,9 @@ import { Product, ProductDocument } from '../product/schema/product.schema';
 import { Order, OrderDocument } from '../order/schema/order.schema';
 import { PaymentStatus } from '../payment/enums/payment-status.enum';
 import { Payment, PaymentDocument } from '../payment/schema/payment.schema';
+import { OrderStatus } from '../order/enums/order-status.enum';
+import { FilterTopSellingProductsDto } from '../../common/dtos/filter.dto';
+import { TopSellingSortBy } from './enums/top-selling-sortBy.enum';
 
 @Injectable()
 export class StatisticsService {
@@ -58,6 +61,7 @@ export class StatisticsService {
     return {
       orders: await this.getStatistics(this.orderModel, {
         paymentStatus: PaymentStatus.PAID,
+        status: { $ne: OrderStatus.CANCELED },
       }),
     };
   }
@@ -237,6 +241,72 @@ export class StatisticsService {
       total,
       growth,
       chartData,
+    };
+  }
+
+  async getTopSellingProducts(filterDto: FilterTopSellingProductsDto) {
+    const { sortBy = TopSellingSortBy.REVENUE, limit = 10 } = filterDto;
+
+    const sortField =
+      sortBy === TopSellingSortBy.REVENUE
+        ? 'totalRevenue'
+        : 'totalSoldQuantity';
+
+    const topSellingProducts = await this.orderModel.aggregate([
+      // فقط سفارش‌های پرداخت‌شده واقعی
+      {
+        $match: {
+          paymentStatus: 'paid',
+          status: { $ne: 'canceled' },
+        },
+      },
+
+      // باز کردن آیتم‌ها
+      { $unwind: '$items' },
+
+      // گروه‌بندی بر اساس محصول
+      {
+        $group: {
+          _id: '$items.productId',
+
+          productName: { $first: '$items.name' },
+
+          totalSoldQuantity: {
+            $sum: '$items.quantity',
+          },
+
+          totalRevenue: {
+            $sum: '$items.totalPrice',
+          },
+        },
+      },
+
+      // 🔴 مرتب‌سازی بر اساس مبلغ فروش
+      {
+        $sort: {
+          [sortField]: -1,
+        },
+      },
+
+      // محدودسازی
+      {
+        $limit: limit,
+      },
+
+      // شکل خروجی مناسب پنل ادمین
+      {
+        $project: {
+          _id: 0,
+          productId: '$_id',
+          productName: 1,
+          totalSoldQuantity: 1,
+          totalRevenue: 1,
+        },
+      },
+    ]);
+
+    return {
+      products: topSellingProducts,
     };
   }
 

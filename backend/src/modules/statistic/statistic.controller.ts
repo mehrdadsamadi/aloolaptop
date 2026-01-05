@@ -1,10 +1,12 @@
 // statistics.controller.ts
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthDecorator } from '../../common/decorators/auth.decorator';
 import { StatisticsService } from './statistic.service';
 import { CanAccess } from '../../common/decorators/role.decorator';
 import { Roles } from '../../common/enums/role.enum';
+import { FilterTopSellingProducts } from '../../common/decorators/filter.decorator';
+import { FilterTopSellingProductsDto } from '../../common/dtos/filter.dto';
 
 @Controller('statistics')
 @ApiTags('Statistics')
@@ -31,5 +33,12 @@ export class StatisticsController {
   @Get('payments')
   async getPaymentStats() {
     return this.statisticsService.getPaymentStatistics();
+  }
+
+  @Get('top-selling-products')
+  @CanAccess(Roles.ADMIN)
+  @FilterTopSellingProducts()
+  getTopSellingProducts(@Query() filterDto: FilterTopSellingProductsDto) {
+    return this.statisticsService.getTopSellingProducts(filterDto);
   }
 }

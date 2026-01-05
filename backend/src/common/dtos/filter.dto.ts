@@ -4,13 +4,16 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsBoolean,
   IsEnum,
+  IsInt,
   IsMongoId,
   IsOptional,
   IsString,
+  Min,
 } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { PaginationDto } from './pagination.dto';
 import { OrderStatus } from '../../modules/order/enums/order-status.enum';
+import { TopSellingSortBy } from '../../modules/statistic/enums/top-selling-sortBy.enum';
 
 export class FilterProductDto extends PaginationDto {
   @ApiPropertyOptional()
@@ -57,4 +60,18 @@ export class FilterOrderDto extends PaginationDto {
   @IsOptional()
   @IsEnum(OrderStatus)
   status?: OrderStatus;
+}
+
+export class FilterTopSellingProductsDto {
+  @ApiPropertyOptional({ example: 10 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  limit?: number;
+
+  @ApiPropertyOptional({ enum: TopSellingSortBy })
+  @IsOptional()
+  @IsEnum(TopSellingSortBy)
+  sortBy?: TopSellingSortBy;
 }

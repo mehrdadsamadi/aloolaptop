@@ -3,6 +3,7 @@ import { ApiQuery } from '@nestjs/swagger';
 import { ProductGrade } from '../../modules/product/enums/product-grade.enum';
 import { ProductCondition } from '../../modules/product/enums/product-condition.enum';
 import { OrderStatus } from '../../modules/order/enums/order-status.enum';
+import { TopSellingSortBy } from '../../modules/statistic/enums/top-selling-sortBy.enum';
 
 export function FilterProduct() {
   return applyDecorators(
@@ -28,6 +29,19 @@ export function FilterOrder() {
       required: false,
       type: 'enum',
       enum: OrderStatus,
+    }),
+  );
+}
+
+export function FilterTopSellingProducts() {
+  return applyDecorators(
+    ApiQuery({ name: 'limit', required: false, type: 'number', default: 10 }),
+    ApiQuery({
+      name: 'sortBy',
+      required: false,
+      type: 'enum',
+      enum: TopSellingSortBy,
+      default: TopSellingSortBy.REVENUE,
     }),
   );
 }
