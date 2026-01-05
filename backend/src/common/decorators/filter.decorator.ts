@@ -4,6 +4,7 @@ import { ProductGrade } from '../../modules/product/enums/product-grade.enum';
 import { ProductCondition } from '../../modules/product/enums/product-condition.enum';
 import { OrderStatus } from '../../modules/order/enums/order-status.enum';
 import { TopSellingSortBy } from '../../modules/statistic/enums/top-selling-sortBy.enum';
+import { ExportFormats } from '../../modules/common/services/export/export.service';
 
 export function FilterProduct() {
   return applyDecorators(
@@ -42,6 +43,23 @@ export function FilterTopSellingProducts() {
       type: 'enum',
       enum: TopSellingSortBy,
       default: TopSellingSortBy.REVENUE,
+    }),
+  );
+}
+
+export function FilterOrderExport() {
+  return applyDecorators(
+    ApiQuery({
+      name: 'status',
+      required: true,
+      type: 'enum',
+      enum: OrderStatus,
+    }),
+    ApiQuery({
+      name: 'format',
+      required: true,
+      type: 'enum',
+      enum: ExportFormats,
     }),
   );
 }

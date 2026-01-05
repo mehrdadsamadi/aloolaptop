@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Query,
+  Res,
+} from '@nestjs/common';
 import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { AuthDecorator } from '../../common/decorators/auth.decorator';
 import { OrderService } from './order.service';
@@ -10,9 +18,16 @@ import {
 } from './dto/change-status.dto';
 import { SwaggerConsumes } from '../../common/enums/swagger-consumes.enum';
 import { Pagination } from '../../common/decorators/pagination.decorator';
-import { FilterOrder } from '../../common/decorators/filter.decorator';
-import { FilterOrderDto } from '../../common/dtos/filter.dto';
+import {
+  FilterOrder,
+  FilterOrderExport,
+} from '../../common/decorators/filter.decorator';
+import {
+  FilterOrderDto,
+  FilterOrderExportDto,
+} from '../../common/dtos/filter.dto';
 import { extractFilters } from '../../common/utils/functions.util';
+import { Response } from 'express';
 
 @Controller('orders')
 @ApiTags('Orders')
@@ -28,6 +43,33 @@ export class OrderController {
     const { paginationDto, filter } = extractFilters(filterDto);
 
     return this.orderService.findAll({ paginationDto, filter });
+  }
+
+  @Get('export')
+  @CanAccess(Roles.ADMIN)
+  @FilterOrderExport()
+  async exportOrders(
+    @Query() filterDto: FilterOrderExportDto,
+    @Res() res: Response,
+  ) {
+    const { format } = filterDto;
+
+    const result = await this.orderService.exportOrders(format, filterDto);
+
+    // ارسال فایل به کاربر
+    const contentType = {
+      excel:
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      csv: 'text/csv',
+      pdf: 'application/pdf',
+    }[format];
+
+    res.setHeader('Content-Type', contentType);
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${result?.filename}"`,
+    );
+    res.send(result?.buffer);
   }
 
   @Get(':id')

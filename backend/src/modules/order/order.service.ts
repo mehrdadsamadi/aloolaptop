@@ -24,7 +24,15 @@ import {
   paginationGenerator,
   paginationSolver,
 } from '../../common/utils/pagination.util';
-import { FilterOrderDto } from '../../common/dtos/filter.dto';
+import {
+  FilterOrderDto,
+  FilterOrderExportDto,
+} from '../../common/dtos/filter.dto';
+import {
+  ExportFormats,
+  ExportOptions,
+  ExportService,
+} from '../common/services/export/export.service';
 
 @Injectable({ scope: Scope.REQUEST })
 export class OrderService {
@@ -34,6 +42,8 @@ export class OrderService {
     private readonly paymentModel: Model<PaymentDocument>,
 
     private readonly cartService: CartService,
+
+    private readonly exportService: ExportService,
 
     @Inject(REQUEST) private req: Request,
   ) {}
@@ -215,6 +225,60 @@ export class OrderService {
       message,
       order,
     };
+  }
+
+  async exportOrders(format: ExportFormats, filters: FilterOrderExportDto) {
+    const { status } = filters;
+
+    // ۱. دریافت داده‌ها
+    const orders = await this.orderModel
+      .find({ status })
+      .sort({ createdAt: -1 })
+      .populate([
+        { path: 'addressId' },
+        { path: 'userId', select: 'profile mobile' },
+        { path: 'couponId', select: 'code' },
+      ]);
+
+    // ۲. تعریف ستون‌های خروجی
+    const exportOptions: ExportOptions = {
+      filename: `orders-report-${new Date().toISOString().split('T')[0]}`,
+      title: 'گزارش سفارشات',
+      columns: [
+        {
+          key: '_id',
+          title: 'شماره سفارش',
+          width: 30,
+        },
+        {
+          key: 'createdAt',
+          title: 'تاریخ',
+          format: (date) => new Date(date).toLocaleDateString('fa-IR'),
+        },
+        {
+          key: 'userId',
+          title: 'نام مشتری',
+          format: (user) =>
+            `${user?.profile?.firstName} ${user?.profile?.lastName}`,
+        },
+        {
+          key: 'userId.mobile',
+          title: 'شماره تماس',
+        },
+        {
+          key: 'totalPrice',
+          title: 'مبلغ (تومان)',
+          format: (amount) => new Intl.NumberFormat('fa-IR').format(amount),
+        },
+        {
+          key: 'status',
+          title: 'وضعیت',
+        },
+      ],
+    };
+
+    // ۴. ایجاد خروجی
+    return this.exportService.export(orders, format, exportOptions);
   }
 
   private generateTrackingCode() {

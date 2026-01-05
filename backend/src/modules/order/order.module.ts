@@ -6,6 +6,7 @@ import { AuthModule } from '../auth/auth.module';
 import { OrderController } from './order.controller';
 import { OrderService } from './order.service';
 import { CartModule } from '../cart/cart.module';
+import { ExportService } from '../common/services/export/export.service';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { CartModule } from '../cart/cart.module';
     ]),
   ],
   controllers: [OrderController],
-  providers: [OrderService],
+  providers: [OrderService, ExportService],
   exports: [OrderService, MongooseModule],
 })
 export class OrderModule {}

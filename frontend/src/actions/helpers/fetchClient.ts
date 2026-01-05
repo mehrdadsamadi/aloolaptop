@@ -70,5 +70,12 @@ export async function refreshTokens() {
 
 export async function getData(url: string) {
   const res = await apiFetch(url)
+
   return res.json()
+}
+
+export async function getExportData(url: string) {
+  const res = await apiFetch(url)
+
+  return res.blob()
 }

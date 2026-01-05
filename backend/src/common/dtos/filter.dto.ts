@@ -1,6 +1,6 @@
 import { ProductCondition } from '../../modules/product/enums/product-condition.enum';
 import { ProductGrade } from '../../modules/product/enums/product-grade.enum';
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsBoolean,
   IsEnum,
@@ -14,6 +14,7 @@ import { Transform, Type } from 'class-transformer';
 import { PaginationDto } from './pagination.dto';
 import { OrderStatus } from '../../modules/order/enums/order-status.enum';
 import { TopSellingSortBy } from '../../modules/statistic/enums/top-selling-sortBy.enum';
+import { ExportFormats } from '../../modules/common/services/export/export.service';
 
 export class FilterProductDto extends PaginationDto {
   @ApiPropertyOptional()
@@ -74,4 +75,14 @@ export class FilterTopSellingProductsDto {
   @IsOptional()
   @IsEnum(TopSellingSortBy)
   sortBy?: TopSellingSortBy;
+}
+
+export class FilterOrderExportDto {
+  @ApiProperty({ enum: ExportFormats })
+  @IsEnum(ExportFormats)
+  format: ExportFormats;
+
+  @ApiProperty({ enum: OrderStatus })
+  @IsEnum(OrderStatus)
+  status: OrderStatus;
 }
