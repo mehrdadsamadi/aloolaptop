@@ -5,7 +5,7 @@ import { ORDER_STATUS_CONSTANTS } from '@/lib/constants/order.constant'
 import { ExportButton } from '@/components/common/exportButton'
 
 export default async function AdminOrdersPage({ searchParams }: { searchParams: SearchParams<{ status: OrderStatus }> }) {
-  const { status } = await searchParams
+  const { status = OrderStatus.PAID } = await searchParams
 
   return (
     <section className="h-full">

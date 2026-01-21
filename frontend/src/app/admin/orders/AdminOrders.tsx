@@ -407,7 +407,7 @@ export default function AdminOrders({ status }: AdminOrdersProps) {
       status,
     })
 
-    setOrders(res.orders)
+    setOrders(res?.orders)
     setPagesCount(res?.pagination?.pagesCount)
   }
 

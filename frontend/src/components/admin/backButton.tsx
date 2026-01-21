@@ -2,7 +2,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { ArrowRightIcon } from 'lucide-react'
+import { ArrowLeftIcon } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
 
 export function BackButton() {
@@ -22,7 +22,7 @@ export function BackButton() {
       className={'mr-auto'}
       onClick={handleClick}
     >
-      <ArrowRightIcon />
+      <ArrowLeftIcon />
     </Button>
   )
 }
