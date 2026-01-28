@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { ISidebarLink } from '@/types/admin/sidebar'
+import { Checkbox } from '@/components/ui/checkbox'
 
 interface AddToFavoriteDialogProps {
   open: boolean
@@ -137,17 +138,17 @@ export default function AddToFavoriteDialog({
                 key={link.title}
                 className="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-muted/50 transition-colors"
               >
-                {/*<Checkbox*/}
-                {/*  id={`favorite-${link.title}`}*/}
-                {/*  checked={link.isFavorite}*/}
-                {/*  onCheckedChange={() => handleToggleFavorite(link.title)}*/}
-                {/*/>*/}
-                <input
-                  type={'checkbox'}
+                <Checkbox
                   id={`favorite-${link.title}`}
                   checked={link.isFavorite}
-                  onChange={() => handleToggleFavorite(link.title)}
+                  onCheckedChange={() => handleToggleFavorite(link.title)}
                 />
+                {/*<input*/}
+                {/*  type={'checkbox'}*/}
+                {/*  id={`favorite-${link.title}`}*/}
+                {/*  checked={link.isFavorite}*/}
+                {/*  onChange={() => handleToggleFavorite(link.title)}*/}
+                {/*/>*/}
                 <Label
                   htmlFor={`favorite-${link.title}`}
                   className="flex items-center gap-2 flex-1 cursor-pointer"
