@@ -19,7 +19,8 @@ export const couponSchema = z
       })
       .min(0, 'مقدار تخفیف نمی‌تواند منفی باشد'),
 
-    productIds: z.array(z.string()).optional().default([]),
+    // productIds: z.array(z.string()).optional().default([]),
+    productIds: z.array(z.string()).default([]),
 
     minOrderAmount: z
       .number({
@@ -35,13 +36,16 @@ export const couponSchema = z
       })
       .min(1, 'تعداد استفاده باید حداقل ۱ باشد'),
 
-    startDate: z.union([z.string(), z.date()]).transform((val) => {
-      return typeof val === 'string' ? new Date(val) : val
-    }),
+    // startDate: z.union([z.string(), z.date()]).transform((val) => {
+    //   return typeof val === 'string' ? new Date(val) : val
+    // }),
+    //
+    // endDate: z.union([z.string(), z.date()]).transform((val) => {
+    //   return typeof val === 'string' ? new Date(val) : val
+    // }),
 
-    endDate: z.union([z.string(), z.date()]).transform((val) => {
-      return typeof val === 'string' ? new Date(val) : val
-    }),
+    startDate: z.date(),
+    endDate: z.date(),
   })
   .superRefine((data, ctx) => {
     // اگر تخفیف درصدی باشد، مقدار نباید بیش از 100 باشد
@@ -96,4 +100,6 @@ export const couponSchema = z
     }
   })
 
-export type CouponFormValues = z.infer<typeof couponSchema>
+// export type CouponFormValues = z.infer<typeof couponSchema>
+export type CouponFormInput = z.input<typeof couponSchema>
+export type CouponFormValues = z.output<typeof couponSchema>

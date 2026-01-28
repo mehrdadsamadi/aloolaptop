@@ -7,6 +7,7 @@ import ProductForm from '@/app/admin/products/_components/ProductForm'
 import { ProductFormValues } from '@/validators/product.validator'
 import { updateProduct } from '@/actions/product.action'
 import { IProduct } from '@/types/admin/product.type'
+import { ImageItem } from '@/components/input/imagesUploader'
 
 export default function EditProduct({ product }: { product: IProduct }) {
   const router = useRouter()
@@ -31,7 +32,7 @@ export default function EditProduct({ product }: { product: IProduct }) {
 
       // اضافه کردن تصاویر قدیمی به صورت JSON
       if (values.images && values.images.length > 0) {
-        const existingImages = values.images.filter((img) => img.url && !img.file && img?.key?.length > 0)
+        const existingImages = values.images.filter((img: ImageItem) => img?.url && !img?.file && img?.key && img?.key?.length > 0)
         formData.append('existingImages', JSON.stringify(existingImages))
       }
 

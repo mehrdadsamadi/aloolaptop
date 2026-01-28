@@ -90,33 +90,32 @@ export function ExportButton({ status, filters = {} }: ExportButtonProps) {
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent
-        dir={'rtl'}
-        align="start"
-      >
-        <DropdownMenuItem
-          className={'cursor-pointer'}
-          onClick={() => handleExport('excel')}
-        >
-          <span className="ml-2">📊</span>
-          خروجی Excel
-        </DropdownMenuItem>
+      <DropdownMenuContent align="start">
+        <div dir={'rtl'}>
+          <DropdownMenuItem
+            className={'cursor-pointer'}
+            onClick={() => handleExport('excel')}
+          >
+            <span className="ml-2">📊</span>
+            خروجی Excel
+          </DropdownMenuItem>
 
-        <DropdownMenuItem
-          className={'cursor-pointer'}
-          onClick={() => handleExport('csv')}
-        >
-          <span className="ml-2">📄</span>
-          خروجی CSV
-        </DropdownMenuItem>
+          <DropdownMenuItem
+            className={'cursor-pointer'}
+            onClick={() => handleExport('csv')}
+          >
+            <span className="ml-2">📄</span>
+            خروجی CSV
+          </DropdownMenuItem>
 
-        <DropdownMenuItem
-          className={'cursor-pointer'}
-          onClick={() => handleExport('pdf')}
-        >
-          <span className="ml-2">📋</span>
-          خروجی PDF
-        </DropdownMenuItem>
+          <DropdownMenuItem
+            className={'cursor-pointer'}
+            onClick={() => handleExport('pdf')}
+          >
+            <span className="ml-2">📋</span>
+            خروجی PDF
+          </DropdownMenuItem>
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   )

@@ -30,14 +30,15 @@ function renderByType(attr: ICategoryAttribute) {
     case AttributeType.SELECT:
       return (
         <>
-          {attr.options?.map((opt) => (
-            <Badge
-              key={opt}
-              variant="secondary"
-            >
-              {opt}
-            </Badge>
-          ))}
+          {Array.isArray(attr.options) &&
+            attr.options?.map((opt) => (
+              <Badge
+                key={opt}
+                variant="secondary"
+              >
+                {opt}
+              </Badge>
+            ))}
         </>
       )
 
@@ -54,9 +55,9 @@ function renderByType(attr: ICategoryAttribute) {
       return (
         <div className={'flex items-center gap-1'}>
           <p>از</p>
-          <Badge variant="secondary">{attr?.options?.[0]}</Badge>
+          <Badge variant="secondary">{Array.isArray(attr.options) && attr?.options?.[0]}</Badge>
           <p>تا</p>
-          <Badge variant="secondary">{attr?.options?.[1]}</Badge>
+          <Badge variant="secondary">{Array.isArray(attr.options) && attr?.options?.[1]}</Badge>
         </div>
       )
 

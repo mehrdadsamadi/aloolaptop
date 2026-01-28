@@ -23,11 +23,7 @@ export const productSchema = z.object({
 
   condition: z.enum(Object.values(ProductCondition) as [string, ...string[]]),
 
-  grade: z
-    .enum(Object.values(ProductGrade) as [string, ...string[]])
-    .nullable()
-    .optional()
-    .default(null),
+  grade: z.enum(Object.values(ProductGrade) as [string, ...string[]]).optional(),
 
   price: z
     .number()
@@ -45,14 +41,15 @@ export const productSchema = z.object({
   discountPercent: z.number().min(0, 'درصد تخفیف نمی‌تواند منفی باشد').max(100, 'درصد تخفیف نمی‌تواند بیشتر از ۱۰۰ باشد'),
 
   discountExpiresAt: z
-    .union([z.string(), z.date()])
+    .date()
     .nullable()
     .optional()
     .default(null)
     .transform((val) => {
       if (val == null) return null
-      return typeof val === 'string' ? new Date(val) : val
+      return val
     }),
 })
 
-export type ProductFormValues = z.infer<typeof productSchema>
+export type ProductFormInput = z.input<typeof productSchema>
+export type ProductFormValues = z.output<typeof productSchema>

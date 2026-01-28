@@ -5,10 +5,10 @@ import { Input } from '@/components/ui/input'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Button } from '@/components/ui/button'
 import { Trash2 } from 'lucide-react'
-import { ProductFormValues } from '@/validators/product.validator'
+import { ProductFormInput } from '@/validators/product.validator'
 
 interface Props {
-  control: Control<ProductFormValues>
+  control: Control<ProductFormInput>
   index: number
   onRemove: () => void
 }

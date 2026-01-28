@@ -9,7 +9,7 @@ import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from '@/compo
 import { InputGroup, InputGroupTextarea } from '@/components/ui/input-group'
 import { AsyncCombobox } from '@/components/input/asyncCombobox'
 import { useEffect, useState } from 'react'
-import { ProductFormValues, productSchema } from '@/validators/product.validator'
+import { ProductFormInput, ProductFormValues, productSchema } from '@/validators/product.validator'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -23,7 +23,7 @@ import { CONDITION_CONSTANTS } from '@/lib/constants/product.constant'
 import { NumberInput } from '@/components/input/numberInput'
 
 interface Props {
-  initialValues?: ProductFormValues
+  initialValues?: ProductFormInput
   onSubmit: (values: ProductFormValues, imageFiles?: File[]) => Promise<void>
   isEdit?: boolean
 }
@@ -32,7 +32,7 @@ export default function ProductForm({ initialValues, onSubmit, isEdit }: Props) 
   const [images, setImages] = useState<ImageItem[]>([])
   const [newImageFiles, setNewImageFiles] = useState<File[]>([])
 
-  const form = useForm<ProductFormValues>({
+  const form = useForm<ProductFormInput>({
     resolver: zodResolver(productSchema),
     defaultValues: initialValues ?? {
       name: '',
@@ -40,7 +40,7 @@ export default function ProductForm({ initialValues, onSubmit, isEdit }: Props) 
       description: '',
       categoryId: '',
       condition: ProductCondition.NEW,
-      grade: null,
+      grade: undefined,
       price: 0,
       stock: null,
       attributes: [],
@@ -54,7 +54,7 @@ export default function ProductForm({ initialValues, onSubmit, isEdit }: Props) 
   // تبدیل images از سرور به فرمت ImagesUploader
   useEffect(() => {
     if (initialValues?.images) {
-      const serverImages = initialValues.images.map((img) => ({
+      const serverImages = initialValues.images.map((img: ImageItem) => ({
         url: img?.url,
         key: img?.key,
         alt: img?.alt,
@@ -71,14 +71,14 @@ export default function ProductForm({ initialValues, onSubmit, isEdit }: Props) 
 
   useEffect(() => {
     if (form.watch('condition') === ProductCondition.NEW) {
-      form.setValue('grade', null)
+      form.setValue('grade', undefined)
     }
   }, [form, form.watch('condition')])
 
   // تابع برای ارسال فرم
-  const handleFormSubmit = async (values: ProductFormValues) => {
-    // ارسال هم داده‌های فرم و هم فایل‌های تصویر جدید
-    await onSubmit(values, newImageFiles.length > 0 ? newImageFiles : undefined)
+  const handleFormSubmit = async (values: ProductFormInput) => {
+    const parsedValues = productSchema.parse(values)
+    await onSubmit(parsedValues, newImageFiles.length ? newImageFiles : undefined)
   }
 
   // تابع مدیریت تغییر تصاویر
@@ -86,11 +86,11 @@ export default function ProductForm({ initialValues, onSubmit, isEdit }: Props) 
     setImages(updatedImages)
 
     // جدا کردن تصاویر قدیمی و جدید
-    const oldImages = updatedImages.filter((img) => img.url && !img.file)
-    const newImages = updatedImages.filter((img) => img.file)
+    const oldImages = updatedImages?.filter((img) => img?.url && !img?.file)
+    const newImages = updatedImages?.filter((img) => img?.file)
 
     // ذخیره فایل‌های جدید
-    const files = newImages.map((img) => img.file)
+    const files = newImages?.map((img) => img?.file).filter((item) => item !== undefined)
     setNewImageFiles(files)
 
     // آپدیت فیلد images در فرم (هم تصاویر قدیمی هم جدید)

@@ -2,13 +2,13 @@
 
 import { Control, useFieldArray } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
-import { ProductFormValues } from '@/validators/product.validator'
+import { ProductFormInput } from '@/validators/product.validator'
 import { BadgeAlert } from 'lucide-react'
 import { Alert, AlertTitle } from '@/components/ui/alert'
 import AttributeInput from './AttributeInput'
 
 interface Props {
-  control: Control<ProductFormValues>
+  control: Control<ProductFormInput>
 }
 
 export default function AttributesForm({ control }: Props) {

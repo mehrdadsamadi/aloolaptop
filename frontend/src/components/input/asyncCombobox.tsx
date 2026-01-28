@@ -116,7 +116,7 @@ export function AsyncCombobox({
 
       // اگر آیتم انتخاب شده در نتایج جدید است، آن را آپدیت کن
       if (selectedValue) {
-        const foundItem = newItems.find((item) => item._id === selectedValue)
+        const foundItem = newItems.find((item: Record<string, unknown>) => item?._id === selectedValue)
         if (foundItem && (!selectedItem || selectedItem._id !== selectedValue)) {
           setSelectedItem(foundItem)
         }

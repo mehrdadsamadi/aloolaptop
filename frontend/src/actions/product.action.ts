@@ -37,7 +37,6 @@ export async function getProductById(productId: string) {
 }
 
 export async function updateProduct(productId: string, formData: FormData) {
-  console.log('formData', formData)
   const res = await apiFetch(ENDPOINTS.PRODUCTS.UPDATE_BY_ID(productId), { method: 'PATCH', body: formData })
 
   return res.json()

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { useEffect, useState } from 'react'
-import { CouponFormValues, couponSchema } from '@/validators/coupon.validator'
+import { CouponFormInput, CouponFormValues, couponSchema } from '@/validators/coupon.validator'
 import { CalendarIcon } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { CouponType, DiscountMethod } from '@/types/admin/coupon.type'
@@ -17,7 +17,7 @@ import { Calendar } from '@/components/ui/calendar'
 import { AsyncMultipleCombobox } from '@/components/input/asyncMultipleCombobox'
 
 interface Props {
-  initialValues?: CouponFormValues
+  initialValues?: CouponFormInput
   onSubmit: (values: CouponFormValues) => Promise<void>
   isEdit?: boolean
 }
@@ -25,7 +25,7 @@ interface Props {
 export default function CouponForm({ initialValues, onSubmit, isEdit }: Props) {
   const [selectedProducts, setSelectedProducts] = useState<string[]>(initialValues?.productIds || [])
 
-  const form = useForm<CouponFormValues>({
+  const form = useForm<CouponFormInput>({
     resolver: zodResolver(couponSchema),
     defaultValues: initialValues ?? {
       code: '',
@@ -76,7 +76,10 @@ export default function CouponForm({ initialValues, onSubmit, isEdit }: Props) {
 
   return (
     <form
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleSubmit((values) => {
+        const parsedValues = couponSchema.parse(values)
+        return onSubmit(parsedValues)
+      })}
       className="flex flex-col gap-6 h-full justify-between"
     >
       <FieldGroup className="space-y-6">
