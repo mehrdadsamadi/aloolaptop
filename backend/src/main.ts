@@ -53,8 +53,8 @@ async function bootstrap() {
 
   await app.listen(PORT, () => {
     console.table({
-      'Local Server': `${URL}:${PORT}`,
-      'Swagger Docs': `${URL}:${PORT}/api-docs`,
+      'Local Server': `${URL}`,
+      'Swagger Docs': `${URL}/api-docs`,
     });
   });
 }
