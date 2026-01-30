@@ -199,10 +199,10 @@ export default function AdminPage() {
   }, [topSellingSortByRevenue])
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="flex flex-col gap-6">
       {/* هدر */}
-      <div className="flex justify-between items-center">
-        <div>
+      <div className="flex flex-col md:flex-row gap-2 justify-between items-center">
+        <div className={''}>
           <h1 className="text-xl font-bold tracking-tight">داشبورد مدیریت</h1>
           <p className="text-muted-foreground text-sm">خوش آمدید! اینجا می‌توانید عملکرد کلی سیستم را مشاهده کنید.</p>
         </div>
@@ -259,7 +259,7 @@ export default function AdminPage() {
           </CardContent>
         </Card>
 
-        <Card className="col-span-3">
+        <Card className="col-span-4 lg:col-span-3">
           <CardHeader>
             <CardTitle>رشد کاربران</CardTitle>
             <CardDescription>ثبت‌نام ماهانه کاربران جدید</CardDescription>
@@ -275,7 +275,7 @@ export default function AdminPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-3">
+        <Card className="col-span-4 lg:col-span-3">
           <CardHeader>
             <CardTitle>رشد محصولات</CardTitle>
             <CardDescription>تعداد ماهانه محصولات</CardDescription>

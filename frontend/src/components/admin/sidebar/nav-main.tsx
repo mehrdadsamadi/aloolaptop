@@ -11,6 +11,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  useSidebar,
 } from '@/components/ui/sidebar'
 import { usePathname, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -19,6 +20,7 @@ import { ISidebarLink } from '@/types/admin/sidebar'
 export default function NavMain({ items }: { items: ISidebarLink[] }) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const { toggleSidebar } = useSidebar()
 
   // تابع برای جدا کردن path از query string
   const getPathWithoutQuery = (url: string) => {
@@ -104,7 +106,10 @@ export default function NavMain({ items }: { items: ISidebarLink[] }) {
                           asChild
                           isActive={isSubItemActive(subItem?.url)} // اصلاح شده: استفاده از subItem.url
                         >
-                          <Link href={subItem?.url}>
+                          <Link
+                            href={subItem?.url}
+                            onClick={toggleSidebar}
+                          >
                             <span>{subItem?.title}</span>
                           </Link>
                         </SidebarMenuSubButton>
@@ -120,7 +125,10 @@ export default function NavMain({ items }: { items: ISidebarLink[] }) {
                 asChild
                 isActive={isActive(item?.url)}
               >
-                <Link href={item?.url}>
+                <Link
+                  href={item?.url}
+                  onClick={toggleSidebar}
+                >
                   {item.icon && <item.icon />}
                   <span>{item?.title}</span>
                 </Link>
