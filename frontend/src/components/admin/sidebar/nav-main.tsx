@@ -20,7 +20,7 @@ import { ISidebarLink } from '@/types/admin/sidebar'
 export default function NavMain({ items }: { items: ISidebarLink[] }) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const { toggleSidebar } = useSidebar()
+  const { toggleSidebar, isMobile } = useSidebar()
 
   // تابع برای جدا کردن path از query string
   const getPathWithoutQuery = (url: string) => {
@@ -77,6 +77,12 @@ export default function NavMain({ items }: { items: ISidebarLink[] }) {
     return subItems.some((subItem) => isSubItemActive(subItem.url))
   }
 
+  const handleToggleSidebar = () => {
+    if (isMobile) {
+      toggleSidebar()
+    }
+  }
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>داشبورد</SidebarGroupLabel>
@@ -108,7 +114,7 @@ export default function NavMain({ items }: { items: ISidebarLink[] }) {
                         >
                           <Link
                             href={subItem?.url}
-                            onClick={toggleSidebar}
+                            onClick={handleToggleSidebar}
                           >
                             <span>{subItem?.title}</span>
                           </Link>
@@ -127,7 +133,7 @@ export default function NavMain({ items }: { items: ISidebarLink[] }) {
               >
                 <Link
                   href={item?.url}
-                  onClick={toggleSidebar}
+                  onClick={handleToggleSidebar}
                 >
                   {item.icon && <item.icon />}
                   <span>{item?.title}</span>

@@ -1,4 +1,4 @@
-import ButtonLink from '@/components/common/ButtonLink'
+import LinkButton from '@/components/common/linkButton'
 import AdminCoupons from '@/app/admin/coupons/AdminCoupons'
 
 export default async function AdminCouponsPage() {
@@ -7,12 +7,12 @@ export default async function AdminCouponsPage() {
       <div className={'flex items-center justify-between w-full mb-4 bg-gray-50 rounded-lg p-3'}>
         <h1 className="text-lg">لیست کوپن ها</h1>
 
-        <ButtonLink
+        <LinkButton
           variant={'outline'}
           href="/admin/coupons/create"
         >
           ایجاد کوپن
-        </ButtonLink>
+        </LinkButton>
       </div>
 
       <AdminCoupons />

@@ -15,7 +15,7 @@ import { Badge } from '@/components/ui/badge'
 import { useConfirm } from '@/hooks/useConfirm'
 import { toast } from 'sonner'
 import CategoryAttributesCell from '@/app/admin/categories/_components/CategoryAttributesCell'
-import ButtonLink from '@/components/common/ButtonLink'
+import LinkButton from '@/components/common/linkButton'
 
 export default function AdminCategories() {
   const { confirm } = useConfirm()
@@ -93,13 +93,13 @@ export default function AdminCategories() {
       cell: ({ row }) => {
         return (
           <div className={'flex items-center gap-2'}>
-            <ButtonLink
+            <LinkButton
               size={'icon'}
               variant={'outline'}
               href={`/admin/categories/edit/${row.original._id}`}
             >
               <PencilIcon />
-            </ButtonLink>
+            </LinkButton>
 
             <Button
               disabled={!row.original.isActive}

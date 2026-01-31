@@ -12,7 +12,7 @@ import { PencilIcon, Trash2Icon } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { useConfirm } from '@/hooks/useConfirm'
 import { toast } from 'sonner'
-import ButtonLink from '@/components/common/ButtonLink'
+import LinkButton from '@/components/common/linkButton'
 import { deleteProduct, getProductsList } from '@/actions/product.action'
 import { IProduct } from '@/types/admin/product.type'
 import { CONDITION_CONSTANTS } from '@/lib/constants/product.constant'
@@ -148,13 +148,13 @@ export default function AdminProducts() {
       cell: ({ row }) => {
         return (
           <div className={'flex items-center gap-2'}>
-            <ButtonLink
+            <LinkButton
               size={'icon'}
               variant={'outline'}
               href={`/admin/products/edit/${row.original._id}`}
             >
               <PencilIcon />
-            </ButtonLink>
+            </LinkButton>
 
             <Button
               variant="destructive"

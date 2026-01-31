@@ -28,12 +28,23 @@ import {
 } from '../../common/enums/message.enum';
 import { CategoryService } from '../category/category.service';
 import { FilterProductDto } from '../../common/dtos/filter.dto';
+import {
+  BestSellersDto,
+  FeaturedProductsDto,
+} from './dto/featured-products.dto';
+import { Order, OrderDocument } from '../order/schema/order.schema';
+import { OrderStatus } from '../order/enums/order-status.enum';
+import { PaymentStatus } from '../payment/enums/payment-status.enum';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectModel(Product.name)
     private readonly productModel: Model<ProductDocument>,
+
+    @InjectModel(Order.name)
+    private readonly orderModel: Model<OrderDocument>,
+
     private readonly categoryService: CategoryService,
     private readonly s3Service: S3Service,
   ) {}
@@ -281,5 +292,209 @@ export class ProductService {
       message: ProductMessage.DeleteImage,
       product,
     };
+  }
+
+  /**
+   * جدیدترین محصولات
+   */
+  async getLatestProducts({ limit = 8 }: FeaturedProductsDto): Promise<any> {
+    const products = await this.productModel
+      .find({ isActive: true })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .populate({ path: 'categoryId', select: '_id name slug' })
+      .lean();
+
+    // محاسبه finalPrice برای هر محصول
+    return products.map((product) => ({
+      ...product,
+      finalPrice: this.calculateFinalPrice(product),
+    }));
+  }
+
+  /**
+   * محصولات با بیشترین تخفیف
+   */
+  async getBiggestDiscounts({ limit = 8 }: FeaturedProductsDto): Promise<any> {
+    // فقط تخفیف‌های فعال
+    const now = new Date();
+
+    const products = await this.productModel
+      .find({
+        isActive: true,
+        discountPercent: { $gt: 0 },
+        $or: [{ discountExpiresAt: { $gt: now } }, { discountExpiresAt: null }],
+      })
+      .sort({ discountPercent: -1 })
+      .limit(limit)
+      .populate({ path: 'categoryId', select: '_id name slug' })
+      .lean();
+
+    return products.map((product) => ({
+      ...product,
+      finalPrice: this.calculateFinalPrice(product),
+      discountAmount: product.price * (product.discountPercent / 100), // مبلغ تخفیف
+    }));
+  }
+
+  /**
+   * پرفروش‌ترین محصولات (واقعی بر اساس سفارشات)
+   */
+  async getRealBestSellers({
+    limit = 8,
+    days = 30,
+  }: BestSellersDto): Promise<any> {
+    // تاریخ شروع دوره
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+    startDate.setHours(0, 0, 0, 0); // ابتدای روز
+
+    // وضعیت‌های سفارش معتبر (غیر از وضعیت‌های غیرفعال)
+    const validStatuses = [
+      OrderStatus.PAID,
+      OrderStatus.PROCESSING,
+      OrderStatus.SHIPPED,
+      OrderStatus.DELIVERED,
+    ];
+
+    try {
+      // Aggregate pipeline برای محاسبه تعداد فروش هر محصول
+      const bestSellers = await this.orderModel.aggregate([
+        // فیلتر سفارشات بر اساس تاریخ و وضعیت
+        {
+          $match: {
+            createdAt: { $gte: startDate },
+            status: { $in: validStatuses },
+            paymentStatus: PaymentStatus.PAID, // فقط پرداخت‌های موفق
+          },
+        },
+        // باز کردن آیتم‌های سفارش
+        { $unwind: '$items' },
+        // گروه‌بندی بر اساس محصول
+        {
+          $group: {
+            _id: '$items.productId',
+            totalSoldQuantity: { $sum: '$items.quantity' },
+            totalSoldAmount: { $sum: '$items.totalPrice' },
+            orderCount: { $sum: 1 }, // تعداد سفارشات حاوی این محصول
+          },
+        },
+        // مرتب‌سازی بر اساس تعداد فروش
+        { $sort: { totalSoldQuantity: -1 } },
+        // محدود کردن تعداد
+        { $limit: limit * 2 }, // بیشتر می‌گیریم چون ممکن است بعضی محصولات غیرفعال باشند
+      ]);
+
+      // اگر محصولی پیدا نشد
+      if (bestSellers.length === 0) {
+        return this.getFallbackBestSellers(limit);
+      }
+
+      // استخراج ID محصولات
+      const productIds = bestSellers.map((item) => item?._id);
+
+      // دریافت اطلاعات محصولات
+      const products = await this.productModel
+        .find({
+          _id: { $in: productIds },
+          isActive: true, // فقط محصولات فعال
+          stock: { $gt: 0 }, // فقط محصولات موجود
+        })
+        .populate({ path: 'categoryId', select: '_id name slug' })
+        .lean();
+
+      // مپ کردن اطلاعات فروش به محصولات و مرتب‌سازی
+      const productsWithSales = products
+        .map((product) => {
+          const saleInfo = bestSellers.find(
+            (item) => item._id.toString() === product._id.toString(),
+          );
+
+          return {
+            ...product,
+            finalPrice: this.calculateFinalPrice(product),
+            saleInfo: saleInfo
+              ? {
+                  totalSoldQuantity: saleInfo?.totalSoldQuantity,
+                  totalSoldAmount: saleInfo?.totalSoldAmount,
+                  orderCount: saleInfo?.orderCount,
+                }
+              : null,
+          };
+        })
+        // حذف محصولاتی که اطلاعات فروش ندارند
+        .filter((product) => product.saleInfo)
+        // مرتب‌سازی بر اساس تعداد فروش
+        .sort(
+          (a, b) =>
+            (b.saleInfo?.totalSoldQuantity || 0) -
+            (a.saleInfo?.totalSoldQuantity || 0),
+        )
+        // محدود کردن به تعداد مورد نیاز
+        .slice(0, limit);
+
+      // اگر تعداد محصولات کافی نبود، با محصولات پشتیبان کامل کنیم
+      if (productsWithSales.length < limit) {
+        const remaining = limit - productsWithSales.length;
+        const fallbackProducts = await this.getFallbackBestSellers(remaining);
+
+        // اضافه کردن فلگ برای تشخیص محصولات پشتیبان
+        const fallbackWithFlag = fallbackProducts.map((product) => ({
+          ...product,
+          isFallback: true,
+          saleInfo: null,
+        }));
+
+        return [...productsWithSales, ...fallbackWithFlag];
+      }
+
+      return productsWithSales;
+    } catch (error) {
+      console.error('Error in getRealBestSellers:', error);
+      // در صورت خطا، از متد جایگزین استفاده کنیم
+      return this.getFallbackBestSellers(limit);
+    }
+  }
+
+  /**
+   * متد جایگزین برای زمانی که داده‌های سفارش کافی نیست
+   */
+  private async getFallbackBestSellers(limit: number) {
+    const products = await this.productModel
+      .find({
+        isActive: true,
+        stock: { $gt: 0 },
+        rate: { $gte: 4 }, // حداقل امتیاز 4
+      })
+      .sort({
+        rate: -1,
+        viewCount: -1, // اگر فیلد viewCount دارید
+        createdAt: -1,
+      })
+      .limit(limit)
+      .populate({ path: 'categoryId', select: '_id name slug' })
+      .lean();
+
+    return products.map((product) => ({
+      ...product,
+      finalPrice: this.calculateFinalPrice(product),
+      isFallback: true,
+      saleInfo: null,
+    }));
+  }
+
+  /**
+   * محاسبه قیمت نهایی (نسخه ساده)
+   */
+  private calculateFinalPrice(product: Product): number {
+    const now = new Date();
+    if (
+      product.discountPercent &&
+      product.discountPercent > 0 &&
+      (!product.discountExpiresAt || product.discountExpiresAt > now)
+    ) {
+      return product.price * (1 - product.discountPercent / 100);
+    }
+    return product.price;
   }
 }

@@ -20,11 +20,19 @@ import { EXAMPLE_PRODUCT } from './examples/product.example';
 import { CreateProductDto } from './dto/create-product.dto';
 import { AuthDecorator } from '../../common/decorators/auth.decorator';
 import { Pagination } from '../../common/decorators/pagination.decorator';
-import { FilterProduct } from '../../common/decorators/filter.decorator';
+import {
+  FilterBestSellerProduct,
+  FilterFeaturedProduct,
+  FilterProduct,
+} from '../../common/decorators/filter.decorator';
 import { FilterProductDto } from '../../common/dtos/filter.dto';
 import { SkipAuth } from '../../common/decorators/skip-auth.decorator';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { extractFilters } from '../../common/utils/functions.util';
+import {
+  BestSellersDto,
+  FeaturedProductsDto,
+} from './dto/featured-products.dto';
 
 @Controller('products')
 @ApiTags('Products')
@@ -52,6 +60,31 @@ export class ProductController {
     const { paginationDto, filter } = extractFilters(filterDto);
 
     return this.productService.findAll({ paginationDto, filter });
+  }
+
+  @Get('latest')
+  @SkipAuth()
+  @FilterFeaturedProduct()
+  getLatestProducts(
+    @Query() featuredProductDto: FeaturedProductsDto,
+  ): Promise<any> {
+    return this.productService.getLatestProducts(featuredProductDto);
+  }
+
+  @Get('biggest-discounts')
+  @SkipAuth()
+  @FilterFeaturedProduct()
+  getBiggestDiscounts(
+    @Query() featuredProductDto: FeaturedProductsDto,
+  ): Promise<any> {
+    return this.productService.getBiggestDiscounts(featuredProductDto);
+  }
+
+  @Get('best-sellers')
+  @SkipAuth()
+  @FilterBestSellerProduct()
+  getBestSellers(@Query() bestSellersDto: BestSellersDto): Promise<any> {
+    return this.productService.getRealBestSellers(bestSellersDto);
   }
 
   @Get(':id')

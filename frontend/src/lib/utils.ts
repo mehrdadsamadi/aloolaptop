@@ -30,3 +30,28 @@ export function getImageUrl(url: string | undefined) {
 export function showError(messages: string[]) {
   messages.forEach((message) => toast.error(message))
 }
+
+export function formatPrice(price: number): string {
+  return new Intl.NumberFormat('fa-IR', {
+    style: 'currency',
+    currency: 'IRR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(price)
+}
+
+export function calculateDiscount(price: number, percent: number): number {
+  return price * (1 - percent / 100)
+}
+
+export function getRemainingTime(expiryDate: Date): string {
+  const now = new Date()
+  const diff = expiryDate.getTime() - now.getTime()
+
+  if (diff <= 0) return 'منقضی شده'
+
+  const hours = Math.floor(diff / (1000 * 60 * 60))
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+
+  return `${hours}h ${minutes}m`
+}

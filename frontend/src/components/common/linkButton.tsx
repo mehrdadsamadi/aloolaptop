@@ -9,7 +9,7 @@ interface ButtonLinkProps extends PropsWithChildren, VariantProps<typeof buttonV
   className?: string
 }
 
-export default function ButtonLink({
+export default function LinkButton({
   href,
   children,
   variant = 'default',
