@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 
 interface RatingStarsProps {
   rating: number
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'xs' | 'sm' | 'md' | 'lg'
   className?: string
 }
 
@@ -14,13 +14,17 @@ export function RatingStars({ rating, size = 'md', className }: RatingStarsProps
   const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0)
 
   const sizeClasses = {
+    xs: 'h-2 w-2',
     sm: 'h-3 w-3',
     md: 'h-4 w-4',
     lg: 'h-5 w-5',
   }
 
   return (
-    <div className={cn('flex items-center gap-0.5', className)}>
+    <div
+      dir={'ltr'}
+      className={cn('flex items-center gap-0.5', className)}
+    >
       {[...Array(fullStars)].map((_, i) => (
         <Star
           key={`full-${i}`}

@@ -1,10 +1,11 @@
 // components/ui/icon-button.tsx
 import { Button, buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import * as React from 'react'
 import { PropsWithChildren } from 'react'
 import type { VariantProps } from 'class-variance-authority'
 
-interface IconButtonProps extends PropsWithChildren, VariantProps<typeof buttonVariants> {
+interface IconButtonProps extends PropsWithChildren, React.ComponentProps<'button'>, VariantProps<typeof buttonVariants> {
   className?: string
 }
 

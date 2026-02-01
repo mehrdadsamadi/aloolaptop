@@ -31,6 +31,9 @@ export const ENDPOINTS = {
     GET_BY_ID: (productId: string) => `/api/products/${productId}`,
     CREATE: '/api/products',
     UPDATE_BY_ID: (productId: string) => `/api/products/${productId}`,
+    LATEST: (limit: number) => `/api/products/latest?limit=${limit}`,
+    BIGGEST_DISCOUNTS: (limit: number) => `/api/products/biggest-discounts?limit=${limit}`,
+    BEST_SELLERS: ({ limit, days }: { limit: number; days: number }) => `/api/products/best-sellers?limit=${limit}&days=${days}`,
   },
   COUPONS: {
     LIST: ({ page = 1, limit = 20 }: PaginationQuery) => `/api/coupons?page=${page}&limit=${limit}`,

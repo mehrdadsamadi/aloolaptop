@@ -1,4 +1,4 @@
-import AuthForm from '@/app/(site)/auth/AuthForm'
+import AuthForm from '@/app/auth/AuthForm'
 
 export default async function AuthPage() {
   return (

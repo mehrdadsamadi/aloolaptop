@@ -41,3 +41,21 @@ export async function updateProduct(productId: string, formData: FormData) {
 
   return res.json()
 }
+
+export async function getLatestProducts(limit: number = 8) {
+  const res = await apiFetch(ENDPOINTS.PRODUCTS.LATEST(limit), { method: 'GET' })
+
+  return res.json()
+}
+
+export async function getBiggestDiscounts(limit: number = 8) {
+  const res = await apiFetch(ENDPOINTS.PRODUCTS.BIGGEST_DISCOUNTS(limit), { method: 'GET' })
+
+  return res.json()
+}
+
+export async function getBestSellers({ limit = 8, days = 30 }: { limit?: number; days?: number }) {
+  const res = await apiFetch(ENDPOINTS.PRODUCTS.BEST_SELLERS({ limit, days }), { method: 'GET' })
+
+  return res.json()
+}
