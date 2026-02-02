@@ -113,12 +113,20 @@
 }
 
 @layer base {
+    :root {
+        --direction: rtl;
+        --font-family: var(--font-vazirmatn), 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
     * {
         @apply border-border outline-ring/50;
     }
 
     body {
         @apply bg-background text-foreground;
+        font-family: var(--font-vazirmatn);
+        direction: rtl;
+        text-align: right;
     }
 
     .dir-ltr {
@@ -127,6 +135,12 @@
 
     .dir-rtl {
         direction: rtl;
+    }
+}
+
+@layer utilities {
+    .persian-number {
+        font-feature-settings: "ss01";
     }
 }
 

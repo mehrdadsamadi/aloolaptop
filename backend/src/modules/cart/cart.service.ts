@@ -22,6 +22,7 @@ import { AddItemDto } from './dto/add-item.dto';
 import { ProductService } from '../product/product.service';
 import { UpdateQuantityDto } from './dto/update-quantity.dto';
 import { ValidateCouponDto } from '../coupon/dto/coupon.dto';
+import { CartItemDocument } from './schemas/cart-item.schema';
 
 @Injectable({ scope: Scope.REQUEST })
 export class CartService {
@@ -73,7 +74,10 @@ export class CartService {
     );
 
     if (existingItem) {
-      if (existingItem.quantity < product.stock) {
+      // بررسی صحیح: مجموع تعداد قدیم و جدید نباید از موجودی بیشتر شود
+      const newTotalQuantity = existingItem.quantity + quantity;
+
+      if (newTotalQuantity > product.stock) {
         throw new BadRequestException(CartMessage.MoreThanStock);
       }
 
@@ -89,6 +93,7 @@ export class CartService {
         discountPercent: product.discountPercent,
         finalUnitPrice: product.finalPrice,
         quantity,
+        stock: product.stock,
         totalPrice: quantity * product.finalPrice,
       });
     }
@@ -209,11 +214,11 @@ export class CartService {
     };
   }
 
-  async removeItem(productId: string) {
+  async removeItem(itemId: string) {
     const cart = await this.getOrCreateCart();
 
     cart.items = cart.items.filter(
-      (item) => item.productId.toString() !== productId,
+      (item: CartItemDocument) => item._id.toString() !== itemId,
     );
 
     this.invalidateCoupon(cart);

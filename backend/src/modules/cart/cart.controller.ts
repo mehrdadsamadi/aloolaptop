@@ -48,12 +48,12 @@ export class CartController {
     return this.cartService.updateQuantity(updateQuantityDto);
   }
 
-  @Delete('remove/:productId')
+  @Delete('remove/:itemId')
   @ApiCreatedResponse({
     schema: { example: [EXAMPLE_CART] },
   })
-  async removeItem(@Param('productId') productId: string) {
-    return this.cartService.removeItem(productId);
+  async removeItem(@Param('itemId') itemId: string) {
+    return this.cartService.removeItem(itemId);
   }
 
   @Delete('clear')

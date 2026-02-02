@@ -8,10 +8,12 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Clock, Eye, Heart, ShoppingCart, Zap } from 'lucide-react'
-import { cn, formatPrice, getRemainingTime } from '@/lib/utils'
+import { cn, formatPrice, getRemainingTime, showError } from '@/lib/utils'
 import { IProduct } from '@/types/admin/product.type'
 import { IconButton } from '@/components/common/iconButton'
 import { RatingStars } from '@/components/common/ratingStart'
+import { addToCart } from '@/actions/cart.action'
+import { toast } from 'sonner'
 
 interface ProductCardProps {
   product: IProduct
@@ -23,6 +25,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product, className, showActions = true, variant = 'default', showSaleInfo = false }: ProductCardProps) {
   const [isWishlisted, setIsWishlisted] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const mainImage = product?.images?.[0]
   const hasDiscount = product?.discountPercent > 0 && (!product?.discountExpiresAt || new Date(product?.discountExpiresAt) > new Date())
   const isOutOfStock = product?.stock === 0
@@ -34,11 +37,27 @@ export function ProductCard({ product, className, showActions = true, variant = 
   // حالت compact برای نمایش متراکم
   const isCompact = variant === 'compact'
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    // افزودن به سبد خرید
-    console.log('Add to cart:', product?._id)
+
+    try {
+      setIsLoading(true)
+
+      const res = await addToCart({ productId: product?._id })
+
+      if (res?.ok === false) {
+        showError(res.messages)
+        return
+      }
+
+      toast.success(res?.message)
+    } catch (error) {
+      console.error('خطا در اضافه کردن به سبد خرید', error)
+      toast.error('خطا در اضافه کردن به سبد خرید')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleToggleWishlist = (e: React.MouseEvent) => {
@@ -305,6 +324,7 @@ export function ProductCard({ product, className, showActions = true, variant = 
                   'shadow-md hover:shadow-lg'
                 )}
                 disabled={isOutOfStock}
+                loading={isLoading}
               >
                 <>
                   <ShoppingCart className="h-4 w-4" />

@@ -24,6 +24,9 @@ export class CartItem {
   @Prop({ default: 1, type: Number })
   quantity: number;
 
+  @Prop({ type: Number, default: 1 })
+  stock: number;
+
   @Prop({ required: true, type: Number })
   totalPrice: number; // quantity * finalUnitPrice
 }

@@ -58,4 +58,12 @@ export const ENDPOINTS = {
     TOP_SELLING_PRODUCTS: ({ limit = 10, sortBy = TopSellingProductsSortBy.REVENUE }: TopSellingProductsDto) =>
       `/api/statistics/top-selling-products?limit=${limit}&sortBy=${sortBy}`,
   },
+  CART: {
+    GET: '/api/cart',
+    ADD: '/api/cart/add',
+    UPDATE: '/api/cart/update',
+    REMOVE_PRODUCT: (productId: string) => `/api/cart/remove/${productId}`,
+    CLEAR: '/api/cart/clear',
+    APPLY_COUPON: '/api/cart/apply-coupon',
+  },
 }
