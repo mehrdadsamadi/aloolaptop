@@ -72,7 +72,7 @@ export default function AdminPage() {
           item.key === 'users'
             ? {
                 ...item,
-                value: res?.users?.total?.toLocaleString(),
+                value: res?.users?.total?.toLocaleString() ?? '0',
                 change: `${res?.users?.growth} %`,
                 trend: res?.users?.growth > 0 ? 'up' : 'down',
               }
@@ -99,7 +99,7 @@ export default function AdminPage() {
           item.key === 'products'
             ? {
                 ...item,
-                value: res?.products?.total?.toLocaleString(),
+                value: res?.products?.total?.toLocaleString() ?? '0',
                 change: `${res?.products?.growth} %`,
                 trend: res?.products?.growth > 0 ? 'up' : 'down',
               }
@@ -126,7 +126,7 @@ export default function AdminPage() {
           item.key === 'orders'
             ? {
                 ...item,
-                value: res?.orders?.total?.toLocaleString(),
+                value: res?.orders?.total?.toLocaleString() ?? '0',
                 change: `${res?.orders?.growth} %`,
                 trend: res?.orders?.growth > 0 ? 'up' : 'down',
               }
@@ -153,7 +153,7 @@ export default function AdminPage() {
           item.key === 'payments'
             ? {
                 ...item,
-                value: `${res?.payments?.total?.toLocaleString()} تومان`,
+                value: `${res?.payments?.total?.toLocaleString() ?? '0'} تومان`,
                 change: `${res?.payments?.growth} %`,
                 trend: res?.payments?.growth > 0 ? 'up' : 'down',
               }
