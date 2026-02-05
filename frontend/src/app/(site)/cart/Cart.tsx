@@ -15,6 +15,7 @@ import { showError } from '@/lib/utils'
 import { useLoading } from '@/hooks/useLoading'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useConfirm } from '@/hooks/useConfirm'
+import LinkButton from '@/components/common/linkButton'
 
 interface CartItem {
   productId: string
@@ -55,7 +56,6 @@ export default function Cart() {
   const [updating, setUpdating] = useState<string | null>(null)
   const [couponCode, setCouponCode] = useState('')
   const [applyingCoupon, setApplyingCoupon] = useState(false)
-  const [stockInfo, setStockInfo] = useState<Record<string, number>>({})
 
   // دریافت اطلاعات سبد خرید
   useEffect(() => {
@@ -478,22 +478,22 @@ export default function Cart() {
             <CardFooter className="flex-col gap-3">
               <Button
                 className="w-full h-12 text-lg"
-                onClick={() => router.push('/checkout')}
+                onClick={() => router.push('/checkout/address')}
                 disabled={cart?.items.length === 0}
                 size="lg"
               >
                 <CreditCard className="w-5 h-5 ml-2" />
-                ادامه جهت تسویه حساب
+                ادامه جهت انتخاب آدرس ارسال
               </Button>
 
-              <Button
+              <LinkButton
                 variant="outline"
                 className="w-full"
-                onClick={() => router.push('/')}
+                href={'/'}
               >
                 <ShoppingBag className="w-4 h-4 ml-2" />
                 ادامه خرید
-              </Button>
+              </LinkButton>
             </CardFooter>
           </Card>
 

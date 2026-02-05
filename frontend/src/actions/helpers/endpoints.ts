@@ -66,4 +66,12 @@ export const ENDPOINTS = {
     CLEAR: '/api/cart/clear',
     APPLY_COUPON: '/api/cart/apply-coupon',
   },
+  ADDRESS: {
+    LIST: ({ page = 1, limit = 20 }: PaginationQuery) => `/api/address?page=${page}&limit=${limit}`,
+    ADD: '/api/address',
+    UPDATE_BY_ID: (id: string) => `/api/address/${id}`,
+    GET_BY_ID: (id: string) => `/api/address/${id}`,
+    DELETE: (id: string) => `/api/address/${id}`,
+    SET_DEFAULT: (id: string) => `/api/address/${id}/set-default`,
+  },
 }
