@@ -6,12 +6,15 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { ArrowRight, CheckCircle, Home, MapPin, Plus, ShoppingCart } from 'lucide-react'
+import { ArrowRight, CheckCircle, Home, MapPin, Plus } from 'lucide-react'
 import { IAddress } from '@/types/admin/address.type'
 import { toast } from 'sonner'
 import { AddressCard } from '@/app/(site)/checkout/address/_components/AddressCard'
 import { AddressFormDialog } from '@/app/(site)/checkout/address/_components/AddressFormDialog'
 import { deleteAddress, getAddressList, setDefaultAddress } from '@/actions/address.action'
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb'
+import Link from 'next/link'
+import { AddressSkeleton } from '@/app/(site)/checkout/address/_components/AddressSkeleton'
 
 export default function Address() {
   const router = useRouter()
@@ -117,31 +120,36 @@ export default function Address() {
     }
   }
 
+  // نمایش Skeleton در حال لودینگ
   if (isLoading) {
-    return (
-      <div className="container max-w-4xl py-8">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-1/3"></div>
-          <div className="h-64 bg-gray-200 rounded"></div>
-        </div>
-      </div>
-    )
+    return <AddressSkeleton />
   }
 
   return (
     <div className="py-8">
       {/* هدر صفحه */}
-      <div className="mb-8">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-          <ShoppingCart className="h-4 w-4" />
-          <span>سبد خرید</span>
-          <span>›</span>
-          <span className="font-medium text-foreground">انتخاب آدرس</span>
-          <span>›</span>
-          <span>پرداخت</span>
-        </div>
+      <div className="mb-8 space-y-4">
+        <Breadcrumb dir={'rtl'}>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/cart">سبد خرید</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator className={'rotate-180'} />
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/checkout/address">انتخاب آدرس</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator className={'rotate-180'} />
+            <BreadcrumbItem>
+              <BreadcrumbPage>پرداخت</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
 
-        <h1 className="text-3xl font-bold mb-2">انتخاب آدرس تحویل</h1>
+        <h1 className="text-2xl font-bold mb-2">انتخاب آدرس تحویل</h1>
         <p className="text-muted-foreground">لطفاً آدرس تحویل سفارش خود را انتخاب کنید</p>
       </div>
 

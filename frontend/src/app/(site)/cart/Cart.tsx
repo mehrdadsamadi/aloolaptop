@@ -477,7 +477,7 @@ export default function Cart() {
 
             <CardFooter className="flex-col gap-3">
               <Button
-                className="w-full h-12 text-lg"
+                className="w-full h-12"
                 onClick={() => router.push('/checkout/address')}
                 disabled={cart?.items.length === 0}
                 size="lg"

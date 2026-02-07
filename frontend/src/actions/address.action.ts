@@ -3,6 +3,7 @@
 import { ENDPOINTS } from '@/actions/helpers/endpoints'
 import { apiFetch } from '@/actions/helpers/fetchClient'
 import { IPagination } from '@/types/pagination.type'
+import { AddressFormValues } from '@/validators/address.validator'
 
 export async function getAddressList(pagination: IPagination) {
   const { page = 1, limit = 20 } = pagination
@@ -18,14 +19,14 @@ export async function getAddressById(addressId: string) {
   return res.json()
 }
 
-export async function createAddress(formData: FormData) {
-  const res = await apiFetch(ENDPOINTS.ADDRESS.ADD, { method: 'POST', body: formData })
+export async function createAddress(data: AddressFormValues) {
+  const res = await apiFetch(ENDPOINTS.ADDRESS.ADD, { method: 'POST', body: JSON.stringify(data) })
 
   return res.json()
 }
 
-export async function updateAddress(addressId: string, formData: FormData) {
-  const res = await apiFetch(ENDPOINTS.ADDRESS.UPDATE_BY_ID(addressId), { method: 'PATCH', body: formData })
+export async function updateAddress(addressId: string, data: AddressFormValues) {
+  const res = await apiFetch(ENDPOINTS.ADDRESS.UPDATE_BY_ID(addressId), { method: 'PATCH', body: JSON.stringify(data) })
 
   return res.json()
 }

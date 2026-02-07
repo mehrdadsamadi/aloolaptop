@@ -11,6 +11,11 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/aloolaptop/**/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'tile.openstreetmap.org',
+        port: '',
+      },
     ],
   },
   experimental: {
