@@ -32,7 +32,7 @@ interface CartItem {
   updatedAt: string
 }
 
-interface CartData {
+export interface CartData {
   _id: string
   userId: string
   items: CartItem[]

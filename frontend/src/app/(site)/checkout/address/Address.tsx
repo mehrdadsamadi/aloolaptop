@@ -15,6 +15,9 @@ import { deleteAddress, getAddressList, setDefaultAddress } from '@/actions/addr
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb'
 import Link from 'next/link'
 import { AddressSkeleton } from '@/app/(site)/checkout/address/_components/AddressSkeleton'
+import { getCart } from '@/actions/cart.action'
+import { Badge } from '@/components/ui/badge'
+import { CartData } from '@/app/(site)/cart/Cart'
 
 export default function Address() {
   const router = useRouter()
@@ -23,6 +26,7 @@ export default function Address() {
   const [isLoading, setIsLoading] = useState(true)
   const [formOpen, setFormOpen] = useState(false)
   const [editingAddress, setEditingAddress] = useState<IAddress | null>(null)
+  const [cart, setCart] = useState<CartData | null>(null)
 
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(20)
@@ -53,6 +57,24 @@ export default function Address() {
       }
     } catch (error) {
       toast.error('خطایی در دریافت آدرس‌ها رخ داد')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // دریافت اطلاعات سبد خرید
+  useEffect(() => {
+    fetchCart()
+  }, [])
+
+  const fetchCart = async () => {
+    try {
+      setIsLoading(true)
+      const response = await getCart()
+
+      setCart(response)
+    } catch (error) {
+      toast.error('خطا در دریافت سبد خرید')
     } finally {
       setIsLoading(false)
     }
@@ -240,7 +262,10 @@ export default function Address() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">تعداد کالاها:</span>
-                  <span>3 مورد</span>
+                  <div className="flex items-center gap-2 mr-auto">
+                    <Badge variant="secondary">{cart?.totalItems} کالا</Badge>
+                    <Badge variant="outline">{cart?.totalQuantity} عدد</Badge>
+                  </div>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">هزینه ارسال:</span>

@@ -15,6 +15,8 @@ import { AddressFormInput, addressFormSchema, AddressFormValues } from '@/valida
 import { Dialog } from '@/components/common/dialog'
 import dynamic from 'next/dynamic'
 import { createAddress, updateAddress } from '@/actions/address.action'
+import { ICity, IState } from '@/types/iranLocations.type'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 const LocationSelectorDialog = dynamic(
   () => import('@/components/common/locationSelectorDialog').then((mod) => mod.LocationSelectorDialog),
@@ -35,6 +37,9 @@ export function AddressFormDialog({ open, onOpenChange, address, onSuccess }: Ad
   const [mapDialogOpen, setMapDialogOpen] = useState(false)
   const [isGettingLocation, setIsGettingLocation] = useState(false)
   const [hasCoordinates, setHasCoordinates] = useState(false)
+  const [states, setStates] = useState<IState[]>([])
+  const [cities, setCities] = useState<ICity[]>([])
+  const [loading, setLoading] = useState(true)
 
   const form = useForm<AddressFormInput>({
     resolver: zodResolver(addressFormSchema),
@@ -116,6 +121,50 @@ export function AddressFormDialog({ open, onOpenChange, address, onSuccess }: Ad
       setHasCoordinates(true) // تهران معتبر است
     }
   }, [address, reset, open])
+
+  useEffect(() => {
+    if (open) {
+      getStates()
+    }
+  }, [open])
+
+  const getStates = async () => {
+    try {
+      setLoading(true)
+
+      const res = await fetch('https://www.iran-locations-api.ir/api/v1/fa/states', { cache: 'force-cache', next: { revalidate: false } })
+      const data = await res.json()
+
+      setStates(data)
+    } catch (e) {
+      console.log('error', e)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const selectedState = watch('state')
+
+  useEffect(() => {
+    if (selectedState) {
+      getStateCities()
+    }
+  }, [selectedState])
+
+  const getStateCities = async () => {
+    try {
+      setLoading(true)
+
+      const res = await fetch(`https://www.iran-locations-api.ir/api/v1/fa/cities?state=${selectedState}`)
+      const data = await res.json()
+
+      setCities(data?.[0]?.cities)
+    } catch (e) {
+      console.log('error', e)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // این تابع فرم را validate می‌کند و data را به فرمت API تبدیل می‌کند
   const processFormData = async (data: AddressFormInput): Promise<AddressFormValues> => {
@@ -332,12 +381,33 @@ export function AddressFormDialog({ open, onOpenChange, address, onSuccess }: Ad
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="state">استان *</FieldLabel>
-                    <Input
-                      {...field}
-                      id="state"
-                      aria-invalid={fieldState.invalid}
-                      placeholder="نام استان"
-                    />
+                    <Select
+                      value={field.value}
+                      onValueChange={(value) => {
+                        field.onChange(value)
+                      }}
+                      disabled={loading}
+                    >
+                      <SelectTrigger
+                        id="state"
+                        aria-invalid={fieldState.invalid}
+                      >
+                        <SelectValue placeholder="نام استان" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>استان</SelectLabel>
+                          {states?.map((state) => (
+                            <SelectItem
+                              key={state.id}
+                              value={state.name}
+                            >
+                              {state.name}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
@@ -349,12 +419,33 @@ export function AddressFormDialog({ open, onOpenChange, address, onSuccess }: Ad
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="city">شهر *</FieldLabel>
-                    <Input
-                      {...field}
-                      id="city"
-                      aria-invalid={fieldState.invalid}
-                      placeholder="نام شهر"
-                    />
+                    <Select
+                      value={field.value}
+                      onValueChange={(value) => {
+                        field.onChange(value)
+                      }}
+                      disabled={loading || !selectedState}
+                    >
+                      <SelectTrigger
+                        id="city"
+                        aria-invalid={fieldState.invalid}
+                      >
+                        <SelectValue placeholder="نام شهر" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>شهر</SelectLabel>
+                          {cities?.map((city) => (
+                            <SelectItem
+                              key={city.id}
+                              value={city.name}
+                            >
+                              {city.name}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
