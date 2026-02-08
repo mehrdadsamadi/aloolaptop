@@ -451,10 +451,12 @@ export default function Cart() {
                   <span className="font-medium">{totalPrice?.toLocaleString('fa-IR')} تومان</span>
                 </div>
 
-                <div className="flex justify-between items-center text-green-600">
-                  <span>تخفیف محصولات</span>
-                  <span>- {totalDiscount?.toLocaleString('fa-IR')} تومان</span>
-                </div>
+                {totalDiscount > 0 && (
+                  <div className="flex justify-between items-center text-green-600">
+                    <span>تخفیف محصولات</span>
+                    <span>- {totalDiscount?.toLocaleString('fa-IR')} تومان</span>
+                  </div>
+                )}
 
                 {cart?.discountAmount > 0 && (
                   <div className="flex justify-between items-center text-green-600">

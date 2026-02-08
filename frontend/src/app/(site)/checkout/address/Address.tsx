@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { ArrowRight, CheckCircle, Home, MapPin, Plus } from 'lucide-react'
+import { ArrowLeft, CheckCircle, Home, MapPin, Plus } from 'lucide-react'
 import { IAddress } from '@/types/admin/address.type'
 import { toast } from 'sonner'
 import { AddressCard } from '@/app/(site)/checkout/address/_components/AddressCard'
@@ -18,6 +18,7 @@ import { AddressSkeleton } from '@/app/(site)/checkout/address/_components/Addre
 import { getCart } from '@/actions/cart.action'
 import { Badge } from '@/components/ui/badge'
 import { CartData } from '@/app/(site)/cart/Cart'
+import { startCheckout } from '@/actions/checkout.action'
 
 export default function Address() {
   const router = useRouter()
@@ -92,15 +93,17 @@ export default function Address() {
 
     try {
       // ذخیره آدرس انتخابی در session یا context
-      const response = await fetch('/api/checkout/address', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ addressId: selectedAddress }),
-      })
+      const res = await startCheckout(selectedAddress)
+      if (res?.updated) {
+        toast.info(res?.message)
 
-      if (response.ok) {
-        // انتقال به صفحه پرداخت
-        router.push('/checkout/payment')
+        router.push('/cart')
+
+        return
+      }
+
+      if (res?.gatewayUrl) {
+        router.push(res?.gatewayUrl)
       }
     } catch (error) {
       toast.error('خطایی در ذخیره آدرس رخ داد')
@@ -142,6 +145,10 @@ export default function Address() {
     }
   }
 
+  const calculateFinalPrice = (shippingCost: number) => {
+    return (cart?.totalPrice || 0) + shippingCost
+  }
+
   // نمایش Skeleton در حال لودینگ
   if (isLoading) {
     return <AddressSkeleton />
@@ -160,13 +167,16 @@ export default function Address() {
             </BreadcrumbItem>
             <BreadcrumbSeparator className={'rotate-180'} />
             <BreadcrumbItem>
-              <BreadcrumbLink asChild>
+              <BreadcrumbLink
+                asChild
+                className={'text-foreground'}
+              >
                 <Link href="/checkout/address">انتخاب آدرس</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator className={'rotate-180'} />
             <BreadcrumbItem>
-              <BreadcrumbPage>پرداخت</BreadcrumbPage>
+              <BreadcrumbPage className={'text-muted-foreground'}>پرداخت</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
@@ -235,15 +245,15 @@ export default function Address() {
             <CardContent>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
                   <span>آدرس باید دقیق و کامل باشد تا پیک بتواند سفارش را تحویل دهد</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
                   <span>کد پستی صحیح برای پردازش بهتر سفارش ضروری است</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
                   <span>می‌توانید از نقشه برای انتخاب دقیق موقعیت استفاده کنید</span>
                 </li>
               </ul>
@@ -269,12 +279,12 @@ export default function Address() {
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">هزینه ارسال:</span>
-                  <span>تعیین خواهد شد</span>
+                  <span>{(300000).toLocaleString('fa-IR')} تومان</span>
                 </div>
                 <Separator />
                 <div className="flex items-center justify-between font-semibold">
                   <span>مبلغ قابل پرداخت:</span>
-                  <span>۲۵۰,۰۰۰ تومان</span>
+                  <span>{calculateFinalPrice(300000).toLocaleString('fa-IR')} تومان</span>
                 </div>
               </div>
 
@@ -294,8 +304,8 @@ export default function Address() {
                 onClick={handleSubmit}
                 disabled={!selectedAddress}
               >
-                ادامه فرآیند خرید
-                <ArrowRight className="h-4 w-4 mr-2" />
+                ثبت سفارش و پرداخت
+                <ArrowLeft className="h-4 w-4 mr-2" />
               </Button>
             </CardFooter>
           </Card>

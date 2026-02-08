@@ -74,4 +74,8 @@ export const ENDPOINTS = {
     DELETE: (id: string) => `/api/address/${id}`,
     SET_DEFAULT: (id: string) => `/api/address/${id}/set-default`,
   },
+  CHECKOUT: {
+    START: '/api/checkout/start',
+    VERIFY: '/api/checkout/verify',
+  },
 }

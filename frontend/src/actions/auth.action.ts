@@ -23,7 +23,7 @@ interface JwtPayload {
 async function postRequest<T>(endpoint: string, body: any, defaultError = 'خطایی رخ داد'): Promise<ApiResponse<T>> {
   try {
     const url = new URL(endpoint, process.env.API_URL)
-    console.log('url', url)
+
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
