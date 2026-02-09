@@ -61,6 +61,11 @@ export class FilterOrderDto extends PaginationDto {
   @IsOptional()
   @IsEnum(OrderStatus)
   status?: OrderStatus;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  trackingCode?: string;
 }
 
 export class FilterTopSellingProductsDto {

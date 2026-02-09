@@ -23,6 +23,7 @@ interface CartItem {
   image: string
   unitPrice: number
   discountPercent: number
+  discountExpiresAt: Date
   finalUnitPrice: number
   quantity: number
   stock: number
@@ -242,6 +243,7 @@ export default function Cart() {
             const stock = item?.stock || 0
             const isLowStock = stock <= 5
             const isOutOfStock = stock === 0
+            const hasDiscount = item?.discountPercent > 0 && (!item?.discountExpiresAt || new Date(item?.discountExpiresAt) > new Date())
 
             return (
               <Card
@@ -260,7 +262,7 @@ export default function Cart() {
                         />
                         <AvatarFallback className="text-lg">{item.name.charAt(0)}</AvatarFallback>
                       </Avatar>
-                      {item.discountPercent > 0 && <Badge className="absolute -top-2 -right-2 bg-red-500">%{item.discountPercent}</Badge>}
+                      {hasDiscount && <Badge className="absolute -top-2 -right-2 bg-red-500">%{item.discountPercent}</Badge>}
                     </div>
 
                     {/* اطلاعات محصول */}
@@ -451,14 +453,14 @@ export default function Cart() {
                   <span className="font-medium">{totalPrice?.toLocaleString('fa-IR')} تومان</span>
                 </div>
 
-                {totalDiscount > 0 && (
+                {!!totalDiscount && totalDiscount > 0 && (
                   <div className="flex justify-between items-center text-green-600">
                     <span>تخفیف محصولات</span>
                     <span>- {totalDiscount?.toLocaleString('fa-IR')} تومان</span>
                   </div>
                 )}
 
-                {cart?.discountAmount > 0 && (
+                {!!cart?.discountAmount && cart?.discountAmount > 0 && (
                   <div className="flex justify-between items-center text-green-600">
                     <span>تخفیف کد تخفیف</span>
                     <span>- {cart?.discountAmount.toLocaleString('fa-IR')} تومان</span>

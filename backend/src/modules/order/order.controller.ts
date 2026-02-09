@@ -45,6 +45,15 @@ export class OrderController {
     return this.orderService.findAll({ paginationDto, filter });
   }
 
+  @Get('/user')
+  @Pagination()
+  @FilterOrder()
+  findAllUserOrders(@Query() filterDto: FilterOrderDto) {
+    const { paginationDto, filter } = extractFilters(filterDto);
+
+    return this.orderService.findAllUserOrders({ paginationDto, filter });
+  }
+
   @Get('export')
   @CanAccess(Roles.ADMIN)
   @FilterOrderExport()

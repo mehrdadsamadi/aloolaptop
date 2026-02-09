@@ -91,6 +91,7 @@ export class CartService {
         image: product.images[0].url,
         unitPrice: product.price,
         discountPercent: product.discountPercent,
+        discountExpiresAt: product.discountExpiresAt,
         finalUnitPrice: product.finalPrice,
         quantity,
         stock: product.stock,

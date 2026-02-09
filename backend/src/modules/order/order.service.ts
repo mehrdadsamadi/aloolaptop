@@ -164,6 +164,51 @@ export class OrderService {
     };
   }
 
+  async findAllUserOrders({
+    paginationDto,
+    filter,
+  }: {
+    paginationDto: PaginationDto;
+    filter?: FilterOrderDto;
+  }) {
+    const userId = this.req.user?._id;
+
+    const { page, limit, skip } = paginationSolver(paginationDto);
+
+    const finalFilter: FilterQuery<OrderDocument> = { userId };
+
+    if (filter?.trackingCode) {
+      finalFilter.trackingCode = {
+        $regex: filter.trackingCode,
+        $options: 'i',
+      };
+    }
+
+    if (filter?.status) {
+      finalFilter.status = filter.status;
+    } else {
+      delete finalFilter.status;
+    }
+
+    const count = await this.orderModel.countDocuments(finalFilter);
+
+    const orders = await this.orderModel
+      .find(finalFilter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate([
+        { path: 'addressId' },
+        { path: 'userId', select: 'profile mobile' },
+        { path: 'couponId', select: 'code' },
+      ]);
+
+    return {
+      orders,
+      pagination: paginationGenerator(count, page, limit),
+    };
+  }
+
   async findById(id: string) {
     const order = await this.orderModel.findById(id);
     if (!order) throw new NotFoundException(OrderMessage.Notfound);

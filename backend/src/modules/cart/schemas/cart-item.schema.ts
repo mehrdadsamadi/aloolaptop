@@ -18,6 +18,9 @@ export class CartItem {
   @Prop({ type: Number, default: 0 })
   discountPercent: number;
 
+  @Prop({ type: Date, default: null }) // زمان انقضا تخفیف
+  discountExpiresAt?: Date;
+
   @Prop({ required: true, type: Number })
   finalUnitPrice: number; // unitPrice - discountPercent
 

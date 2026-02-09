@@ -13,6 +13,22 @@ export async function getOrdersList({ pagination, status }: { pagination: IPagin
   return res.json()
 }
 
+export async function getUserOrdersList({
+  pagination,
+  status,
+  trackingCode,
+}: {
+  pagination: IPagination
+  status?: OrderStatus
+  trackingCode?: string
+}) {
+  const { page = 1, limit = 20 } = pagination
+
+  const res = await apiFetch(ENDPOINTS.ORDERS.USER_ORDERS_LIST({ page, limit, status, trackingCode }), { method: 'GET' })
+
+  return res.json()
+}
+
 export async function changeOrderStatus(orderId: string, orderStatus: OrderStatus, meta?: HistoryMeta) {
   const res = await apiFetch(ENDPOINTS.ORDERS.CHANGE_STATUS(orderId, orderStatus), { method: 'PATCH', body: JSON.stringify(meta) })
 

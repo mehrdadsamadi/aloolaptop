@@ -44,6 +44,18 @@ export const ENDPOINTS = {
   ORDERS: {
     LIST: ({ page = 1, limit = 20, status }: { page?: number; limit?: number; status: OrderStatus }) =>
       `/api/orders?status=${status}&page=${page}&limit=${limit}`,
+    USER_ORDERS_LIST: ({
+      page = 1,
+      limit = 20,
+      status,
+      trackingCode,
+    }: {
+      page?: number
+      limit?: number
+      status?: OrderStatus
+      trackingCode?: string
+    }) =>
+      `/api/orders/user?page=${page}&limit=${limit}${status ? `&status=${status}` : ''}${trackingCode ? `&trackingCode=${trackingCode}` : ''}`,
     CHANGE_STATUS: (orderId: string, status: OrderStatus) => `/api/orders/${orderId}/${status}`,
   },
   REVIEWS: {
