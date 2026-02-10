@@ -19,7 +19,7 @@ import {
   Truck,
   XCircle,
 } from 'lucide-react'
-import { formatPersianDate } from '@/lib/utils'
+import { formatPersianDate, formatPrice } from '@/lib/utils'
 import { ORDER_STATUS_CONSTANTS } from '@/lib/constants/order.constant'
 import { Meta } from '@/types/admin/order.type'
 
@@ -64,10 +64,6 @@ export default function MetaInfoDialog({ open, onOpenChange, meta, title = 'اط
   const hasPayment = meta.payment && Object.keys(meta.payment).length > 0
   const hasHistory = meta.history && meta.history.length > 0
 
-  const formatPrice = (price: number) => {
-    return price.toLocaleString() + ' تومان'
-  }
-
   // تفسیر کد پرداخت
   const getPaymentCodeText = (code?: number) => {
     if (!code) return 'نامشخص'
@@ -96,7 +92,7 @@ export default function MetaInfoDialog({ open, onOpenChange, meta, title = 'اط
         </Button>
       }
     >
-      <ScrollArea className="h-[500px] pr-4">
+      <ScrollArea className="h-125 pr-4">
         <div
           className="space-y-8"
           dir={'rtl'}

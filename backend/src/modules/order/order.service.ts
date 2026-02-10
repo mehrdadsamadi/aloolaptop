@@ -210,7 +210,14 @@ export class OrderService {
   }
 
   async findById(id: string) {
-    const order = await this.orderModel.findById(id);
+    const order = await this.orderModel
+      .findById(id)
+      .populate([
+        { path: 'addressId' },
+        { path: 'userId', select: 'profile mobile' },
+        { path: 'couponId', select: 'code' },
+      ]);
+
     if (!order) throw new NotFoundException(OrderMessage.Notfound);
 
     return order;

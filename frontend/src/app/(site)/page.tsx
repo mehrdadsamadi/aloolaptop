@@ -3,11 +3,13 @@ import { ProductGrid } from '@/components/product/productGrid'
 import { SectionHeader } from '@/components/product/sectionHeader'
 
 export default async function HomePage() {
-  const [latestProducts, bestSellers, discountedProducts] = await Promise.all([
+  const [discountedProducts, latestProducts, bestSellers] = await Promise.all([
     getBiggestDiscounts(),
     getLatestProducts(),
     getBestSellers({}),
   ])
+
+  console.log('bestSellers', bestSellers)
 
   return (
     <main className="">
@@ -44,7 +46,7 @@ export default async function HomePage() {
       </section>
 
       {/* Best Sellers */}
-      <section className="container py-8 md:py-12 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-2xl my-8">
+      <section className="container py-8 md:py-12 bg-linear-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-2xl my-8">
         <div className="px-4">
           <SectionHeader
             title="پرفروش‌ترین‌ها"

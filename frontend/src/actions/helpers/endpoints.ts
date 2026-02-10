@@ -57,6 +57,7 @@ export const ENDPOINTS = {
     }) =>
       `/api/orders/user?page=${page}&limit=${limit}${status ? `&status=${status}` : ''}${trackingCode ? `&trackingCode=${trackingCode}` : ''}`,
     CHANGE_STATUS: (orderId: string, status: OrderStatus) => `/api/orders/${orderId}/${status}`,
+    GET_BY_ID: (orderId: string) => `/api/orders/${orderId}`,
   },
   REVIEWS: {
     LIST: ({ page = 1, limit = 20 }: PaginationQuery) => `/api/reviews?page=${page}&limit=${limit}`,

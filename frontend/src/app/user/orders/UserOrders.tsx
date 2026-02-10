@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
+import { formatDate, formatPrice } from '@/lib/utils'
 
 interface UserOrdersProps {
   status: OrderStatus | 'all'
@@ -118,20 +119,6 @@ export default function UserOrders({ status }: UserOrdersProps) {
         {config.label}
       </Badge>
     )
-  }
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fa-IR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-  }
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('fa-IR').format(price) + ' تومان'
   }
 
   if (loading) {
@@ -245,7 +232,7 @@ export default function UserOrders({ status }: UserOrdersProps) {
                       <p className="text-sm text-muted-foreground">مبلغ کل</p>
                     </div>
                     <div className="flex gap-2">
-                      <Link href={`/dashboard/orders/${order._id}`}>
+                      <Link href={`/user/orders/${order._id}`}>
                         <Button
                           variant="outline"
                           size="sm"

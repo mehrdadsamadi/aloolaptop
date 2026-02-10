@@ -160,7 +160,7 @@ export default function DashboardPage() {
             <CardTitle>دسترسی سریع</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-4 ">
-            <Link href="/products">
+            <Link href="/">
               <Button
                 variant="outline"
                 className="w-full justify-start gap-2"
@@ -169,7 +169,7 @@ export default function DashboardPage() {
                 ادامه خرید
               </Button>
             </Link>
-            <Link href="/dashboard/orders">
+            <Link href="/user/orders">
               <Button
                 variant="outline"
                 className="w-full justify-start gap-2"
@@ -187,7 +187,7 @@ export default function DashboardPage() {
                 پشتیبانی
               </Button>
             </Link>
-            <Link href="/dashboard/settings">
+            <Link href="/user/settings">
               <Button
                 variant="outline"
                 className="w-full justify-start gap-2"

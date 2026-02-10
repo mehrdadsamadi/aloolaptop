@@ -34,3 +34,9 @@ export async function changeOrderStatus(orderId: string, orderStatus: OrderStatu
 
   return res.json()
 }
+
+export async function getOrderById(orderId: string) {
+  const res = await apiFetch(ENDPOINTS.ORDERS.GET_BY_ID(orderId), { method: 'GET' })
+
+  return res.json()
+}

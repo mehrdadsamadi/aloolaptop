@@ -10,6 +10,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
+import { formatDate } from '@/lib/utils'
 
 interface CheckoutCallbackProps {
   success: boolean
@@ -32,17 +33,6 @@ export default function CheckoutCallback({ success, message, gatewayUrl, trackin
       navigator.clipboard.writeText(trackingCode)
       toast.success('کد رهگیری کپی شد')
     }
-  }
-
-  const formatDate = () => {
-    const now = new Date()
-    return now.toLocaleDateString('fa-IR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
   }
 
   // حالت موفق
@@ -89,7 +79,7 @@ export default function CheckoutCallback({ success, message, gatewayUrl, trackin
                 <div className="space-y-1.5 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">تاریخ:</span>
-                    <span>{formatDate()}</span>
+                    <span>{formatDate(String(new Date()))}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">وضعیت پرداخت:</span>

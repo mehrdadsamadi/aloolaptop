@@ -41,6 +41,7 @@ export interface Item {
   image: string
   unitPrice: number
   discountPercent: number
+  discountExpiresAt: Date
   finalUnitPrice: number
   quantity: number
   totalPrice: number

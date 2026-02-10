@@ -23,6 +23,16 @@ export function formatPersianDate(date: string | Date) {
   }).format(new Date(date))
 }
 
+export const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('fa-IR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
 export function getImageUrl(url: string | undefined) {
   return url ?? '/images/image-placeholder.jpeg'
 }
@@ -32,12 +42,7 @@ export function showError(messages: string[]) {
 }
 
 export function formatPrice(price: number): string {
-  return new Intl.NumberFormat('fa-IR', {
-    style: 'currency',
-    currency: 'IRR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(price)
+  return new Intl.NumberFormat('fa-IR').format(price) + ' تومان'
 }
 
 export function calculateDiscount(price: number, percent: number): number {

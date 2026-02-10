@@ -96,14 +96,14 @@ export function ProductCard({ product, className, showActions = true, variant = 
         <div className="absolute top-2 left-2 z-10 flex flex-wrap gap-1">
           {/* Discount Badge */}
           {hasDiscount && (
-            <Badge className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white border-0 text-xs px-2 py-1">
+            <Badge className="bg-linear-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white border-0 text-xs px-2 py-1">
               {product?.discountPercent}% تخفیف
             </Badge>
           )}
 
           {/* New Arrival Badge (اگر محصول جدید باشد) */}
           {product?.createdAt && isNewArrival(product?.createdAt) && (
-            <Badge className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white border-0 text-xs px-2 py-1">
+            <Badge className="bg-linear-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white border-0 text-xs px-2 py-1">
               جدید
             </Badge>
           )}
@@ -127,8 +127,8 @@ export function ProductCard({ product, className, showActions = true, variant = 
         {/* Image Container */}
         <div
           className={cn(
-            'relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800',
-            isCompact ? 'aspect-square' : 'aspect-[4/3]'
+            'relative overflow-hidden bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800',
+            isCompact ? 'aspect-square' : 'aspect-4/3'
           )}
         >
           {mainImage ? (
@@ -150,7 +150,7 @@ export function ProductCard({ product, className, showActions = true, variant = 
           {showActions && (
             <div
               className="absolute inset-0 flex items-center justify-center gap-1 md:gap-2
-                         bg-gradient-to-t from-black/60 via-black/30 to-transparent
+                         bg-linear-to-t from-black/60 via-black/30 to-transparent
                          opacity-0 transition-all duration-300 group-hover:opacity-100"
             >
               <IconButton
@@ -195,7 +195,7 @@ export function ProductCard({ product, className, showActions = true, variant = 
           {/* Discount Timer */}
           {hasDiscount && discountTimeLeft && !discountTimeLeft.includes('منقضی') && (
             <div className="absolute bottom-2 left-2 right-2">
-              <div className="flex items-center justify-center gap-1 bg-gradient-to-r from-red-500/90 to-red-600/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
+              <div className="flex items-center justify-center gap-1 bg-linear-to-r from-red-500/90 to-red-600/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
                 <Clock className="h-3 w-3" />
                 <span>{discountTimeLeft}</span>
               </div>
@@ -203,7 +203,7 @@ export function ProductCard({ product, className, showActions = true, variant = 
           )}
         </div>
 
-        <CardContent className={cn('p-3 md:p-4 flex-grow', isCompact && 'p-2')}>
+        <CardContent className={cn('p-3 md:p-4 grow', isCompact && 'p-2')}>
           <div className="space-y-1.5 md:space-y-2">
             {/* Category */}
             {product?.categoryId?.name && (
@@ -320,7 +320,7 @@ export function ProductCard({ product, className, showActions = true, variant = 
                 size={isCompact ? 'sm' : 'default'}
                 className={cn(
                   'w-full gap-2 transition-all duration-200',
-                  'bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary',
+                  'bg-linear-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary',
                   'shadow-md hover:shadow-lg'
                 )}
                 disabled={isOutOfStock}
