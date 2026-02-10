@@ -12,6 +12,8 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { formatDate, formatPrice } from '@/lib/utils'
+import { toast } from 'sonner'
+import { startCheckout } from '@/actions/checkout.action'
 
 interface UserOrdersProps {
   status: OrderStatus | 'all'
@@ -60,6 +62,24 @@ export default function UserOrders({ status }: UserOrdersProps) {
 
   const clearUrl = () => {
     router.replace(pathname, { scroll: false })
+  }
+
+  const repayment = async (addressId: string) => {
+    try {
+      // ذخیره آدرس انتخابی در session یا context
+      const res = await startCheckout(addressId)
+      if (res?.updated) {
+        toast.info('امکان پرداخت مجدد برای این سفارش وجود ندارد')
+
+        return
+      }
+
+      if (res?.gatewayUrl) {
+        router.push(res?.gatewayUrl)
+      }
+    } catch (error) {
+      toast.error('خطایی در ذخیره آدرس رخ داد')
+    }
   }
 
   const getStatusBadge = (status: OrderStatus) => {
@@ -240,7 +260,14 @@ export default function UserOrders({ status }: UserOrdersProps) {
                           جزئیات
                         </Button>
                       </Link>
-                      {order.status === 'awaiting_payment' && <Button size="sm">پرداخت</Button>}
+                      {order.status === 'awaiting_payment' && (
+                        <Button
+                          size="sm"
+                          onClick={() => repayment(order.addressId._id)}
+                        >
+                          پرداخت
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>

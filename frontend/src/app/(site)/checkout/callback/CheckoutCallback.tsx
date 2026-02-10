@@ -127,7 +127,7 @@ export default function CheckoutCallback({ success, message, gatewayUrl, trackin
             <CardFooter className="flex flex-col gap-2 pt-4">
               <Button
                 className="w-full"
-                onClick={() => router.push('/orders')}
+                onClick={() => router.push('/user/orders')}
               >
                 <ShoppingBag className="h-4 w-4 ml-2" />
                 مشاهده سفارشات

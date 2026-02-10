@@ -9,8 +9,6 @@ export default async function HomePage() {
     getBestSellers({}),
   ])
 
-  console.log('bestSellers', bestSellers)
-
   return (
     <main className="">
       {/* Hero Section */}

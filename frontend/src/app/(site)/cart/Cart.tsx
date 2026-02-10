@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { ArrowLeft, CreditCard, Minus, Plus, ShoppingBag, ShoppingCart, TicketPercent, Trash2 } from 'lucide-react'
+import { ArrowRight, CreditCard, Minus, Plus, ShoppingBag, ShoppingCart, TicketPercent, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { applyCouponToCart, clearCart, getCart, removeProductFromCart, updateCart } from '@/actions/cart.action'
 import { showError } from '@/lib/utils'
@@ -227,7 +227,7 @@ export default function Cart() {
           onClick={() => router.back()}
           className="hover:bg-gray-100"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowRight className="w-5 h-5" />
         </Button>
         <h1 className="text-2xl font-bold">سبد خرید</h1>
         <div className="flex items-center gap-2 mr-auto">

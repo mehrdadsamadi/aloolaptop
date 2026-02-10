@@ -31,6 +31,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { formatDate, formatPrice, getFullName } from '@/lib/utils'
 import { Alert, AlertTitle } from '@/components/ui/alert'
 import { ORDER_STATUS_CONSTANTS } from '@/lib/constants/order.constant'
+import { startCheckout } from '@/actions/checkout.action'
 
 interface OrderDetailProps {
   id: string
@@ -133,6 +134,24 @@ export default function OrderDetail({ id }: OrderDetailProps) {
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href)
     toast.success('لینک سفارش کپی شد')
+  }
+
+  const repayment = async (addressId: string) => {
+    try {
+      // ذخیره آدرس انتخابی در session یا context
+      const res = await startCheckout(addressId)
+      if (res?.updated) {
+        toast.info('امکان پرداخت مجدد برای این سفارش وجود ندارد')
+
+        return
+      }
+
+      if (res?.gatewayUrl) {
+        router.push(res?.gatewayUrl)
+      }
+    } catch (error) {
+      toast.error('خطایی در ذخیره آدرس رخ داد')
+    }
   }
 
   if (loading) {
@@ -578,7 +597,14 @@ export default function OrderDetail({ id }: OrderDetailProps) {
             صفحه اصلی
           </Button>
         </Link>
-        {order.status === 'awaiting_payment' && <Button className="flex-1">پرداخت سفارش</Button>}
+        {order.status === 'awaiting_payment' && (
+          <Button
+            className="flex-1"
+            onClick={() => repayment(order?.addressId?._id)}
+          >
+            پرداخت سفارش
+          </Button>
+        )}
       </div>
     </div>
   )
