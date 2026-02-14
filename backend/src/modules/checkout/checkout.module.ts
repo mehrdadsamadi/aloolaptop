@@ -7,9 +7,10 @@ import { CheckoutService } from './checkout.service';
 import { CouponService } from '../coupon/coupon.service';
 import { OrderModule } from '../order/order.module';
 import { PaymentModule } from '../payment/payment.module';
+import { ProductModule } from '../product/product.module';
 
 @Module({
-  imports: [AuthModule, CartModule, OrderModule, PaymentModule],
+  imports: [AuthModule, CartModule, OrderModule, PaymentModule, ProductModule],
   controllers: [CheckoutController],
   providers: [CheckoutService, ZarinpalService, CouponService],
 })

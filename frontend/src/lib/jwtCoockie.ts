@@ -43,7 +43,12 @@ async function setJwtCookie({ name, token, cookieOptions = {} }: SetJwtCookieOpt
   })
 }
 
-export async function handleSetTokensInCookie(tokens: { accessToken: string; refreshToken: string }) {
-  await setJwtCookie({ name: 'access_token', token: tokens.accessToken })
-  await setJwtCookie({ name: 'refresh_token', token: tokens.refreshToken })
+export async function handleSetTokensInCookie({ accessToken, refreshToken }: { accessToken?: string; refreshToken?: string }) {
+  if (accessToken) {
+    await setJwtCookie({ name: 'access_token', token: accessToken })
+  }
+
+  if (refreshToken) {
+    await setJwtCookie({ name: 'refresh_token', token: refreshToken })
+  }
 }

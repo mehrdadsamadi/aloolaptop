@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model } from 'mongoose';
+import { ClientSession, FilterQuery, Model, QueryOptions } from 'mongoose';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product, ProductDocument } from './schema/product.schema';
@@ -436,7 +436,15 @@ export class ProductService {
       // اگر تعداد محصولات کافی نبود، با محصولات پشتیبان کامل کنیم
       if (productsWithSales.length < limit) {
         const remaining = limit - productsWithSales.length;
-        const fallbackProducts = await this.getFallbackBestSellers(remaining);
+        let fallbackProducts = await this.getFallbackBestSellers(remaining);
+
+        // محصولات غیر تکراری باشد
+        fallbackProducts = fallbackProducts.filter(
+          (item) =>
+            !productsWithSales.find(
+              (product) => product._id.toString() === item._id.toString(),
+            ),
+        );
 
         // اضافه کردن فلگ برای تشخیص محصولات پشتیبان
         const fallbackWithFlag = fallbackProducts.map((product) => ({
@@ -454,6 +462,39 @@ export class ProductService {
       // در صورت خطا، از متد جایگزین استفاده کنیم
       return this.getFallbackBestSellers(limit);
     }
+  }
+
+  async decreaseStock(
+    productId: string,
+    quantity: number,
+    session?: ClientSession,
+  ): Promise<ProductDocument> {
+    // آپشن‌های آپدیت
+    const options: QueryOptions<ProductDocument> = { new: true };
+    if (session) {
+      options.session = session;
+    }
+
+    // کاهش موجودی با اتمیک آپدیت
+    const product = await this.productModel.findByIdAndUpdate(
+      productId,
+      { $inc: { stock: -quantity } },
+      options,
+    );
+
+    if (!product) {
+      throw new NotFoundException(ProductMessage.Notfound);
+    }
+
+    // بررسی موجودی منفی (نباید اتفاق بیفتد چون قبلاً چک کردیم)
+    if (product.stock < 0) {
+      // برگرداندن تغییر (در صورت استفاده از تراکنش نیازی نیست)
+      throw new BadRequestException(
+        ProductMessage.OutOfStockByName(product.name),
+      );
+    }
+
+    return product;
   }
 
   /**

@@ -7,6 +7,9 @@ import { CartService } from '../cart/cart.service';
 import { CouponService } from '../coupon/coupon.service';
 import { StartCheckoutDto, VerifyCheckoutDto } from './dto/checkout.dto';
 import { VerifyStatus } from './enums/verify-status.enum';
+import { ProductService } from '../product/product.service';
+import { InjectConnection } from '@nestjs/mongoose';
+import { Connection } from 'mongoose';
 
 @Injectable()
 export class CheckoutService {
@@ -15,7 +18,10 @@ export class CheckoutService {
     private readonly paymentService: PaymentService,
     private readonly orderService: OrderService,
     private readonly couponService: CouponService,
+    private readonly productService: ProductService,
     private readonly zarinpalService: ZarinpalService,
+
+    @InjectConnection() private readonly connection: Connection,
   ) {}
 
   async startCheckout(startCheckoutDto: StartCheckoutDto) {
@@ -68,25 +74,54 @@ export class CheckoutService {
     }
 
     // موفق
-    await this.paymentService.markPaid(payment._id.toString(), refId, verify);
-    await this.orderService.markPaid(order._id.toString(), verify);
+    const session = await this.connection.startSession();
+    session.startTransaction();
 
-    // کاهش موجودی + خالی کردن سبد خرید
-    await this.cartService.clearCart();
+    try {
+      await this.paymentService.markPaid(payment._id.toString(), refId, verify);
+      await this.orderService.markPaid(order._id.toString(), verify);
 
-    // درصورت وجود تخفیف، یکی به تخفیف اضافه کن
-    if (order.couponId) {
-      const coupon = await this.couponService.findById(
-        order.couponId.toString(),
-      );
+      // کاهش موجودی + خالی کردن سبد خرید
+      await this.cartService.clearCart();
 
-      await this.couponService.increaseUsage(coupon.code);
+      // کاهش تعداد محصول
+      for (const item of order.items) {
+        await this.productService.decreaseStock(
+          item.productId.toString(),
+          item.quantity,
+          session, // پاس دادن session برای تراکنش
+        );
+      }
+
+      // درصورت وجود تخفیف، یکی به تخفیف اضافه کن
+      if (order.couponId) {
+        const coupon = await this.couponService.findById(
+          order.couponId.toString(),
+        );
+
+        await this.couponService.increaseUsage(coupon.code);
+      }
+
+      await session.commitTransaction();
+      await session.endSession();
+
+      return {
+        success: true,
+        message: CheckoutMessage.Verify,
+        trackingCode: order.trackingCode,
+      };
+    } catch (error) {
+      await session.abortTransaction();
+      await session.endSession();
+
+      await this.paymentService.markFailed(payment._id.toString(), {
+        verify,
+      });
+
+      return {
+        success: false,
+        message: CheckoutMessage.VerifyFailed,
+      };
     }
-
-    return {
-      success: true,
-      message: CheckoutMessage.Verify,
-      trackingCode: order.trackingCode,
-    };
   }
 }

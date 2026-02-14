@@ -7,11 +7,29 @@ import { JwtPayload } from '@/lib/jwtCoockie'
 import { refreshTokens } from '@/actions/helpers/fetchClient'
 
 const PUBLIC_ROUTES = ['/auth']
-const PRIVATE_ROUTES = ['/admin']
+const PRIVATE_ROUTES = ['/admin', '/user']
+const CALLBACK_ROUTES = ['/checkout/callback'] // مسیرهای کالبک
 
 export async function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl
+  const { pathname, searchParams } = request.nextUrl
   const cookieStore = await cookies()
+
+  if (CALLBACK_ROUTES.some((route) => pathname.startsWith(route))) {
+    const urlToken = searchParams.get('token')
+    const response = NextResponse.next()
+
+    if (urlToken) {
+      response.cookies.set('access_token', urlToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7, // 7 روز
+      })
+      return response
+    }
+
+    return response
+  }
 
   // مثال ساده: بررسی کوکی "token" برای تشخیص لاگین بودن
   let token = request.cookies.get('access_token')?.value
@@ -42,7 +60,7 @@ export async function proxy(request: NextRequest) {
   if (PUBLIC_ROUTES.some((route) => pathname.startsWith(route))) {
     if (isLoggedIn) {
       // اگر کاربر لاگین است — هدایت به صفحه پروفایل
-      return NextResponse.redirect(new URL('/', request.url))
+      return NextResponse.redirect(new URL('/user', request.url))
     }
     return NextResponse.next()
   }
@@ -69,6 +87,8 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     '/auth/:path*', // مسیرهای ورود/ثبت نام
-    '/admin/:path*', // صفحات داشبورد
+    '/admin/:path*', // صفحات ادمین
+    '/user/:path*', // صفحات کاربر
+    '/checkout/callback/:path*', // صفحات کالبک
   ],
 }

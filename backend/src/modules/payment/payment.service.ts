@@ -24,6 +24,7 @@ export class PaymentService {
 
   async create(orderId: string) {
     const userId = this.req.user?._id;
+    const token = this.req.user?.token;
 
     const order = await this.orderService.findById(orderId);
 
@@ -32,7 +33,7 @@ export class PaymentService {
     const zarinpalRes = await this.zarinpalService.requestPayment({
       amount,
       orderId,
-      callbackUrl: `${process.env.FRONTEND_URL}/${process.env.GATEWAY_CALLBACK_ENDPOINT}`,
+      callbackUrl: `${process.env.FRONTEND_URL}/${process.env.GATEWAY_CALLBACK_ENDPOINT}?token=${token}`,
       description: `پرداخت سفارش ${order.trackingCode}`,
     });
 
