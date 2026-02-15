@@ -12,6 +12,6 @@ export default async function CheckoutCallbackPage({
   const { Authority, Status } = await searchParams
 
   const res = await verifyCheckout(Authority, Status)
-  console.log('res', res)
+
   return <CheckoutCallback {...res} />
 }

@@ -89,7 +89,6 @@ export class CheckoutService {
         await this.productService.decreaseStock(
           item.productId.toString(),
           item.quantity,
-          session, // پاس دادن session برای تراکنش
         );
       }
 
@@ -111,6 +110,7 @@ export class CheckoutService {
         trackingCode: order.trackingCode,
       };
     } catch (error) {
+      console.log('error', error);
       await session.abortTransaction();
       await session.endSession();
 

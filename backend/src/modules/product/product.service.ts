@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { ClientSession, FilterQuery, Model, QueryOptions } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product, ProductDocument } from './schema/product.schema';
@@ -467,19 +467,12 @@ export class ProductService {
   async decreaseStock(
     productId: string,
     quantity: number,
-    session?: ClientSession,
   ): Promise<ProductDocument> {
-    // آپشن‌های آپدیت
-    const options: QueryOptions<ProductDocument> = { new: true };
-    if (session) {
-      options.session = session;
-    }
-
     // کاهش موجودی با اتمیک آپدیت
-    const product = await this.productModel.findByIdAndUpdate(
-      productId,
+    const product = await this.productModel.findOneAndUpdate(
+      { _id: productId, stock: { $gte: quantity } }, // شرط موجودی کافی
       { $inc: { stock: -quantity } },
-      options,
+      { new: true },
     );
 
     if (!product) {

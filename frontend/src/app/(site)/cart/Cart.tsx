@@ -224,7 +224,7 @@ export default function Cart() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => router.back()}
+          onClick={() => router.push('/')}
           className="hover:bg-gray-100"
         >
           <ArrowRight className="w-5 h-5" />
