@@ -11,7 +11,7 @@ export default function Providers({
   children: React.ReactNode
 }>) {
   return (
-    <DirectionProvider direction="rtl">
+    <DirectionProvider dir="rtl">
       <LoadingProvider>
         <ConfirmDialogProvider>
           <UserProvider>

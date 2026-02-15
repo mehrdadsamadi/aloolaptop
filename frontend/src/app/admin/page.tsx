@@ -73,7 +73,7 @@ export default function AdminPage() {
             ? {
                 ...item,
                 value: res?.users?.total?.toLocaleString() ?? '0',
-                change: `${res?.users?.growth} %`,
+                change: `${res?.users?.growth || 0} %`,
                 trend: res?.users?.growth > 0 ? 'up' : 'down',
               }
             : item
@@ -100,7 +100,7 @@ export default function AdminPage() {
             ? {
                 ...item,
                 value: res?.products?.total?.toLocaleString() ?? '0',
-                change: `${res?.products?.growth} %`,
+                change: `${res?.products?.growth || 0} %`,
                 trend: res?.products?.growth > 0 ? 'up' : 'down',
               }
             : item
@@ -127,7 +127,7 @@ export default function AdminPage() {
             ? {
                 ...item,
                 value: res?.orders?.total?.toLocaleString() ?? '0',
-                change: `${res?.orders?.growth} %`,
+                change: `${res?.orders?.growth || 0} %`,
                 trend: res?.orders?.growth > 0 ? 'up' : 'down',
               }
             : item
@@ -154,7 +154,7 @@ export default function AdminPage() {
             ? {
                 ...item,
                 value: `${res?.payments?.total?.toLocaleString() ?? '0'} تومان`,
-                change: `${res?.payments?.growth} %`,
+                change: `${res?.payments?.growth || 0} %`,
                 trend: res?.payments?.growth > 0 ? 'up' : 'down',
               }
             : item
