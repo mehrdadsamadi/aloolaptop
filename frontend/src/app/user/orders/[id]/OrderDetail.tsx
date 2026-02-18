@@ -32,6 +32,7 @@ import { formatDate, formatPrice, getFullName } from '@/lib/utils'
 import { Alert, AlertTitle } from '@/components/ui/alert'
 import { ORDER_STATUS_CONSTANTS } from '@/lib/constants/order.constant'
 import { startCheckout } from '@/actions/checkout.action'
+import Image from 'next/image'
 
 interface OrderDetailProps {
   id: string
@@ -294,8 +295,17 @@ export default function OrderDetail({ id }: OrderDetailProps) {
                       key={index}
                       className="flex items-start gap-4 p-4 rounded-lg border"
                     >
-                      <div className="h-20 w-20 bg-gray-100 rounded-lg flex items-center justify-center">
-                        <Package className="h-8 w-8 text-gray-400" />
+                      <div className="h-20 w-20 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                        {item.image ? (
+                          <Image
+                            width={80}
+                            height={80}
+                            src={item.image}
+                            alt={item.name}
+                          />
+                        ) : (
+                          <Package className="h-8 w-8 text-gray-400" />
+                        )}
                       </div>
                       <div className="flex-1">
                         <h4 className="font-medium mb-1">{item.name}</h4>
