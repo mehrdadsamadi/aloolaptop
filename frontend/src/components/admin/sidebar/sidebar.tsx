@@ -9,7 +9,7 @@ import FavoriteSwitcher from '@/components/admin/sidebar/favorite-switcher'
 import NavMain from '@/components/admin/sidebar/nav-main'
 import { useSidebarLinks } from '@/hooks/useSidebarLinks'
 
-export function Sidebar({ ...props }: React.ComponentProps<typeof ShadSidebar>) {
+export function AdminSidebar({ ...props }: React.ComponentProps<typeof ShadSidebar>) {
   const { links: sidebarLinks, isLoading, updateFavorite, updateAllLinks } = useSidebarLinks()
 
   const favoriteLinks = useMemo(() => {

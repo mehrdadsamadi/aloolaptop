@@ -1,11 +1,17 @@
 export const breadcrumbMapping: Record<string, string> = {
+  // ادمین
   '/admin': 'داشبورد',
   '/admin/users': 'کاربران',
   '/admin/categories': 'دسته ‌بندی ‌ها',
   '/admin/products': 'محصولات',
   '/admin/orders': 'سفارشات',
   '/admin/settings': 'تنظیمات',
-  // می‌توانید موارد بیشتری اضافه کنید
+
+  // کاربر
+  '/user': 'داشبورد',
+  '/user/orders': 'سفارشات',
+  '/user/profile': 'پروفایل',
+  '/user/settings': 'تنظیمات',
 }
 
 export const getBreadcrumbItems = (pathname: string) => {

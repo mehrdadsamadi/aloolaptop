@@ -1,12 +1,12 @@
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
-import { Sidebar } from '@/components/admin/sidebar/sidebar'
+import { AdminSidebar } from '@/components/admin/sidebar/sidebar'
 import { DynamicBreadcrumb } from '@/components/admin/dynamicBreadcrumb'
 import { BackButton } from '@/components/admin/backButton'
 
 export default async function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <Sidebar side={'right'} />
+      <AdminSidebar side={'right'} />
 
       <SidebarInset className={'overflow-auto'}>
         <header className="flex h-16 shrink-0 items-center gap-4 border-b px-4">
