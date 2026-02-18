@@ -1,11 +1,10 @@
 'use client'
 
-// app/(site)/dashboard/page.tsx
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ArrowUpRight, CheckCircle, Package, Settings, ShoppingBag, TrendingUp, Truck } from 'lucide-react'
 import Link from 'next/link'
-import { useUser } from '../../hooks/useUser'
+import { useUser } from '@/hooks/useUser'
 
 // این داده‌ها از API گرفته می‌شوند
 const stats = [

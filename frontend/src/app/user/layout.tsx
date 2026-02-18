@@ -1,12 +1,9 @@
-// app/(site)/dashboard/layout.tsx
-'use client'
-
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { UserSidebar } from '@/components/user/sidebar/sidebar'
 import { DynamicBreadcrumb } from '@/components/admin/dynamicBreadcrumb'
 import { BackButton } from '@/components/admin/backButton'
 
-export default function UserDashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function UserDashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <UserSidebar side="right" />

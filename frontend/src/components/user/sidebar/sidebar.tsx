@@ -1,4 +1,7 @@
+'use client'
+
 import * as React from 'react'
+import { Suspense } from 'react'
 
 import { Sidebar, SidebarContent, SidebarFooter, SidebarRail } from '@/components/ui/sidebar'
 import { LayoutDashboard, Settings, ShoppingBag, User } from 'lucide-react'
@@ -44,7 +47,9 @@ export function UserSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
       {...props}
     >
       <SidebarContent>
-        <NavMain items={menuItems} />
+        <Suspense fallback={'loading ...'}>
+          <NavMain items={menuItems} />
+        </Suspense>
       </SidebarContent>
 
       <hr />
