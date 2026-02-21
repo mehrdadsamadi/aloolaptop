@@ -1,7 +1,7 @@
 import { getBestSellers, getBiggestDiscounts, getLatestProducts } from '@/actions/product.action'
 import { ProductGrid } from '@/components/product/productGrid'
 import { SectionHeader } from '@/components/product/sectionHeader'
-import LinkButton from '@/components/common/linkButton'
+import SubHeader from '@/components/layout/subHeader'
 
 export default async function HomePage() {
   const [discountedProducts, latestProducts, bestSellers] = await Promise.all([
@@ -12,10 +12,7 @@ export default async function HomePage() {
 
   return (
     <main className="">
-      {/* Hero Section */}
-      {/*<HeroSection />*/}
-
-      <LinkButton href={'/cart'}>سبد خرید</LinkButton>
+      <SubHeader />
 
       {/* Biggest Discounts */}
       <section className="container py-8 md:py-12">
