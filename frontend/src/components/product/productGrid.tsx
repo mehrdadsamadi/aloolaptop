@@ -26,7 +26,7 @@ export function ProductGrid({ products, isLoading = false, itemsPerPage = 12, gr
         {Array.from({ length: itemsPerPage }).map((_, i) => (
           <Skeleton
             key={i}
-            className="h-[300px] md:h-[350px] rounded-lg md:rounded-xl"
+            className="h-75 md:h-87.5 rounded-lg md:rounded-xl"
           />
         ))}
       </div>
@@ -49,7 +49,6 @@ export function ProductGrid({ products, isLoading = false, itemsPerPage = 12, gr
         <ProductCard
           key={product?._id}
           product={product}
-          variant={variant}
         />
       ))}
     </div>

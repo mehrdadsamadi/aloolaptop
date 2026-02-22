@@ -14,10 +14,10 @@ export default function SubHeader() {
   return (
     <div
       className={
-        'px-6.25 py-2.5 rounded-full bg-card-bg shadow-[0px_2px_6.4px_0px_rgba(0,0,0,0.25)] flex items-center justify-between mt-4 mb-8 font-bold text-dark'
+        'px-6.25 py-2.5 rounded-full bg-input-bg shadow-[0px_2px_6.4px_0px_rgba(0,0,0,0.25)] flex items-center justify-between mt-4 mb-8 font-bold text-primary-text'
       }
     >
-      <div className={'flex items-center gap-2'}>
+      <div className={'flex items-center gap-2 cursor-pointer'}>
         <Menu />
         <p>دسته بندی ها</p>
       </div>

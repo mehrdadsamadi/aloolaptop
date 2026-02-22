@@ -1,7 +1,9 @@
 import { getBestSellers, getBiggestDiscounts, getLatestProducts } from '@/actions/product.action'
 import { ProductGrid } from '@/components/product/productGrid'
-import { SectionHeader } from '@/components/product/sectionHeader'
 import SubHeader from '@/components/layout/subHeader'
+import { ChevronLeft } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import LinkButton from '@/components/common/linkButton'
 
 export default async function HomePage() {
   const [discountedProducts, latestProducts, bestSellers] = await Promise.all([
@@ -11,77 +13,122 @@ export default async function HomePage() {
   ])
 
   return (
-    <main className="">
+    <main className="flex flex-col gap-20">
       <SubHeader />
 
       {/* Biggest Discounts */}
-      <section className="container py-8 md:py-12">
-        <SectionHeader
-          title="تخفیف‌های شگفت‌انگیز"
-          subtitle="فرصت طلایی برای خرید با قیمت استثنایی"
-          viewAllLink="/products?discount=true"
-          viewAllText="مشاهده همه تخفیف‌ها"
-        />
+      <section className="rounded-[38px] bg-input-bg border border-card-border pt-8.75 px-20.25 pb-14.75 flex flex-col gap-9.25 text-primary-text">
+        <div className={'flex flex-col gap-5.25'}>
+          <p className={'font-bold text-2xl'}>پیشنهاد های ویژه:</p>
+
+          <div className={'flex items-center justify-between'}>
+            <div className={'flex items-center gap-4'}>
+              <Button
+                size={'lg'}
+                className={'bg-primary-text rounded-2xl px-9'}
+              >
+                لپت تاپ ها
+              </Button>
+              <Button
+                size={'lg'}
+                variant={'outline'}
+                className={'text-primary-text rounded-2xl border-primary-text bg-input-bg px-9'}
+              >
+                لوازم جانبی
+              </Button>
+            </div>
+
+            <LinkButton
+              href={'/'}
+              variant={'ghost'}
+            >
+              <p className={'font-medium'}>نمایش همه</p>
+              <ChevronLeft />
+            </LinkButton>
+          </div>
+        </div>
+
         <ProductGrid
           products={discountedProducts}
-          gridCols="5" // نمایش ۵ محصول در ردیف
-          variant="compact" // حالت فشرده برای نمایش بیشتر
+          gridCols="5"
         />
       </section>
 
       {/* Latest Products */}
-      <section className="container py-8 md:py-12">
-        <SectionHeader
-          title="جدیدترین محصولات"
-          subtitle="تازه‌های فروشگاه ما را کشف کنید"
-          viewAllLink="/products?sort=newest"
-          viewAllText="مشاهده همه جدیدترین‌ها"
-        />
+      <section className="rounded-[38px] bg-input-bg border border-card-border pt-8.75 px-20.25 pb-14.75 flex flex-col gap-9.25 text-primary-text">
+        <div className={'flex flex-col gap-5.25'}>
+          <p className={'font-bold text-2xl'}>جدیدترین ها:</p>
+
+          <div className={'flex items-center justify-between'}>
+            <div className={'flex items-center gap-4'}>
+              <Button
+                size={'lg'}
+                className={'bg-primary-text rounded-2xl px-9'}
+              >
+                لپت تاپ ها
+              </Button>
+              <Button
+                size={'lg'}
+                variant={'outline'}
+                className={'text-primary-text rounded-2xl border-primary-text bg-input-bg px-9'}
+              >
+                لوازم جانبی
+              </Button>
+            </div>
+
+            <LinkButton
+              href={'/'}
+              variant={'ghost'}
+            >
+              <p className={'font-medium'}>نمایش همه</p>
+              <ChevronLeft />
+            </LinkButton>
+          </div>
+        </div>
+
         <ProductGrid
           products={latestProducts}
-          gridCols="4"
+          gridCols="5"
         />
       </section>
 
       {/* Best Sellers */}
-      <section className="container py-8 md:py-12 bg-linear-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-2xl my-8">
-        <div className="px-4">
-          <SectionHeader
-            title="پرفروش‌ترین‌ها"
-            subtitle="محصولات محبوب خریداران"
-            viewAllLink="/products?sort=best-selling"
-            viewAllText="مشاهده همه پرفروش‌ها"
-          />
-          <ProductGrid
-            products={bestSellers}
-            gridCols="4"
-            variant="default"
-          />
+      <section className="rounded-[38px] bg-input-bg border border-card-border pt-8.75 px-20.25 pb-14.75 flex flex-col gap-9.25 text-primary-text mb-20">
+        <div className={'flex flex-col gap-5.25'}>
+          <p className={'font-bold text-2xl'}>پرفروش ترین ها:</p>
+
+          <div className={'flex items-center justify-between'}>
+            <div className={'flex items-center gap-4'}>
+              <Button
+                size={'lg'}
+                className={'bg-primary-text rounded-2xl px-9'}
+              >
+                لپت تاپ ها
+              </Button>
+              <Button
+                size={'lg'}
+                variant={'outline'}
+                className={'text-primary-text rounded-2xl border-primary-text bg-input-bg px-9'}
+              >
+                لوازم جانبی
+              </Button>
+            </div>
+
+            <LinkButton
+              href={'/'}
+              variant={'ghost'}
+            >
+              <p className={'font-medium'}>نمایش همه</p>
+              <ChevronLeft />
+            </LinkButton>
+          </div>
         </div>
+
+        <ProductGrid
+          products={bestSellers}
+          gridCols="5"
+        />
       </section>
-
-      {/* Categories */}
-      {/*<section className="bg-gray-50 dark:bg-gray-900 py-16">*/}
-      {/*  <div className="container">*/}
-      {/*    <div className="mb-12 text-center">*/}
-      {/*      <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">دسته‌بندی‌ها</h2>*/}
-      {/*      <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">محصولات را بر اساس دسته‌بندی کشف کنید</p>*/}
-      {/*    </div>*/}
-      {/*    <CategoryGrid />*/}
-      {/*  </div>*/}
-      {/*</section>*/}
-
-      {/* Promo Banner */}
-      {/*<PromoBanner*/}
-      {/*  title="تخفیف‌های ویژه"*/}
-      {/*  description="تا ۵۰٪ تخفیف روی محصولات منتخب"*/}
-      {/*  imageUrl="/promo-banner.jpg"*/}
-      {/*/>*/}
-
-      {/* Testimonials */}
-      {/*<section className="container py-16">*/}
-      {/*  <Testimonials />*/}
-      {/*</section>*/}
     </main>
   )
 }

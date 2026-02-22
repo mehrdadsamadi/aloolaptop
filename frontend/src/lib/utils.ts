@@ -41,8 +41,8 @@ export function showError(messages: string[]) {
   messages.forEach((message) => toast.error(message))
 }
 
-export function formatPrice(price: number): string {
-  return new Intl.NumberFormat('fa-IR').format(price) + ' تومان'
+export function formatPrice(price: number, hasPostfix: boolean = true): string {
+  return new Intl.NumberFormat('fa-IR').format(price) + (hasPostfix ? ' تومان' : '')
 }
 
 export function calculateDiscount(price: number, percent: number): number {
@@ -58,5 +58,5 @@ export function getRemainingTime(expiryDate: Date): string {
   const hours = Math.floor(diff / (1000 * 60 * 60))
   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
 
-  return `${hours}h ${minutes}m`
+  return `${hours <= 9 ? '۰' : ''}${new Intl.NumberFormat('fa-IR').format(hours)}:${minutes <= 9 ? '۰' : ''}${new Intl.NumberFormat('fa-IR').format(minutes)}`
 }

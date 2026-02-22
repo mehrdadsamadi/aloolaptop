@@ -6,10 +6,13 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-    --color-btn-txt: #FCFCFC;
-    --color-input-bg: #F5F5F5;
-    --color-dark: #1A1A1A;
-    --color-card-bg: #EFEFEF;
+    --color-input-bg: #F7F7F7;
+    --color-primary-text: #2A2A2A;
+    --color-secondary-text: #737373;
+    --color-card-bg: #FEFEFE;
+    --color-card-border: #EAEAEA;
+    --color-error: #F63049;
+    --color-success: #17BE71;
 }
 
 @theme inline {
@@ -134,7 +137,7 @@
     body {
         @apply bg-background text-foreground;
         font-family: var(--font-vazirmatn);
-        direction: rtl;
+        direction: var(--direction);
         text-align: right;
     }
 

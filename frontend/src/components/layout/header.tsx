@@ -7,7 +7,9 @@ import Logo from '@/components/common/logo'
 export default function Header() {
   return (
     <header
-      className={'py-5.5 px-35.75 flex items-center justify-between shadow-[0px_2px_5.8px_0px_rgba(0,0,0,0.25)] bg-btn-txt text-dark'}
+      className={
+        'py-5.5 px-35.75 flex items-center justify-between shadow-[0px_2px_5.8px_0px_rgba(0,0,0,0.25)] bg-input-bg text-primary-text'
+      }
     >
       <Logo />
 

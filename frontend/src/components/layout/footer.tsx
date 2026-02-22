@@ -6,7 +6,7 @@ import Image from 'next/image'
 
 export default function Footer() {
   return (
-    <footer className={'px-36 py-10 bg-card-bg grid grid-cols-4 gap-20 text-dark'}>
+    <footer className={'px-36 py-10 bg-input-bg grid grid-cols-4 gap-20 border-t-2 border-card-border text-primary-text'}>
       <div className={'flex flex-col gap-2'}>
         <Logo />
         <p className={'font-medium'}>
@@ -94,7 +94,7 @@ export default function Footer() {
       <div className={'flex flex-col gap-2'}>
         <p className={'font-bold text-2xl'}>نماد اعتماد</p>
         <Image
-          src={'/enamad.png'}
+          src={'/images/enamad.png'}
           alt={'enamad'}
           width={94}
           height={500}
