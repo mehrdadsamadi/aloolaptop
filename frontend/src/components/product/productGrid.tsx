@@ -8,10 +8,9 @@ interface ProductGridProps {
   isLoading?: boolean
   itemsPerPage?: number
   gridCols?: '2' | '3' | '4' | '5' // تعداد ستون‌های گرید
-  variant?: 'default' | 'compact' // حالت نمایش
 }
 
-export function ProductGrid({ products, isLoading = false, itemsPerPage = 12, gridCols = '4', variant = 'default' }: ProductGridProps) {
+export function ProductGrid({ products, isLoading = false, itemsPerPage = 12, gridCols = '4' }: ProductGridProps) {
   // کلاس‌های responsive بر اساس تعداد ستون‌ها
   const gridColsClasses = {
     '2': 'grid-cols-1 sm:grid-cols-2',

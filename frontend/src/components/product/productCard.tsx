@@ -147,19 +147,22 @@ export function ProductCard({ product }: ProductCardProps) {
           <Button
             onClick={handleAddToCart}
             disabled={isOutOfStock}
-            className={'col-span-3 bg-success font-normal text-[8px] h-6 rounded-[10px]'}
+            loading={isLoading}
+            className={'col-span-3 bg-success font-normal text-[8px] h-6 rounded-[10px] hover:bg-success/90'}
           >
             افزودن به سبد خرید
             <ShoppingCart className={'size-4'} />
           </Button>
           <Button
             variant={'outline'}
+            disabled
             className={'col-span-1 h-6 rounded-[10px] border-secondary-text text-secondary-text'}
           >
             <Shuffle className={'size-4'} />
           </Button>
           <Button
             variant={'outline'}
+            disabled
             className={'col-span-1 h-6 rounded-[10px] border-secondary-text text-secondary-text'}
           >
             <Heart className={'size-4'} />

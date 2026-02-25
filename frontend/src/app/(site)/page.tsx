@@ -86,6 +86,11 @@ export default async function HomePage() {
           </div>
         </div>
 
+        {/*<ProductCarousel*/}
+        {/*  products={latestProducts}*/}
+        {/*  slidesPerView={2}*/}
+        {/*/>*/}
+
         <ProductGrid
           products={latestProducts}
           gridCols="5"
