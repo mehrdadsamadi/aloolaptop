@@ -84,29 +84,31 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* rate */}
-        {product?.rate > 0 && (
-          <div className={'flex items-center gap-1 mt-2 mr-auto'}>
-            <Image
-              src={'/images/star.png'}
-              alt={'star'}
-              width={14}
-              height={14}
-            />
-            <p className={'text-secondary-text font-normal text-xs pt-1'}>{product?.rate}</p>
-          </div>
-        )}
+        <div className={'flex items-center gap-1 mt-2 mr-auto h-5'}>
+          {product?.rate > 0 && (
+            <>
+              <Image
+                src={'/images/star.png'}
+                alt={'star'}
+                width={14}
+                height={14}
+              />
+              <p className={'text-secondary-text font-normal text-xs pt-1'}>{product?.rate}</p>
+            </>
+          )}
+        </div>
 
         {/* name */}
         <div className={'flex flex-col gap-2 mt-2'}>
           <p className={'font-bold text-sm'}>{product?.name}</p>
 
-          {isLowStock && <p className={'font-normal text-xs text-error'}>تنها {product?.stock} عدد در انبار باقی مانده</p>}
+          <p className={'font-normal text-xs text-error h-4'}>{isLowStock && `تنها ${product?.stock} عدد در انبار باقی مانده`}</p>
         </div>
 
         {/* attrs */}
-        {product?.attributes?.length > 0 && (
-          <div className={'flex flex-col gap-2 my-4'}>
-            {product?.attributes?.slice(0, 4)?.map((attr) => (
+        <div className={'flex flex-col gap-2 my-4 flex-1'}>
+          {product?.attributes?.length > 0 &&
+            product?.attributes?.slice(0, 4)?.map((attr) => (
               <div
                 key={attr?._id}
                 className={'flex items-center justify-between'}
@@ -115,8 +117,7 @@ export function ProductCard({ product }: ProductCardProps) {
                 <p className={'font-normal text-xs'}>{attr?.value}</p>
               </div>
             ))}
-          </div>
-        )}
+        </div>
 
         {/* price */}
         <div className={'flex flex-col'}>
@@ -125,18 +126,20 @@ export function ProductCard({ product }: ProductCardProps) {
             <p className={'font-normal text-[8px]'}>تومان</p>
           </div>
 
-          {hasDiscount && (
-            <div className={'flex items-center justify-between'}>
-              <div className={'bg-error text-white rounded-xl flex items-center justify-center px-2 py-0.5 font-normal text-xs'}>
-                ٪ {formatPrice(product?.discountPercent, false)} - {discountTimeLeft}
-              </div>
+          <div className={'flex items-center justify-between h-6'}>
+            {hasDiscount && (
+              <>
+                <div className={'bg-error text-white rounded-xl flex items-center justify-center px-2 py-0.5 font-normal text-xs'}>
+                  ٪ {formatPrice(product?.discountPercent, false)} - {discountTimeLeft}
+                </div>
 
-              <div className={'flex items-center gap-1 text-secondary-text/73 justify-end line-through'}>
-                <p className={'font-bold'}>{formatPrice(product?.price, false)}</p>
-                <p className={'font-normal text-[8px]'}>تومان</p>
-              </div>
-            </div>
-          )}
+                <div className={'flex items-center gap-1 text-secondary-text/73 justify-end line-through'}>
+                  <p className={'font-bold'}>{formatPrice(product?.price, false)}</p>
+                  <p className={'font-normal text-[8px]'}>تومان</p>
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         {/* buttons */}
