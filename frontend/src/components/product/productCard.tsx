@@ -16,7 +16,6 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  console.log('product', product)
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -63,7 +62,7 @@ export function ProductCard({ product }: ProductCardProps) {
       <div
         className={'flex flex-col rounded-[26px] bg-card-bg relative px-4.5 pt-4 pb-8 max-w-59 min-w-59 text-primary-text h-full'}
         style={{
-          boxShadow: '0px 2px 6px 2px rgba(0, 0, 0, 0.15); 0px 1px 2px 0px rgba(0, 0, 0, 0.3) !important;',
+          boxShadow: '0px 2px 6px 2px rgba(0, 0, 0, 0.15); 0px 1px 2px 0px rgba(0, 0, 0, 0.3) !important',
         }}
       >
         {/* label */}

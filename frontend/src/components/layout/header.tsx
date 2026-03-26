@@ -34,12 +34,13 @@ export default function Header() {
         >
           <HeartIcon className={'size-5'} />
         </Button>
-        <Button
+        <LinkButton
+          href={'/user'}
           variant="ghost"
           size="icon"
         >
           <UserIcon className={'size-5'} />
-        </Button>
+        </LinkButton>
       </div>
     </header>
   )
