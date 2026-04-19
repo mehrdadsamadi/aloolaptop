@@ -1,10 +1,16 @@
+'use client'
+
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
-import { HeartIcon, Search, ShoppingCart, UserIcon } from 'lucide-react'
+import { HeartIcon, Search, ShoppingCart, UserIcon, LayoutDashboardIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import LinkButton from '@/components/common/linkButton'
 import Logo from '@/components/common/logo'
+import { useUser } from '@/hooks/useUser'
+import { Roles } from '@/lib/enums/roles.enum'
 
 export default function Header() {
+  const { user } = useUser()
+
   return (
     <header
       className={
@@ -21,6 +27,15 @@ export default function Header() {
       </InputGroup>
 
       <div className={'flex items-center gap-5'}>
+        {user?.role === Roles.ADMIN && (
+          <LinkButton
+            href={'/admin'}
+            variant="ghost"
+            size="icon"
+          >
+            <LayoutDashboardIcon className={'size-5'} />
+          </LinkButton>
+        )}
         <LinkButton
           href={'/cart'}
           variant="ghost"

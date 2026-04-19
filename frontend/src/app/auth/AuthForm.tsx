@@ -13,16 +13,17 @@ import { GalleryVerticalEnd } from 'lucide-react'
 import { toast } from 'sonner'
 import { convertFaToEn } from '@/lib/utils'
 import { useCountdown } from '@/hooks/useCountdown'
-// import { useUser } from '@/hooks/useUser'
-// import { getMe } from '@/actions/user.action'
+import { useUser } from '@/hooks/useUser'
+import { getMe } from '@/actions/user.action'
 import { useRouter } from 'next/navigation'
 
 export default function AuthForm() {
-  // const { saveUser } = useUser()
+  const { saveUser } = useUser()
   const router = useRouter()
 
   const [authStep, setAuthStep] = useState(1)
   const [loading, setLoading] = useState(false)
+  const [isLoggedInComplete   , setIsLoggedInComplete   ] = useState(false)
 
   const { timer, reset } = useCountdown(120, authStep === 2)
 
@@ -51,6 +52,12 @@ export default function AuthForm() {
       checkOtpHandler({ code: otpCode })
     }
   }, [otpCode])
+
+  useEffect(() => {
+    if(isLoggedInComplete) {
+      getAndSaveUser()
+    }
+  }, [isLoggedInComplete])
 
   // ---------------------------
   // مرحله 1 → ارسال OTP
@@ -94,7 +101,23 @@ export default function AuthForm() {
         return
       }
 
-      // await getAndSaveUser()
+      setIsLoggedInComplete(true)
+    } catch (error) {
+      console.log('error', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const getAndSaveUser = async () => {
+    try {
+      setLoading(true)
+
+      const user = await getMe()
+
+      if (user) {
+        saveUser(user)
+      }
 
       toast.success('ورود موفقیت آمیز بود')
 
@@ -105,25 +128,6 @@ export default function AuthForm() {
       setLoading(false)
     }
   }
-
-  // const getAndSaveUser = async () => {
-  //   try {
-  //     setLoading(true)
-
-  //     console.log('getAndSaveUser')
-
-  //     const user = await getMe()
-  //     console.log('user', user)
-
-  //     if (user) {
-  //       saveUser(user)
-  //     }
-  //   } catch (error) {
-  //     console.log('error', error)
-  //   } finally {
-  //     setLoading(false)
-  //   }
-  // }
 
   return (
     <div className={'flex flex-col gap-6'}>
