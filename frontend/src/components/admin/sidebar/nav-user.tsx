@@ -22,8 +22,7 @@ import ChangeProfileDialog from '@/components/admin/dialogs/changeProfile'
 export function NavUser() {
   const { isMobile } = useSidebar()
   const { confirm } = useConfirm()
-  const { logout } = useUser()
-  const { user } = useUser()
+  const { logout, user } = useUser()
 
   const [changeProfileDialog, setChangeProfileDialog] = useState(false)
 

@@ -3,10 +3,9 @@
 import { Button } from '@/components/ui/button'
 import { Field, FieldDescription, FieldError, FieldGroup, FieldSet } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { checkOtp, sendOtp } from '@/actions/auth.action'
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp'
-import { redirect } from 'next/navigation'
 import { MobileSchemaType, mobileValidator, OtpSchemaType, otpValidator } from '@/validators/auth.validator'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -14,11 +13,13 @@ import { GalleryVerticalEnd } from 'lucide-react'
 import { toast } from 'sonner'
 import { convertFaToEn } from '@/lib/utils'
 import { useCountdown } from '@/hooks/useCountdown'
-import { useUser } from '@/hooks/useUser'
-import { getMe } from '@/actions/user.action'
+// import { useUser } from '@/hooks/useUser'
+// import { getMe } from '@/actions/user.action'
+import { useRouter } from 'next/navigation'
 
 export default function AuthForm() {
-  const { saveUser } = useUser()
+  // const { saveUser } = useUser()
+  const router = useRouter()
 
   const [authStep, setAuthStep] = useState(1)
   const [loading, setLoading] = useState(false)
@@ -40,6 +41,16 @@ export default function AuthForm() {
     resolver: zodResolver(otpValidator),
     defaultValues: { code: '' },
   })
+
+  const { watch } = otpForm
+
+  const otpCode = watch('code')
+
+  useEffect(() => {
+    if (otpCode?.length >= 5) {
+      checkOtpHandler({ code: otpCode })
+    }
+  }, [otpCode])
 
   // ---------------------------
   // مرحله 1 → ارسال OTP
@@ -68,36 +79,51 @@ export default function AuthForm() {
   // مرحله 2 → بررسی OTP
   // ---------------------------
   const checkOtpHandler = async (data: OtpSchemaType) => {
-    setLoading(true)
+    try {
+      setLoading(true)
 
-    const response = await checkOtp({
-      mobile: mobileForm.getValues('mobile'),
-      code: data.code,
-    })
-
-    setLoading(false)
-
-    if (!response.success) {
-      otpForm.setError('code', {
-        message: response.error,
+      const response = await checkOtp({
+        mobile: mobileForm.getValues('mobile'),
+        code: data.code,
       })
-      return
+
+      if (!response.success) {
+        otpForm.setError('code', {
+          message: response.error,
+        })
+        return
+      }
+
+      // await getAndSaveUser()
+
+      toast.success('ورود موفقیت آمیز بود')
+
+      router.replace('/')
+    } catch (error) {
+      console.log('error', error)
+    } finally {
+      setLoading(false)
     }
-
-    await getAndSaveUser()
-
-    toast.success('ورود موفقیت آمیز بود')
-
-    redirect('/')
   }
 
-  const getAndSaveUser = async () => {
-    const user = await getMe()
+  // const getAndSaveUser = async () => {
+  //   try {
+  //     setLoading(true)
 
-    if (user) {
-      saveUser(user)
-    }
-  }
+  //     console.log('getAndSaveUser')
+
+  //     const user = await getMe()
+  //     console.log('user', user)
+
+  //     if (user) {
+  //       saveUser(user)
+  //     }
+  //   } catch (error) {
+  //     console.log('error', error)
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
 
   return (
     <div className={'flex flex-col gap-6'}>
@@ -131,7 +157,7 @@ export default function AuthForm() {
             <Button
               loading={loading}
               className="w-full"
-              disabled={mobileForm.formState.isSubmitting || mobileForm.watch('mobile').length !== 11}
+              disabled={mobileForm.formState.isSubmitting || mobileForm.watch('mobile').length !== 11 || loading}
             >
               ارسال کد
             </Button>
@@ -170,7 +196,7 @@ export default function AuthForm() {
               <Button
                 loading={loading}
                 className="w-full"
-                disabled={otpForm.watch('code').length !== 5 || otpForm.formState.isSubmitting}
+                disabled={otpCode?.length !== 5 || otpForm.formState.isSubmitting || loading}
               >
                 ورود
               </Button>

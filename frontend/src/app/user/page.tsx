@@ -5,6 +5,9 @@ import { Button } from '@/components/ui/button'
 import { ArrowUpRight, CheckCircle, Package, Settings, ShoppingBag, TrendingUp, Truck } from 'lucide-react'
 import Link from 'next/link'
 import { useUser } from '@/hooks/useUser'
+import { useLoading } from '@/hooks/useLoading'
+import { getMe } from '@/actions/user.action'
+import { useEffect } from 'react'
 
 // این داده‌ها از API گرفته می‌شوند
 const stats = [
@@ -66,8 +69,31 @@ const recentOrders = [
   },
 ]
 
-export default function DashboardPage() {
-  const { user } = useUser()
+export default function UserDashboardPage() {
+  const { user, saveUser } = useUser()
+  const { showLoading, hideLoading } = useLoading()
+
+  useEffect(() => {
+    if (!localStorage.getItem('user')?.length) {
+      getAndSaveUser()
+    }
+  }, [])
+
+  const getAndSaveUser = async () => {
+    try {
+      showLoading()
+
+      const user = await getMe()
+
+      if (user) {
+        saveUser(user)
+      }
+    } catch (error) {
+      console.log('error', error)
+    } finally {
+      hideLoading()
+    }
+  }
 
   return (
     <div className="space-y-6">
