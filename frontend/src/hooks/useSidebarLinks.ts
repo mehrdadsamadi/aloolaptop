@@ -1,6 +1,6 @@
 // hooks/use-sidebar-links.ts
 import { useCallback, useEffect, useState } from 'react'
-import { BoxesIcon, LaptopMinimalIcon, LayoutDashboardIcon, ListIcon, TicketPercentIcon, UsersIcon, ImageDownIcon } from 'lucide-react'
+import { BoxesIcon, ImageDownIcon, LaptopMinimalIcon, LayoutDashboardIcon, ListIcon, TicketPercentIcon, UsersIcon } from 'lucide-react'
 import { ISidebarLink, ISidebarLinkStorage } from '@/types/admin/sidebar'
 
 const iconMap = {
@@ -10,6 +10,7 @@ const iconMap = {
   TicketPercentIcon,
   UsersIcon,
   LaptopMinimalIcon,
+  ImageDownIcon,
 }
 
 const STORAGE_KEY = 'sidebarLinks'

@@ -1,4 +1,3 @@
-// app/admin/orders/_components/OrderItemsDialog.tsx
 'use client'
 
 import { Dialog } from '@/components/common/dialog'

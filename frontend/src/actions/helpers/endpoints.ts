@@ -91,4 +91,9 @@ export const ENDPOINTS = {
     START: '/api/checkout/start',
     VERIFY: '/api/checkout/verify',
   },
+  IMAGES_ARCHIVE: {
+    LIST: ({ page = 1, limit = 20 }: PaginationQuery) => `/api/imagesArchive?page=${page}&limit=${limit}`,
+    ADD: '/api/imagesArchive/add',
+    DELETE: (id: string) => `/api/imagesArchive/${id}`,
+  },
 }
