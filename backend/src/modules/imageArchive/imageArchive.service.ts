@@ -35,8 +35,8 @@ export class ImageArchiveService {
     const { title } = addImageDto;
 
     const uploaded = await this.s3Service.uploadFile(image, 'images-archive');
-    let url = uploaded.url;
-    let key = uploaded.key;
+    const url = uploaded.url;
+    const key = uploaded.key;
 
     const imageArchive = await this.imageArchiveModel.create({
       title,
