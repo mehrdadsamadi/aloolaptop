@@ -11,6 +11,7 @@ import { CartModule } from '../cart/cart.module';
 import { CheckoutModule } from '../checkout/checkout.module';
 import { OrderModule } from '../order/order.module';
 import { StatisticsModule } from '../statistic/statistics.module';
+import { ImageArchiveModule } from '../imageArchive/imageArchive.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { StatisticsModule } from '../statistic/statistics.module';
     OrderModule,
     CheckoutModule,
     StatisticsModule,
+    ImageArchiveModule,
   ],
   controllers: [],
   providers: [

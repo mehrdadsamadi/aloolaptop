@@ -131,3 +131,9 @@ export const CheckoutMessage = {
   Verify: 'پرداخت با موفقیت انجام شد',
   VerifyFailed: 'تایید پرداخت ناموفق بود',
 } as const;
+
+export const ImageArchiveMessage = {
+  Add: 'تصویر با موفقیت اضافه شد',
+  Notfound: 'تصویر یافت نشد',
+  Deleted: 'تصویر با موفقیت حذف شد',
+} as const;

@@ -1,6 +1,6 @@
 // hooks/use-sidebar-links.ts
 import { useCallback, useEffect, useState } from 'react'
-import { BoxesIcon, LaptopMinimalIcon, LayoutDashboardIcon, ListIcon, TicketPercentIcon, UsersIcon } from 'lucide-react'
+import { BoxesIcon, LaptopMinimalIcon, LayoutDashboardIcon, ListIcon, TicketPercentIcon, UsersIcon, ImageDownIcon } from 'lucide-react'
 import { ISidebarLink, ISidebarLinkStorage } from '@/types/admin/sidebar'
 
 const iconMap = {
@@ -42,6 +42,13 @@ const defaultLinks: ISidebarLink[] = [
     icon: TicketPercentIcon,
     isActive: false,
     isFavorite: true,
+  },
+  {
+    title: 'آرشیو تصاویر',
+    url: '/admin/imagesArchive',
+    icon: ImageDownIcon,
+    isActive: false,
+    isFavorite: false,
   },
   {
     title: 'کاربران',
