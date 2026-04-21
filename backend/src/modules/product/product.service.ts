@@ -9,7 +9,6 @@ import { FilterQuery, Model } from 'mongoose';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product, ProductDocument } from './schema/product.schema';
-import { S3Service } from '../common/services/s3/s3.service';
 import {
   isValidObjectId,
   makeSlug,
@@ -20,7 +19,6 @@ import {
   paginationGenerator,
   paginationSolver,
 } from '../../common/utils/pagination.util';
-import { ImageType } from '../../common/types/image.type';
 import {
   CategoryMessage,
   ExceptionMessage,
@@ -46,13 +44,9 @@ export class ProductService {
     private readonly orderModel: Model<OrderDocument>,
 
     private readonly categoryService: CategoryService,
-    private readonly s3Service: S3Service,
   ) {}
 
-  async create(
-    createDto: CreateProductDto,
-    imagesFiles?: Express.Multer.File[],
-  ) {
+  async create(createDto: CreateProductDto) {
     const {
       name,
       slug: PSlug,
@@ -60,6 +54,7 @@ export class ProductService {
       description,
       discountExpiresAt,
       discountPercent,
+      images,
       isActive,
       condition,
       categoryId,
@@ -80,15 +75,6 @@ export class ProductService {
     // parse attributes if sent as string
     const attributes = parseAttributes(PAttributes);
 
-    // upload images if provided (array of files)
-    const images: ImageType[] = [];
-    if (imagesFiles && imagesFiles.length) {
-      for (const file of imagesFiles) {
-        const { key, url } = await this.s3Service.uploadFile(file, 'products');
-        images.push({ url, key });
-      }
-    }
-
     try {
       const created = await this.productModel.create({
         name,
@@ -103,7 +89,7 @@ export class ProductService {
         stock,
         grade,
         attributes,
-        images: images.length ? images : [],
+        images: images?.length ? images : [],
       });
 
       return {
@@ -169,11 +155,7 @@ export class ProductService {
     return product;
   }
 
-  async update(
-    id: string,
-    updateDto: UpdateProductDto,
-    imageFiles?: Express.Multer.File[],
-  ) {
+  async update(id: string, updateDto: UpdateProductDto) {
     await this.findById(id);
 
     let {
@@ -186,21 +168,11 @@ export class ProductService {
       description,
       discountExpiresAt,
       discountPercent,
+      images,
       isActive,
       condition,
       name,
-      existingImages,
     } = updateDto;
-
-    // پارس کردن existingImages
-    let existingImagesParsed: ImageType[] = [];
-    if (existingImages) {
-      try {
-        existingImagesParsed = JSON.parse(existingImages);
-      } catch (error) {
-        throw new BadRequestException('فرمت تصاویر قدیمی نامعتبر است');
-      }
-    }
 
     // parse attributes if needed
     if (attributes) {
@@ -210,16 +182,6 @@ export class ProductService {
     // handle slug
     if (slug) slug = makeSlug(slug);
 
-    // upload new images if provided (append to images array)
-    const uploadedImages: ImageType[] = [...existingImagesParsed];
-
-    if (imageFiles && imageFiles.length) {
-      for (const file of imageFiles) {
-        const { key, url } = await this.s3Service.uploadFile(file, 'products');
-        uploadedImages.push({ url, key });
-      }
-    }
-
     const updated = await this.productModel.findByIdAndUpdate(
       id,
       {
@@ -227,7 +189,7 @@ export class ProductService {
           name,
           slug,
           attributes,
-          images: uploadedImages,
+          images,
           categoryId,
           price,
           stock,
@@ -251,23 +213,12 @@ export class ProductService {
   }
 
   async remove(id: string) {
-    const product = await this.findById(id);
+    if (!isValidObjectId(id))
+      throw new NotFoundException(ExceptionMessage.InvalidId);
 
-    // delete images from S3
-    if (product.images && product.images.length) {
-      for (const img of product.images) {
-        if (img.key) {
-          try {
-            await this.s3Service.deleteFile(img.key);
-          } catch (e) {
-            // ignore single failures, but log if you want
-          }
-        }
-      }
-    }
+    const product = await this.productModel.findByIdAndDelete(id);
 
-    // remove document
-    await this.productModel.deleteOne({ _id: id });
+    if (!product) throw new NotFoundException(ProductMessage.Notfound);
 
     return { message: ProductMessage.Deleted };
   }
@@ -279,9 +230,6 @@ export class ProductService {
     const images = product.images || [];
     const idx = images.findIndex((i) => i.key === imageKey);
     if (idx === -1) throw new NotFoundException(ProductMessage.ImageNotfound);
-
-    // delete from s3
-    await this.s3Service.deleteFile(imageKey);
 
     images.splice(idx, 1);
 

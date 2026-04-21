@@ -43,13 +43,9 @@ export class ProductController {
   @Post()
   @CanAccess(Roles.ADMIN)
   @ApiCreatedResponse({ schema: { example: EXAMPLE_PRODUCT } })
-  @ApiConsumes(SwaggerConsumes.Multipart)
-  @UseInterceptors(uploadFileFieldsS3([{ name: 'images', maxCount: 10 }]))
-  create(
-    @Body() createProductDto: CreateProductDto,
-    @UploadedFiles() files: { images: Express.Multer.File[] },
-  ) {
-    return this.productService.create(createProductDto, files.images);
+  @ApiConsumes(SwaggerConsumes.UrlEncoded, SwaggerConsumes.Json)
+  create(@Body() createProductDto: CreateProductDto) {
+    return this.productService.create(createProductDto);
   }
 
   @Get()
@@ -96,14 +92,9 @@ export class ProductController {
   @Patch(':id')
   @CanAccess(Roles.ADMIN)
   @ApiCreatedResponse({ schema: { example: EXAMPLE_PRODUCT } })
-  @ApiConsumes(SwaggerConsumes.Multipart)
-  @UseInterceptors(uploadFileFieldsS3([{ name: 'images', maxCount: 10 }]))
-  update(
-    @Param('id') id: string,
-    @Body() updateProductDto: UpdateProductDto,
-    @UploadedFiles() files?: { images?: Express.Multer.File[] },
-  ) {
-    return this.productService.update(id, updateProductDto, files?.images);
+  @ApiConsumes(SwaggerConsumes.UrlEncoded, SwaggerConsumes.Json)
+  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
+    return this.productService.update(id, updateProductDto);
   }
 
   @Delete(':id')

@@ -14,6 +14,8 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ProductCondition } from '../enums/product-condition.enum';
 import { ProductGrade } from '../enums/product-grade.enum';
 import { parseAttributes } from '../../../common/utils/functions.util';
+import { ImageType } from 'src/common/types/image.type';
+import { ImageDto } from 'src/common/dtos/image.dto';
 
 class AttributeDto {
   @ApiProperty({ example: 'ram' }) @IsString() key: string;
@@ -75,15 +77,13 @@ export class CreateProductDto {
   )
   attributes?: AttributeDto[];
 
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsString()
-  existingImages?: string;
-
-  @ApiPropertyOptional({ format: 'binary' })
+  @ApiPropertyOptional({ type: [ImageDto] })
   @IsOptional()
   @IsArray()
-  images?: string[];
+  @Transform(({ value }) =>
+    typeof value === 'string' ? parseAttributes(value) : value,
+  )
+  images?: ImageType[];
 
   @ApiPropertyOptional({ example: true })
   @IsOptional()
