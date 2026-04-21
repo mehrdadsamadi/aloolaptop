@@ -115,9 +115,9 @@ export default function AuthForm() {
 
       const user = await getMe()
 
-      if (user) {
+      if(!user) return toast.error('خطایی رخ داده است، باردیگر تلاش کنید')
+
         saveUser(user)
-      }
 
       toast.success('ورود موفقیت آمیز بود')
 

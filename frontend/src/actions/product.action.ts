@@ -3,6 +3,7 @@
 import { IPagination } from '@/types/pagination.type'
 import { apiFetch } from '@/actions/helpers/fetchClient'
 import { ENDPOINTS } from '@/actions/helpers/endpoints'
+import { ProductFormValues } from '@/validators/product.validator'
 
 export async function getProductsList(pagination: IPagination) {
   const { page = 1, limit = 20 } = pagination
@@ -24,8 +25,8 @@ export async function deleteProductImage(productId: string, imageKey: string) {
   return res.json()
 }
 
-export async function createProduct(formData: FormData) {
-  const res = await apiFetch(ENDPOINTS.PRODUCTS.CREATE, { method: 'POST', body: formData })
+export async function createProduct(data: ProductFormValues) {
+  const res = await apiFetch(ENDPOINTS.PRODUCTS.CREATE, { method: 'POST', body: JSON.stringify(data) })
 
   return res.json()
 }
@@ -36,8 +37,8 @@ export async function getProductById(productId: string) {
   return res.json()
 }
 
-export async function updateProduct(productId: string, formData: FormData) {
-  const res = await apiFetch(ENDPOINTS.PRODUCTS.UPDATE_BY_ID(productId), { method: 'PATCH', body: formData })
+export async function updateProduct(productId: string, data: ProductFormValues) {
+  const res = await apiFetch(ENDPOINTS.PRODUCTS.UPDATE_BY_ID(productId), { method: 'PATCH', body: JSON.stringify(data) })
 
   return res.json()
 }

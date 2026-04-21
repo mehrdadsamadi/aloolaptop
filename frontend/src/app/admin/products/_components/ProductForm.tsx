@@ -13,24 +13,25 @@ import { ProductFormInput, ProductFormValues, productSchema } from '@/validators
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { CalendarIcon } from 'lucide-react'
+import { CalendarIcon, Trash2Icon, TrashIcon, X } from 'lucide-react'
 import { cn, formatPersianDate } from '@/lib/utils'
 import { format } from 'date-fns'
 import AttributesForm from './AttributesForm'
 import { ProductCondition, ProductGrade } from '@/types/admin/product.type'
-import ImagesUploader, { ImageItem } from '@/components/input/imagesUploader'
 import { CONDITION_CONSTANTS } from '@/lib/constants/product.constant'
 import { NumberInput } from '@/components/input/numberInput'
+import { IImage } from '@/types/image.type'
+import Image from 'next/image'
+import { useConfirm } from '@/hooks/useConfirm'
 
 interface Props {
   initialValues?: ProductFormInput
-  onSubmit: (values: ProductFormValues, imageFiles?: File[]) => Promise<void>
+  onSubmit: (values: ProductFormValues) => Promise<void>
   isEdit?: boolean
 }
 
 export default function ProductForm({ initialValues, onSubmit, isEdit }: Props) {
-  const [images, setImages] = useState<ImageItem[]>([])
-  const [newImageFiles, setNewImageFiles] = useState<File[]>([])
+  const { confirm } = useConfirm()
 
   const form = useForm<ProductFormInput>({
     resolver: zodResolver(productSchema),
@@ -51,18 +52,6 @@ export default function ProductForm({ initialValues, onSubmit, isEdit }: Props) 
     },
   })
 
-  // تبدیل images از سرور به فرمت ImagesUploader
-  useEffect(() => {
-    if (initialValues?.images) {
-      const serverImages = initialValues.images.map((img: ImageItem) => ({
-        url: img?.url,
-        key: img?.key,
-        alt: img?.alt,
-      }))
-      setImages(serverImages)
-    }
-  }, [initialValues])
-
   const {
     handleSubmit,
     control,
@@ -78,29 +67,15 @@ export default function ProductForm({ initialValues, onSubmit, isEdit }: Props) 
   // تابع برای ارسال فرم
   const handleFormSubmit = async (values: ProductFormInput) => {
     const parsedValues = productSchema.parse(values)
-    await onSubmit(parsedValues, newImageFiles.length ? newImageFiles : undefined)
+    await onSubmit(parsedValues)
   }
 
-  // تابع مدیریت تغییر تصاویر
-  const handleImagesChange = (updatedImages: ImageItem[]) => {
-    setImages(updatedImages)
+  const removeImageByKey = (imageKey: string) => {
+    let images = form.getValues('images')
 
-    // جدا کردن تصاویر قدیمی و جدید
-    const oldImages = updatedImages?.filter((img) => img?.url && !img?.file)
-    const newImages = updatedImages?.filter((img) => img?.file)
+    images = images?.filter((img) => img?.key !== imageKey)
 
-    // ذخیره فایل‌های جدید
-    const files = newImages?.map((img) => img?.file).filter((item) => item !== undefined)
-    setNewImageFiles(files)
-
-    // آپدیت فیلد images در فرم (هم تصاویر قدیمی هم جدید)
-    const formImages = updatedImages.map((img) => ({
-      url: img?.url || '',
-      key: img?.key || '',
-      alt: img?.alt || '',
-    }))
-
-    form.setValue('images', formImages)
+    form.setValue('images', images)
   }
 
   return (
@@ -288,7 +263,7 @@ export default function ProductForm({ initialValues, onSubmit, isEdit }: Props) 
                 </Field>
               )}
             />
-
+            {/* TODO: موقع ویرایش وقتی تاریخ انقضا داشته باشد و تغییرش ندیم ، خطا میده */}
             <Controller
               name="discountExpiresAt"
               control={form.control}
@@ -362,16 +337,50 @@ export default function ProductForm({ initialValues, onSubmit, isEdit }: Props) 
         />
 
         {/* بخش تصاویر */}
-        <div className="bg-gray-50 rounded-lg p-4">
-          <h3 className="font-semibold mb-4">تصاویر محصول</h3>
-          <ImagesUploader
-            value={images}
-            onChange={handleImagesChange}
-            maxFiles={10}
-            maxSize={5}
-            accept="image/*"
-            disabled={isSubmitting}
-          />
+        <div className="bg-gray-50 rounded-lg p-4 flex flex-col gap-4">
+          <div className="w-full flex items-center justify-between gap-2">
+            <h3 className="font-semibold mb-4">تصاویر محصول</h3>
+
+            {/* TODO: درست کرد مدال و دکمه انتخاب تصویر */}
+            {form.getValues('images')?.length < 10 && <Button>انتخاب تصویر</Button>}
+          </div>
+
+          <div className="flex items-center gap-4">
+            {form.getValues('images')?.map((img) => (
+              <div
+                key={img?.key}
+                className="max-w-[250px] relative group cursor-pointer"
+              >
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg p-2">
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    className="h-7 w-7 p-0"
+                    onClick={() => {
+                      confirm({
+                        title: 'حذف تصویر',
+                        description: `آیا از حذف تصویر مطمئن هستید؟`,
+                        confirmText: 'بله',
+                        cancelText: 'لغو',
+                        onConfirm: () => removeImageByKey(img?.key),
+                      })
+                    }}
+                  >
+                    <Trash2Icon className="w-3 h-3" />
+                  </Button>
+                </div>
+
+                <Image
+                  src={img?.url}
+                  alt={img?.key}
+                  width={200}
+                  height={200}
+                  className="rounded-md w-full"
+                />
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* بخش ویژگی‌ها */}

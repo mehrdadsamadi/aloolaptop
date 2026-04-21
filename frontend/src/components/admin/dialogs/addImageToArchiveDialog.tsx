@@ -12,6 +12,7 @@ import { toast } from 'sonner'
 import { imageArchive, ImageArchiveFormValues } from '@/validators/imageArchive.validator'
 import { addImageArchive } from '@/actions/imageArchive.action'
 import { IImageArchive } from '@/types/admin/imageArchive.type'
+import { showError } from '@/lib/utils'
 
 interface AddImageToArchiveDialogProps {
   open: boolean
@@ -50,10 +51,10 @@ export default function AddImageToArchiveDialog({ open, onOpenChange, onComplete
 
       const res = await addImageArchive(formData)
 
-      // if (res?.ok === false) {
-      //   showError(res.messages)
-      //   return
-      // }
+      if (res?.ok === false) {
+        showError(res.messages)
+        return
+      }
 
       form.reset({
         title: '',

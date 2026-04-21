@@ -8,6 +8,12 @@ const attributeSchema = z.object({
   value: z.string().min(1, 'مقدار ویژگی الزامی است'),
 })
 
+// ولیدیشن تصاویر محصول
+const imageSchema = z.object({
+  url: z.string().min(1, 'آدرس تصویر الزامی است'),
+  key: z.string().min(1, 'کلید تصویر الزامی است'),
+})
+
 // ولیدیشن اصلی فرم محصول
 export const productSchema = z.object({
   name: z.string().min(1, 'نام محصول الزامی است'),
@@ -34,7 +40,7 @@ export const productSchema = z.object({
 
   attributes: z.array(attributeSchema).optional().default([]),
 
-  images: z.any().optional().default([]),
+  images: z.array(imageSchema).optional().default([]),
 
   isActive: z.boolean().optional().default(true),
 
