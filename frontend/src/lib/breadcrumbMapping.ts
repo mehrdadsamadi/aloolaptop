@@ -1,10 +1,15 @@
 export const breadcrumbMapping: Record<string, string> = {
   // ادمین
   '/admin': 'داشبورد',
-  '/admin/users': 'کاربران',
   '/admin/categories': 'دسته ‌بندی ‌ها',
-  '/admin/imagesArchive': 'آرشیو تصاویر',
+  '/admin/categories/create': 'ایجاد دسته بندی',
   '/admin/products': 'محصولات',
+  '/admin/products/create': 'ایجاد محصول',
+  '/admin/coupons': 'کوپن تخفیف',
+  '/admin/coupons/create': 'ایجاد کوپن تخفیف',
+  '/admin/imagesArchive': 'آرشیو تصاویر',
+  '/admin/users': 'کاربران',
+  '/admin/reviews': 'دیدگاه ها و امتیاز ها',
   '/admin/orders': 'سفارشات',
   '/admin/settings': 'تنظیمات',
 
