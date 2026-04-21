@@ -1,7 +1,8 @@
 'use client'
 
 import { deleteImageArchive, getImageArchiveList } from '@/actions/imageArchive.action'
-import AddImageToArchiveDialog from '@/components/admin/dialogs/addImageToArchive'
+import AddImageToArchiveDialog from '@/components/admin/dialogs/addImageToArchiveDialog'
+import ImagePreviewDialog from '@/components/admin/dialogs/imagePreviewDialog'
 import DataTable from '@/components/common/dataTable'
 import LoadingSection from '@/components/common/loadingSection'
 import NoData from '@/components/common/noData'
@@ -19,19 +20,27 @@ export default function AdminImagesArchive() {
   const { confirm } = useConfirm()
 
   const [addImageArchiveDialog, setAddImageArchiveDialog] = useState(false)
+  const [imagePreviewDialog, setImagePreviewDialog] = useState(false)
+  const [selectedImage, setSelectedImage] = useState<IImageArchive | null>(null)
+
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const [images, setImages] = useState<IImageArchive[] | null>(null)
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(20)
   const [pagesCount, setPagesCount] = useState(1)
 
-  //   TODO: روی تصویر که زد تصویر بزرگ باز بشه
   const imageColumns: ColumnDef<IImageArchive>[] = [
     {
       accessorKey: 'image',
       header: 'تصویر',
       cell: ({ row }) => (
-        <Avatar>
+        <Avatar
+          className="cursor-pointer hover:opacity-80 transition-opacity"
+          onClick={() => {
+            setSelectedImage(row?.original)
+            setImagePreviewDialog(true)
+          }}
+        >
           <AvatarImage src={getImageUrl(row.original?.image?.url)} />
           <AvatarFallback>IM</AvatarFallback>
         </Avatar>
@@ -147,6 +156,12 @@ export default function AdminImagesArchive() {
         onCompleteUpload={(image) => {
           setImages((prev) => (prev ? [image, ...prev] : [image]))
         }}
+      />
+
+      <ImagePreviewDialog
+        open={imagePreviewDialog}
+        onOpenChange={setImagePreviewDialog}
+        imageData={selectedImage}
       />
     </section>
   )

@@ -17,14 +17,14 @@ import { useUser } from '@/hooks/useUser'
 import { getFullName, getImageUrl } from '@/lib/utils'
 import { useConfirm } from '@/hooks/useConfirm'
 import { useState } from 'react'
-import ChangeProfileDialog from '@/components/admin/dialogs/changeProfile'
+import ChangeProfileDialog from '@/components/admin/dialogs/changeProfileDialog'
 
 export function NavUser() {
   const { isMobile } = useSidebar()
   const { confirm } = useConfirm()
   const { logout, user } = useUser()
 
-  const [changeProfileDialog, setChangeProfileDialog] = useState(false)
+  const [openChangeProfileDialog, setOpenChangeProfileDialog] = useState(false)
 
   return (
     <SidebarMenu>
@@ -79,7 +79,7 @@ export function NavUser() {
             <DropdownMenuGroup dir={'rtl'}>
               <DropdownMenuItem
                 className={'cursor-pointer'}
-                onClick={() => setChangeProfileDialog(true)}
+                onClick={() => setOpenChangeProfileDialog(true)}
               >
                 <UserIcon />
                 حساب کاربری
@@ -117,8 +117,8 @@ export function NavUser() {
       </SidebarMenuItem>
 
       <ChangeProfileDialog
-        open={changeProfileDialog}
-        onOpenChange={setChangeProfileDialog}
+        open={openChangeProfileDialog}
+        onOpenChange={setOpenChangeProfileDialog}
       />
     </SidebarMenu>
   )
