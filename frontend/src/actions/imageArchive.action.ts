@@ -3,9 +3,8 @@
 import { ENDPOINTS } from '@/actions/helpers/endpoints'
 import { apiFetch } from '@/actions/helpers/fetchClient'
 import { IPagination } from '@/types/pagination.type'
-import { ImageArchiveFormValues } from '@/validators/imageArchive.validator'
 
-export async function getImageArchiveList(pagination: IPagination) {
+export async function getImageArchiveList(pagination: IPagination, searchTerm?: string) {
   const { page = 1, limit = 20 } = pagination
 
   const res = await apiFetch(ENDPOINTS.IMAGES_ARCHIVE.LIST({ page, limit }), { method: 'GET' })

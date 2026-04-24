@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/common/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useEffect, useState } from 'react'
-// import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { ISidebarLink } from '@/types/admin/sidebar'
@@ -143,12 +142,6 @@ export default function AddToFavoriteDialog({
                   checked={link.isFavorite}
                   onCheckedChange={() => handleToggleFavorite(link.title)}
                 />
-                {/*<input*/}
-                {/*  type={'checkbox'}*/}
-                {/*  id={`favorite-${link.title}`}*/}
-                {/*  checked={link.isFavorite}*/}
-                {/*  onChange={() => handleToggleFavorite(link.title)}*/}
-                {/*/>*/}
                 <Label
                   htmlFor={`favorite-${link.title}`}
                   className="flex items-center gap-2 flex-1 cursor-pointer"

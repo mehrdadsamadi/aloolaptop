@@ -20,9 +20,10 @@ import AttributesForm from './AttributesForm'
 import { ProductCondition, ProductGrade } from '@/types/admin/product.type'
 import { CONDITION_CONSTANTS } from '@/lib/constants/product.constant'
 import { NumberInput } from '@/components/input/numberInput'
-import { IImage } from '@/types/image.type'
 import Image from 'next/image'
 import { useConfirm } from '@/hooks/useConfirm'
+import SelectImageFromArchiveDialog from '@/components/admin/dialogs/selectImageFromArchiveDialog'
+import { IImageArchive } from '@/types/admin/imageArchive.type'
 
 interface Props {
   initialValues?: ProductFormInput
@@ -32,6 +33,8 @@ interface Props {
 
 export default function ProductForm({ initialValues, onSubmit, isEdit }: Props) {
   const { confirm } = useConfirm()
+
+  const [isArchiveDialogOpen, setIsArchiveDialogOpen] = useState(false)
 
   const form = useForm<ProductFormInput>({
     resolver: zodResolver(productSchema),
@@ -74,6 +77,14 @@ export default function ProductForm({ initialValues, onSubmit, isEdit }: Props) 
     let images = form.getValues('images')
 
     images = images?.filter((img) => img?.key !== imageKey)
+
+    form.setValue('images', images)
+  }
+
+  const handleSelectImageFromArchive = (image: IImageArchive) => {
+    let images = form.getValues('images')
+    
+    images?.push(image?.image)
 
     form.setValue('images', images)
   }
@@ -263,7 +274,7 @@ export default function ProductForm({ initialValues, onSubmit, isEdit }: Props) 
                 </Field>
               )}
             />
-            
+
             <Controller
               name="discountExpiresAt"
               control={form.control}
@@ -341,8 +352,14 @@ export default function ProductForm({ initialValues, onSubmit, isEdit }: Props) 
           <div className="w-full flex items-center justify-between gap-2">
             <h3 className="font-semibold mb-4">تصاویر محصول</h3>
 
-            {/* TODO: درست کرد مدال و دکمه انتخاب تصویر */}
-            {form.getValues('images')?.length < 10 && <Button>انتخاب تصویر</Button>}
+            {form.getValues('images')?.length < 10 && (
+              <Button
+                type="button"
+                onClick={() => setIsArchiveDialogOpen(true)}
+              >
+                انتخاب تصویر
+              </Button>
+            )}
           </div>
 
           <div className="flex items-center gap-4">
@@ -425,6 +442,12 @@ export default function ProductForm({ initialValues, onSubmit, isEdit }: Props) 
       >
         {isEdit ? 'ویرایش محصول' : 'ایجاد محصول'}
       </Button>
+
+      <SelectImageFromArchiveDialog
+        open={isArchiveDialogOpen}
+        onOpenChange={setIsArchiveDialogOpen}
+        onSelectImage={handleSelectImageFromArchive}
+      />
     </form>
   )
 }
