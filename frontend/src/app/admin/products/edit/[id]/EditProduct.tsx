@@ -34,7 +34,8 @@ export default function EditProduct({ product }: { product: IProduct }) {
       isEdit
       initialValues={{
         ...product,
-        categoryId: product?.categoryId?._id
+        categoryId: product?.categoryId?._id,
+        discountExpiresAt: product?.discountExpiresAt ? new Date(product?.discountExpiresAt) : null
       }}
       onSubmit={handleEditProduct}
     />

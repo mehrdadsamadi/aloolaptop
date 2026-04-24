@@ -263,7 +263,7 @@ export default function ProductForm({ initialValues, onSubmit, isEdit }: Props) 
                 </Field>
               )}
             />
-            {/* TODO: موقع ویرایش وقتی تاریخ انقضا داشته باشد و تغییرش ندیم ، خطا میده */}
+            
             <Controller
               name="discountExpiresAt"
               control={form.control}
