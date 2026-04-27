@@ -37,6 +37,12 @@ export async function getProductById(productId: string) {
   return res.json()
 }
 
+export async function getProductBySlug(productSlug: string) {
+  const res = await apiFetch(ENDPOINTS.PRODUCTS.GET_BY_SLUG(productSlug), { method: 'GET' })
+
+  return res.json()
+}
+
 export async function updateProduct(productId: string, data: ProductFormValues) {
   const res = await apiFetch(ENDPOINTS.PRODUCTS.UPDATE_BY_ID(productId), { method: 'PATCH', body: JSON.stringify(data) })
 

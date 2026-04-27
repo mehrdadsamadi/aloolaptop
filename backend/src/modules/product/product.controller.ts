@@ -7,15 +7,12 @@ import {
   Patch,
   Post,
   Query,
-  UploadedFiles,
-  UseInterceptors,
 } from '@nestjs/common';
 import { ApiConsumes, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { ProductService } from './product.service';
 import { CanAccess } from '../../common/decorators/role.decorator';
 import { Roles } from '../../common/enums/role.enum';
 import { SwaggerConsumes } from '../../common/enums/swagger-consumes.enum';
-import { uploadFileFieldsS3 } from '../../common/interceptors/upload-file.interceptor';
 import { EXAMPLE_PRODUCT } from './examples/product.example';
 import { CreateProductDto } from './dto/create-product.dto';
 import { AuthDecorator } from '../../common/decorators/auth.decorator';
@@ -87,6 +84,12 @@ export class ProductController {
   @SkipAuth()
   findOne(@Param('id') id: string) {
     return this.productService.findById(id);
+  }
+
+  @Get('by-slug/:slug')
+  @SkipAuth()
+  findOneBySlug(@Param('slug') slug: string) {
+    return this.productService.findBySlug(slug);
   }
 
   @Patch(':id')

@@ -88,6 +88,7 @@ export class CartService {
       cart.items.push({
         productId: product._id,
         name: product.name,
+        slug: product.slug,
         image: product.images[0].url,
         unitPrice: product.price,
         discountPercent: product.discountPercent,

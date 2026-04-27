@@ -25,8 +25,11 @@ const vazir = localFont({
 })
 
 export const metadata: Metadata = {
-  title: 'الو لپتاپ',
-  description: 'خرید لپتاپ های دسته دوم و نو',
+  title: {
+    template: '%s | الو لپ‌تاپ‌',
+    default: 'الو لپ‌تاپ‌'
+  },
+  description: 'خرید لپ‌تاپ‌ های دسته دوم و نو',
 }
 
 export default function RootLayout({

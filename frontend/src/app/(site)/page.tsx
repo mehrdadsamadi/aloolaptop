@@ -27,7 +27,7 @@ export default async function HomePage() {
                 size={'lg'}
                 className={'bg-primary-text rounded-2xl px-9'}
               >
-                لپت تاپ ها
+                لپ‌تاپ‌ ها
               </Button>
               <Button
                 size={'lg'}
@@ -65,7 +65,7 @@ export default async function HomePage() {
                 size={'lg'}
                 className={'bg-primary-text rounded-2xl px-9'}
               >
-                لپت تاپ ها
+                لپ‌تاپ‌ ها
               </Button>
               <Button
                 size={'lg'}
@@ -108,7 +108,7 @@ export default async function HomePage() {
                 size={'lg'}
                 className={'bg-primary-text rounded-2xl px-9'}
               >
-                لپت تاپ ها
+                لپ‌تاپ‌ ها
               </Button>
               <Button
                 size={'lg'}

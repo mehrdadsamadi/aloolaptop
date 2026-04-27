@@ -155,6 +155,15 @@ export class ProductService {
     return product;
   }
 
+  async findBySlug(slug: string) {
+    const product = await this.productModel
+      .findOne({ slug })
+      .populate({ path: 'categoryId', select: '_id name slug' });
+    if (!product) throw new NotFoundException(ProductMessage.Notfound);
+
+    return product;
+  }
+
   async update(id: string, updateDto: UpdateProductDto) {
     await this.findById(id);
 

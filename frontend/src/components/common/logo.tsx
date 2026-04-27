@@ -13,7 +13,7 @@ export default function Logo() {
         width={54}
         height={500}
       />
-      <p className={'font-bold text-2xl pt-1'}>الو لپ تاپ</p>
+      <p className={'font-bold text-2xl pt-1'}>الو لپ‌تاپ‌</p>
     </Link>
   )
 }

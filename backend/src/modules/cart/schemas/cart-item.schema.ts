@@ -9,6 +9,9 @@ export class CartItem {
   @Prop({ required: true })
   name: string;
 
+  @Prop({ required: true, unique: true, lowercase: true, trim: true })
+  slug: string;
+
   @Prop()
   image: string;
 

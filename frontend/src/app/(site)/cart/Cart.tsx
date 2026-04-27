@@ -16,10 +16,12 @@ import { useLoading } from '@/hooks/useLoading'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useConfirm } from '@/hooks/useConfirm'
 import LinkButton from '@/components/common/linkButton'
+import Link from 'next/link'
 
 interface CartItem {
   productId: string
   name: string
+  slug: string
   image: string
   unitPrice: number
   discountPercent: number
@@ -253,7 +255,10 @@ export default function Cart() {
                 <CardContent className="p-6">
                   <div className="flex flex-col sm:flex-row gap-4">
                     {/* تصویر محصول */}
-                    <div className="relative">
+                    <Link
+                      href={`/products/${item?.slug}`}
+                      className="relative"
+                    >
                       <Avatar className="w-24 h-24 rounded-lg border">
                         <AvatarImage
                           src={item.image}
@@ -263,13 +268,18 @@ export default function Cart() {
                         <AvatarFallback className="text-lg">{item.name.charAt(0)}</AvatarFallback>
                       </Avatar>
                       {hasDiscount && <Badge className="absolute -top-2 -right-2 bg-red-500">%{item.discountPercent}</Badge>}
-                    </div>
+                    </Link>
 
                     {/* اطلاعات محصول */}
                     <div className="flex-1">
                       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-4">
                         <div className="flex-1">
-                          <h3 className="font-semibold text-lg mb-1 line-clamp-2">{item.name}</h3>
+                          <Link
+                            href={`/products/${item?.slug}`}
+                            className="font-semibold text-lg mb-1 line-clamp-2"
+                          >
+                            {item.name}
+                          </Link>
                           <div className="flex items-center gap-2">
                             <Badge variant={isOutOfStock ? 'destructive' : isLowStock ? 'default' : 'secondary'}>
                               {isOutOfStock ? 'ناموجود' : isLowStock ? `تنها ${stock} عدد باقی مانده` : 'موجود'}

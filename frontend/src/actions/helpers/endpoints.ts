@@ -29,6 +29,7 @@ export const ENDPOINTS = {
     DELETE: (productId: string) => `/api/products/${productId}`,
     DELETE_IMAGE: (productId: string, imageKey: string) => `/api/products/${productId}/image?imageKey=${imageKey}`,
     GET_BY_ID: (productId: string) => `/api/products/${productId}`,
+    GET_BY_SLUG: (productSlug: string) => `/api/products/by-slug/${productSlug}`,
     CREATE: '/api/products',
     UPDATE_BY_ID: (productId: string) => `/api/products/${productId}`,
     LATEST: (limit: number) => `/api/products/latest?limit=${limit}`,

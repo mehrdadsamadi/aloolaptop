@@ -26,6 +26,7 @@ export interface CategoryId {
   _id: string
   name: string
   id: string
+  slug?: string
 }
 
 export interface Attribute {
