@@ -18,6 +18,7 @@ import { EXAMPLE_REVIEW } from '../examples/review.example';
 import { CreateReviewDto, UpdateReviewDto } from '../dto/user-review.dto';
 import { CanAccess } from '../../../common/decorators/role.decorator';
 import { Roles } from '../../../common/enums/role.enum';
+import { SkipAuth } from 'src/common/decorators/skip-auth.decorator';
 
 @Controller('reviews')
 @ApiTags('Reviews')
@@ -39,16 +40,26 @@ export class ReviewController {
     return this.reviewService.findAll(paginationDto);
   }
 
+  @Get('visitor')
+  @Pagination()
+  listVisitor(@Query() paginationDto: PaginationDto) {
+    return this.reviewService.listVisitor(paginationDto);
+  }
+
   @Get(':id')
   @CanAccess(Roles.ADMIN)
   findOne(@Param('id') id: string) {
     return this.reviewService.findOne(id);
   }
 
-  @Get('visitor')
+  @Get('product/:productId')
   @Pagination()
-  listVisitor(@Query() paginationDto: PaginationDto) {
-    return this.reviewService.listVisitor(paginationDto);
+  @SkipAuth()
+  listProductReviews(
+    @Query() paginationDto: PaginationDto,
+    @Param('productId') productId: string,
+  ) {
+    return this.reviewService.listProductReviews(paginationDto, productId);
   }
 
   @Get(':id/visitor')

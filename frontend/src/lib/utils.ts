@@ -10,7 +10,7 @@ export function cn(...inputs: ClassValue[]) {
 export const convertFaToEn = (str: string) => str.replace(/[۰-۹]/g, (d) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)))
 
 export const getFullName = (profile: Profile | null) => {
-  if (profile?.firstName === undefined) return ''
+  if (profile?.firstName === undefined) return 'کاربر'
 
   return profile?.firstName + ' ' + profile?.lastName
 }

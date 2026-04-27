@@ -63,6 +63,8 @@ export const ENDPOINTS = {
   REVIEWS: {
     LIST: ({ page = 1, limit = 20 }: PaginationQuery) => `/api/reviews?page=${page}&limit=${limit}`,
     CHANGE_VISIBILITY: (reviewId: string) => `/api/reviews/${reviewId}/change-visibility`,
+    CREATE: '/api/reviews',
+    LIST_PRODUCT_REVIEWS: (productId: string, { page = 1, limit = 20 }: PaginationQuery) => `/api/reviews/product/${productId}?page=${page}&limit=${limit}`,
   },
   STATISTICS: {
     USERS: '/api/statistics/users',

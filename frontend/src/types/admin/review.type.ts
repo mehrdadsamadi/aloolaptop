@@ -14,7 +14,7 @@ export interface IReview {
 export interface UserId {
   _id: string
   profile: Profile
-  mobile: string
+  mobile?: string
   id: string
 }
 

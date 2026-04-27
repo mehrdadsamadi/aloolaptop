@@ -30,7 +30,7 @@ import {
   ChevronRight,
 } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { IImageArchive } from '@/types/admin/imageArchive.type'
+import ProductReviews from './_components/ProductReviews'
 
 interface ProductDetailsClientProps {
   product: IProduct
@@ -405,15 +405,7 @@ export default function ProductDetailsClient({ product }: ProductDetailsClientPr
             value="reviews"
             className="mt-6"
           >
-            <div className="text-center py-12 rounded-lg bg-gray-50">
-              <p className="text-muted-foreground">هنوز نظری ثبت نشده است</p>
-              <Button
-                variant="outline"
-                className="mt-4"
-              >
-                ثبت اولین نظر
-              </Button>
-            </div>
+            <ProductReviews productId={product._id} />
           </TabsContent>
         </Tabs>
       </div>

@@ -64,45 +64,31 @@ export class ReviewService {
         { path: 'productId', select: 'name images rate' },
       ]);
 
-    // const reviews = await this.reviewModel
-    //   .aggregate([
-    //     { $sort: { createdAt: -1 } },
-    //     { $skip: skip },
-    //     { $limit: limit },
-    //
-    //     // Join product → مشابه populate
-    //     {
-    //       $lookup: {
-    //         from: 'products',
-    //         localField: 'productId',
-    //         foreignField: '_id',
-    //         as: 'product',
-    //       },
-    //     },
-    //
-    //     // فقط یکی بگیر چون محصول یک دونه است
-    //     { $unwind: '$product' },
-    //
-    //     // فقط اطلاعات لازم محصول را برگردان
-    //     {
-    //       $project: {
-    //         userId: 1,
-    //         productId: 1,
-    //         rating: 1,
-    //         comment: 1,
-    //         isVisible: 1,
-    //         createdAt: 1,
-    //         updatedAt: 1,
-    //
-    //         product: {
-    //           _id: '$product._id',
-    //           name: '$product.name',
-    //           image: { $arrayElemAt: ['$product.images', 0] }, // عکس اول
-    //         },
-    //       },
-    //     },
-    //   ])
-    //   .exec();
+    return {
+      reviews,
+      pagination: paginationGenerator(count, page, limit),
+    };
+  }
+
+  async listProductReviews(paginationDto: PaginationDto, productId: string) {
+    const { page, limit, skip } = paginationSolver(paginationDto);
+
+    const count = await this.reviewModel.countDocuments({
+      productId: new Types.ObjectId(productId),
+      isVisible: true,
+    });
+
+    const reviews = await this.reviewModel
+      .find({ productId: new Types.ObjectId(productId), isVisible: true })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate([
+        {
+          path: 'userId',
+          select: 'profile.firstName profile.lastName profile.avatar',
+        },
+      ]);
 
     return {
       reviews,
@@ -129,47 +115,6 @@ export class ReviewService {
         },
         { path: 'productId', select: 'name images rate' },
       ]);
-
-    // const reviews = await this.reviewModel
-    //   .aggregate([
-    //     { $match: { userId } },
-    //     { $sort: { createdAt: -1 } },
-    //     { $skip: skip },
-    //     { $limit: limit },
-    //
-    //     // Join product → مشابه populate
-    //     {
-    //       $lookup: {
-    //         from: 'products',
-    //         localField: 'productId',
-    //         foreignField: '_id',
-    //         as: 'product',
-    //       },
-    //     },
-    //
-    //     // فقط یکی بگیر چون محصول یک دونه است
-    //     { $unwind: '$product' },
-    //
-    //     // فقط اطلاعات لازم محصول را برگردان
-    //     {
-    //       $project: {
-    //         userId: 1,
-    //         productId: 1,
-    //         rating: 1,
-    //         comment: 1,
-    //         isVisible: 1,
-    //         createdAt: 1,
-    //         updatedAt: 1,
-    //
-    //         product: {
-    //           _id: '$product._id',
-    //           name: '$product.name',
-    //           image: { $arrayElemAt: ['$product.images', 0] }, // عکس اول
-    //         },
-    //       },
-    //     },
-    //   ])
-    //   .exec();
 
     return {
       reviews,
@@ -265,24 +210,6 @@ export class ReviewService {
       throw new NotFoundException(UserReviewMessage.Notfound);
 
     return review[0]; // چون aggregate آرایه برمی‌گرداند
-  }
-
-  async getReviewsByProduct(productId: string, paginationDto: PaginationDto) {
-    const { page, limit, skip } = paginationSolver(paginationDto);
-
-    const count = await this.reviewModel.countDocuments();
-
-    const reviews = await this.reviewModel
-      .find({ productId, isVisible: true })
-      .populate('userId', 'profile.firstName profile.lastName avatar')
-      .skip(skip)
-      .limit(limit)
-      .sort({ createdAt: -1 });
-
-    return {
-      reviews,
-      pagination: paginationGenerator(count, page, limit),
-    };
   }
 
   async update(reviewId: string, updateReviewDto: UpdateReviewDto) {
