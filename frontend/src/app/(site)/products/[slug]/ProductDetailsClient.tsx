@@ -184,7 +184,7 @@ export default function ProductDetailsClient({ product }: ProductDetailsClientPr
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <span>دسته‌بندی:</span>
                 <Link
-                  href={`/categories/${product.categoryId?.slug}`}
+                  href={`/products/search?category=${product.categoryId?.slug}`}
                   className="text-primary hover:underline"
                 >
                   {product.categoryId.name}

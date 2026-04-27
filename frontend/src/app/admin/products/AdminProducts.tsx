@@ -179,10 +179,12 @@ export default function AdminProducts() {
   ]
 
   const productList = async () => {
-    const res = await getProductsList({
-      page,
-      limit,
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
     })
+
+    const res = await getProductsList(queryParams.toString())
 
     setProducts(res.products)
 

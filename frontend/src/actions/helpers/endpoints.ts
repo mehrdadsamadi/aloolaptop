@@ -25,7 +25,7 @@ export const ENDPOINTS = {
     UPDATE_BY_ID: (categoryId: string) => `/api/categories/${categoryId}`,
   },
   PRODUCTS: {
-    LIST: ({ page = 1, limit = 20 }: PaginationQuery) => `/api/products?page=${page}&limit=${limit}`,
+    LIST: (queryParams: string) => `/api/products?${queryParams}`,
     DELETE: (productId: string) => `/api/products/${productId}`,
     DELETE_IMAGE: (productId: string, imageKey: string) => `/api/products/${productId}/image?imageKey=${imageKey}`,
     GET_BY_ID: (productId: string) => `/api/products/${productId}`,

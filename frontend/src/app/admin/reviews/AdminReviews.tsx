@@ -56,7 +56,7 @@ export default function AdminReviews() {
             <p>{row.original?.productId?.name}</p>
             <div className={'flex items-center gap-1'}>
               <StarIcon className={'size-5 text-yellow-500 pb-1'} />
-              <p className={'text-xs'}>{row.original?.productId?.rate}</p>
+              <p className={'text-xs'}>{row.original?.productId?.rate.toFixed(1)}</p>
             </div>
           </div>
         </div>

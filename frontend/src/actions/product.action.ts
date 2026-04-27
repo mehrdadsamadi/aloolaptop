@@ -5,10 +5,8 @@ import { apiFetch } from '@/actions/helpers/fetchClient'
 import { ENDPOINTS } from '@/actions/helpers/endpoints'
 import { ProductFormValues } from '@/validators/product.validator'
 
-export async function getProductsList(pagination: IPagination) {
-  const { page = 1, limit = 20 } = pagination
-
-  const res = await apiFetch(ENDPOINTS.PRODUCTS.LIST({ page, limit }), { method: 'GET' })
+export async function getProductsList(queryParams: string) {
+  const res = await apiFetch(ENDPOINTS.PRODUCTS.LIST(queryParams), { method: 'GET' })
 
   return res.json()
 }
